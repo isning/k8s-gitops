@@ -1,0 +1,17 @@
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "default-internal-ipv6-pool"
+spec:
+  blocks:
+  - cidr: "192.168.3.0/24"
+
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "default-public-ipv6-pool"
+spec:
+  blocks:
+  - cidr: "2409:8a04:a010:e550:caf0:::0/112"
