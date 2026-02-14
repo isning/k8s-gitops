@@ -6,7 +6,8 @@ metadata:
   name: kiali
   namespace: flux-system
 spec:
+  type: oci
   interval: 12h
-  url: https://kiali.org/helm-charts
+  url: oci://ghcr.io/isning/charts-mirror
 
 
