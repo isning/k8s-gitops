@@ -11,7 +11,11 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: oci://quay.io/cilium/charts/cilium
+      chart: cilium
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: flux-system
       interval: 12h
       version: "1.19.*"
   # https://github.com/cilium/cilium/tree/v1.19.0/install/kubernetes/cilium
