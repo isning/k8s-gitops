@@ -4,6 +4,7 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: "default-internal-ipv6-pool"
 spec:
+  allowFirstLastIPs: No
   blocks:
   - cidr: "192.168.3.0/24"
 
@@ -13,5 +14,6 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: "default-public-ipv6-pool"
 spec:
+  allowFirstLastIPs: No
   blocks:
   - cidr: "2409:8a04:a010:e550:caf0::0/112"
