@@ -16,7 +16,7 @@ resources:
   # ========================================
   # Install Cluster Network Addons Operator
   # ========================================
-  - ./cluster-network-addons-operator
+  - ./cluster-network-addons-config
 
 patches:
   # We have create the those namespace in ./infra/namespaces,
