@@ -18,7 +18,6 @@ resources:
   # ========================================
   - ./cluster-network-addons-operator-v0.101.2.yaml
   - ./cluster-network-addons-config.crd-v0.101.2.yaml
-  - ./cnao-patch
 
 patches:
   # We have create the those namespace in ./infra/namespaces,
