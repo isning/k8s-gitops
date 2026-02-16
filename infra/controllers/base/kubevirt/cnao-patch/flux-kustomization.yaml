@@ -9,11 +9,9 @@ spec:
   retryInterval: 10s
   dependsOn:
     - name: infra-controllers
-      namespace: flux-system
   sourceRef:
     kind: GitRepository
     name: flux-system
-    namespace: flux-system
   path: ./overlay
   prune: true
   wait: true
