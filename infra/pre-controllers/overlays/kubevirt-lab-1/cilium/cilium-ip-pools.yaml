@@ -2,7 +2,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumLoadBalancerIPPool
 metadata:
-  name: "default-internal-ipv6-pool"
+  name: "default-internal-ipv4-pool"
 spec:
   allowFirstLastIPs: No
   blocks:
