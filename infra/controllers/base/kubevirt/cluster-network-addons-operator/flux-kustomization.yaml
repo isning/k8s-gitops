@@ -11,7 +11,7 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./overlay
+  path: ./infra/controllers/base/kubevirt/cluster-network-addons-operator/overlay
   prune: true
   wait: true
   timeout: 1m
@@ -31,7 +31,7 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./patch-overlay
+  path: ./infra/controllers/base/kubevirt/cluster-network-addons-operator/patch-overlay
   prune: true
   wait: true
   timeout: 1m
