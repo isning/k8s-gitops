@@ -5,7 +5,6 @@ resources:
   # deploy monitoring stack first
   - ../../base/victoria-metrics/
   - ../../base/cert-manager/
-  - ../../base/kong-gateway/
   - ../../base/kubevirt/
   # - ../../base/longhorn/ # longhorn is buggy on my 3-nodes homelab, remove it.
 

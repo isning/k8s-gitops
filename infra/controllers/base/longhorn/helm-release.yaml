@@ -39,5 +39,5 @@ spec:
       snapshotMaxCount: 2
     ingress:
       enabled: true
-      ingressClassName: kong
+      ingressClassName: istio
       host: longhorn.isning.moe
