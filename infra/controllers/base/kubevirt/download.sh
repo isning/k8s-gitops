@@ -31,3 +31,5 @@ echo "The latest Cluster Network Addons Operator's version is $CNAO_VERSION"
 # curl -Lo cluster-network-addons-namespace-${CNAO_VERSION}.yaml https://github.com/kubevirt/cluster-network-addons-operator/releases/download/${CNAO_VERSION}/namespace.yaml
 curl -Lo cluster-network-addons-config.crd-${CNAO_VERSION}.yaml https://github.com/kubevirt/cluster-network-addons-operator/releases/download/${CNAO_VERSION}/network-addons-config.crd.yaml
 curl -Lo cluster-network-addons-operator-${CNAO_VERSION}.yaml https://github.com/kubevirt/cluster-network-addons-operator/releases/download/${CNAO_VERSION}/operator.yaml
+
+curl -Lo cluster-network-addons-operator-multus-dynamic-networks-controller-${CNAO_VERSION}.yaml https://github.com/kubevirt/cluster-network-addons-operator/raw/refs/tags/${CNAO_VERSION}/data/multus-dynamic-networks-controller/000-controller.yaml

@@ -1,13 +1,14 @@
 CNAO hardcoded cri socket path to /run/crio/crio.sock,
-but in k3s, the cri socket path is /run/k3s/containerd/containerd.sock,
+but for k3s, the cri socket path is /run/k3s/containerd/containerd.sock,
 so we need to patch the dynamic-networks-controller-ds to change the cri socket path.
 
 Since the dynamic-networks-controller-ds is managed by cluster-network-addons-operator,
-we cannot directly patch the ds, we need to create a kustomization to patch the ds,
-and then create a flux kustomization to apply the patch, making use of flux's retry
-mechanism to ensure the patch is applied after the cluster-network-addons-operator creates the ds.
+we cannot directly patch the ds, so manually instll the multus-dynamic-networks-controller,
+and then patch the ds to change the cri socket path.
 
-Without this patch, the dynamic-networks-controller failed to start with the error:
+https://github.com/kubevirt/cluster-network-addons-operator/issues/1846
+
+Without the patch, the dynamic-networks-controller failed to start with the error:
 ```
 ~: kubectl describe pod dynamic-networks-controller-ds-gnn42 -n cluster-network-addons
 Name:             dynamic-networks-controller-ds-gnn42
