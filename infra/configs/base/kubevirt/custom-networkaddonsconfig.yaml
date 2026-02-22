@@ -12,4 +12,5 @@ spec:
   # macvtap: {}
   ovs: {} # openvswitch cni plugin
   multus: {} # required by ovs-cni
-  multusDynamicNetworks: {}
+  # Manually installed and patched along with the cluster-network-addons-operator
+  #multusDynamicNetworks: {}
