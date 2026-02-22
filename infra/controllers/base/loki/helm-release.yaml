@@ -244,7 +244,7 @@ spec:
           http_config:
             insecure_skip_verify: false # skip verifying the certificate chain and hostname.
             ca_file: /data/ca-certs/ca.crt
-          endpoint: https://minio.writefor.fun
+          endpoint: https://minio.isning.moe
           # Encrypt Command:
           #  sops --encrypt --age=${AGE_RECIPIENT}   --encrypted-regex 'Key' --in-place ./infra/controllers/overlays/k3s-test-1/helmrelease-loki.yaml
           #

@@ -58,7 +58,7 @@ spec:
       is_core: true
       query_scope:
         cluster: "k3s-test-1"
-      url: "https://prometheus.writefor.fun"
+      url: "https://prometheus.isning.moe"
     # [Optional] Kiali will query Grafana and try to fetch the configured Istio dashboards.
     # For this reason Kiali must be able to reach Grafana, authenticate, and find the Istio dashboards.
     # https://kiali.io/docs/configuration/p8s-jaeger-grafana/grafana/
@@ -68,7 +68,7 @@ spec:
         insecure_skip_verify: false
       enabled: false
       is_core: false
-      url: "https://grafana.writefor.fun"
+      url: "https://grafana.isning.moe"
     # [Optional] Jaeger is a highly recommended service because Kiali uses distributed tracing data for
     # several features, providing an enhanced experience.
     tracing:

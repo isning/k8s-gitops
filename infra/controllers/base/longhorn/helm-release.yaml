@@ -40,4 +40,4 @@ spec:
     ingress:
       enabled: true
       ingressClassName: kong
-      host: longhorn.writefor.fun
+      host: longhorn.isning.moe

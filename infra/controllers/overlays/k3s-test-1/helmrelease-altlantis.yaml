@@ -6,7 +6,7 @@ spec:
     # -- An option to override the atlantis url,
     # if not using an ingress, set it to the external IP.
     # Check values.yaml for examples.
-    atlantisUrl: "https://atlantis.writefor.fun"
+    atlantisUrl: "https://atlantis.isning.moe"
 
     orgAllowlist: "github.com/ryan4yin/infra-gitops"
 

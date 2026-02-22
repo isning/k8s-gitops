@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: istio-default
       namespace: istio-ingress
-  hostnames: ["test1-vmagent.writefor.fun"]
+  hostnames: ["test1-vmagent.isning.moe"]
   rules:
     - matches:
         - path:
