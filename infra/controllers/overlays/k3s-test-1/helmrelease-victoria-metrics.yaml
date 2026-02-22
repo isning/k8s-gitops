@@ -12,4 +12,4 @@ spec:
           env: test
       ingress:
         hosts:
-          - test1-vmagent.writefor.fun
+          - test1-vmagent.isning.moe

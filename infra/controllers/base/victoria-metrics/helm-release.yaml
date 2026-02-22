@@ -53,7 +53,7 @@ spec:
       spec:
         # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
         remoteWrite:
-        - url: https://prometheus.writefor.fun/api/v1/write
+        - url: https://prometheus.isning.moe/api/v1/write
           tlsConfig:
             caFile: /data/ca-certs/ca.crt
         selectAllByDefault: true
