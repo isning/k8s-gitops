@@ -8,7 +8,7 @@ metadata:
 spec:
   type: oci
   interval: 12h
-  url: oci://gcr.io/istio-release/charts
+  url: oci://gcr.nju.edu.cn/istio-release/charts
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
