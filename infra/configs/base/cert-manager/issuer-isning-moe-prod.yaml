@@ -19,15 +19,13 @@ spec:
       # certificates for any/all domains managed using your previous account,
       # but you will be unable to revoke any certificates generated using that
       # previous account.
-      name: issuer-account-key-letsencrypt-prod
-      namespace: prod
+      name: issuer-account-key-letsencrypt
     solvers:
     - dns01:
         cloudflare:
           apiTokenSecretRef:
             name: cloudflare-dns-01-secret
             key: api-token
-            namespace: cert-manager
       selector:
         dnsZones:
         - 'isning.moe'
