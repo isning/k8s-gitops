@@ -5,6 +5,8 @@ resources:
   # deploy monitoring stack first
   - ../../base/victoria-metrics/
   - ../../base/cert-manager/
+  - ../../base/gateway-api/
+  - ../../base/istio/
   - ../../base/kubevirt/
 
 patches:
