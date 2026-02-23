@@ -36,7 +36,14 @@ spec:
         kinds:
           - kind: HTTPRoute
         namespaces:
-          from: All
+          from: Selector
+          selector:
+            matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values:
+              - prod
+              - staging
   allowedListeners:
     namespaces:
       from: Selector
