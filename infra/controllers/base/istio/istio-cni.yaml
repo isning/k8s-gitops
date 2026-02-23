@@ -23,4 +23,4 @@ spec:
     global:
       platform: k3s
       # In order to use native nftable rules instead of iptable rules, set this flag to true.
-      nativeNftables: true
+      nativeNftables: false
