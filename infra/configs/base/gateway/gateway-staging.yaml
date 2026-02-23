@@ -20,11 +20,11 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "*.isning.moe"
+      hostname: "*.staging.isning.moe"
       tls:
         mode: Terminate
         certificateRefs:
-          - name: infra-gateway-wildcard-isning-moe-tls
+          - name: infra-gateway-wildcard-staging-isning-moe-tls
       allowedRoutes:
         kinds:
           - kind: HTTPRoute
