@@ -5,7 +5,16 @@ metadata:
   namespace: prod
 spec:
   gatewayClassName: istio
-  listeners: []
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "*.isning.moe"
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+        namespaces:
+          from: Same
   allowedListeners:
     namespaces:
       from: Same # = same namespace
