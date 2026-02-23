@@ -7,4 +7,5 @@ spec:
   gatewayClassName: istio
   listeners: []
   allowedListeners:
-  - from: Same # = same namespace
+    namespaces:
+      from: Same # = same namespace
