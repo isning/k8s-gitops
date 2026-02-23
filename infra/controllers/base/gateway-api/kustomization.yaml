@@ -3,5 +3,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # Use experimental install for XListenerSet.
-  # 477d172=v1.4.1 Short hash is not supported by kustomize, so use the full hash.
-  - github.com/kubernetes-sigs/gateway-api//config/crd/experimental?ref=477d172e6ac5eccb82b65781ddb8f924afec4170
+  - github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v1.4.1
