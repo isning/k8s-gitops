@@ -7,7 +7,6 @@ resources:
   - ./istiod.yaml
   - ./ztunnel.yaml
   - ./cilium-allow-ambient.yaml
-  - ./istio-telemetry.yaml
 
 patches:
   # set the version of all the istio components
