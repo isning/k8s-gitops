@@ -39,3 +39,12 @@ spec:
         limits:
           cpu: 100m
           memory: 128Mi
+    # Enable dual-stack for ambient mode: https://github.com/istio/istio/discussions/57723
+    pilot:
+      env:
+        ISTIO_DUAL_STACK: "true"
+    meshConfig:
+      defaultConfig:
+        proxyMetadata:
+          ISTIO_DUAL_STACK: "true"
+    ipFamilyPolicy: PreferDualStack
