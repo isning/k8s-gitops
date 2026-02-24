@@ -29,7 +29,7 @@ spec:
         kinds:
           - kind: HTTPRoute
         namespaces:
-          from: All
+          from: Same
   allowedListeners:
     namespaces:
       from: Same # = same namespace
