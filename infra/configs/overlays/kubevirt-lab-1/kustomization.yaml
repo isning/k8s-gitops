@@ -14,3 +14,13 @@ patches:
       name: infra-gateway
       namespace: kube-system
     path: ./gateway-infra-patch.yaml
+  - target:
+      group: gateway.networking.x-k8s.io
+      kind: XListenerSet
+      name: http-listener-set
+    path: ./gateway-infra-http-listener-set-patch.yaml
+  - target:
+      group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: tls-redirect
+    path: ./gateway-infra-tls-redirect-patch.yaml
