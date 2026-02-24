@@ -14,21 +14,21 @@ subjects:
       # MUST be patched
       fqdn: "*.clustername.isning.moe"
       protocol: https
-      target: https://infra-gateway-istio.kube-system.svc.cluster.local:443
+      target: https://infra-gateway-istio.kube-system.svc.cluster.local:8080
       caPool: ""
       noTlsVerify: false
   - name: wildcard
     spec:
       fqdn: "*.isning.moe"
       protocol: https
-      target: https://default-gateway-istio.prod.svc.cluster.local:443
+      target: https://default-gateway-istio.prod.svc.cluster.local:8080
       caPool: ""
       noTlsVerify: false
   - name: wildcard-staging
     spec:
       fqdn: "*.staging.isning.moe"
       protocol: https
-      target: https://default-gateway-istio.staging.svc.cluster.local:443
+      target: https://default-gateway-istio.staging.svc.cluster.local:8080
       caPool: ""
       noTlsVerify: false
 tunnelRef:
