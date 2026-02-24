@@ -35,6 +35,7 @@ spec:
     namespaces:
       from: Same # = same namespace
 ---
+# FIXME: Istio does not support XListenerSet yet, left it as is for future use when it supports, 80 port is not working for now, always use 443
 # Move HTTP listener out of gateway to avoid auto attaching HTTPRoute to it to ensure the redirect HTTPRoute is selected
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
