@@ -5,8 +5,8 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-    - name: istio-default
-      namespace: istio-ingress
+    - name: infra-gateway
+      namespace: kube-system
   hostnames: ["loki-gateway.isning.moe"]
   rules:
     - matches:
