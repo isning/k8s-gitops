@@ -9,11 +9,12 @@ metadata:
   namespace: cloudflare-operator-system
 subjects:
   # Explicitly define all specs properties, workaround for https://github.com/adyanth/cloudflare-operator/issues/111
-  - name: wildcard-staging
+  - name: wildcard-infra
     spec:
-      fqdn: "*.staging.isning.moe"
+      # MUST be patched
+      fqdn: "*.clustername.isning.moe"
       protocol: https
-      target: https://default-gateway-istio.staging.svc.cluster.local:443
+      target: https://infra-gateway-istio.kube-system.svc.cluster.local:443
       caPool: ""
       noTlsVerify: false
   - name: wildcard
@@ -23,12 +24,11 @@ subjects:
       target: https://default-gateway-istio.prod.svc.cluster.local:443
       caPool: ""
       noTlsVerify: false
-  - name: wildcard-infra
+  - name: wildcard-staging
     spec:
-      # MUST be patched
-      fqdn: "*.clustername.isning.moe"
+      fqdn: "*.staging.isning.moe"
       protocol: https
-      target: https://infra-gateway-istio.kube-system.svc.cluster.local:443
+      target: https://default-gateway-istio.staging.svc.cluster.local:443
       caPool: ""
       noTlsVerify: false
 tunnelRef:
