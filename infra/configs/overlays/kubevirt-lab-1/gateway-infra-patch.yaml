@@ -1,0 +1,9 @@
+kind: will-be-ignored
+metadata:
+  name: will-be-ignored
+spec:
+  listeners:
+    - name: http
+      hostname: "*.kubevirt-lab-1.isning.moe"
+    - name: https
+      hostname: "*.kubevirt-lab-1.isning.moe"
