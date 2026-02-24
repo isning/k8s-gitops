@@ -22,7 +22,6 @@ spec:
             - key: kubernetes.io/metadata.name
               operator: NotIn
               values:
-              - prod
               - staging
     - name: https
       protocol: HTTPS
@@ -42,7 +41,6 @@ spec:
             - key: kubernetes.io/metadata.name
               operator: NotIn
               values:
-              - prod
               - staging
   allowedListeners:
     namespaces:
@@ -52,5 +50,4 @@ spec:
         - key: kubernetes.io/metadata.name
           operator: NotIn
           values:
-          - prod
           - staging
