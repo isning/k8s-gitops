@@ -24,7 +24,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: infra-gateway-wildcard-staging-isning-moe-tls
+          - name: staging-gateway-wildcard-staging-isning-moe-tls
       allowedRoutes:
         kinds:
           - kind: HTTPRoute
