@@ -63,9 +63,8 @@ metadata:
   name: http-listener-set
   namespace: kube-system
 spec:
-  parentRefs:
-    - name: infra-gateway
-      namespace: kube-system
+  parentRef:
+    name: infra-gateway
   listeners:
     - name: http-raw
       protocol: HTTP
@@ -93,7 +92,6 @@ metadata:
 spec:
   parentRefs:
   - name: infra-gateway
-    namespace: kube-system
     sectionName: http-raw
   hostnames:
   - "*.clustername.isning.moe"

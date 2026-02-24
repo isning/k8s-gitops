@@ -42,9 +42,8 @@ metadata:
   name: http-listener-set
   namespace: staging
 spec:
-  parentRefs:
-    - name: default-gateway
-      namespace: staging
+  parentRef:
+    name: default-gateway
   listeners:
     - name: http-raw
       protocol: HTTP
@@ -65,7 +64,6 @@ metadata:
 spec:
   parentRefs:
   - name: default-gateway
-    namespace: staging
     sectionName: http-raw
   hostnames:
   - "*.staging.isning.moe"
