@@ -11,7 +11,7 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "*.kubevirt-lab-1.isning.moe"
+      hostname: "*.clustername.isning.moe"
       allowedRoutes:
         kinds:
           - kind: HTTPRoute
@@ -27,7 +27,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "*.kubevirt-lab-1.isning.moe"
+      hostname: "*.clustername.isning.moe"
       tls:
         mode: Terminate
         certificateRefs:
