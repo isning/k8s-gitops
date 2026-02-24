@@ -2,7 +2,6 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
 metadata:
   name: grafana
-  namespace: grafana
   labels:
     dashboards: "grafana"
 spec:
@@ -31,8 +30,7 @@ spec:
   httpRoute:
     spec:
       parentRefs:
-        - name: infra-gateway
-          namespace: kube-system
+        - name: default-gateway
       hostnames:
         - grafana.isning.moe
       rules:
