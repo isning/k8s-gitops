@@ -6,7 +6,6 @@ resources:
   - ../../base/kubevirt/
   - ../../base/storageclasses/
   - ../../base/gateway/
-  - ../../base/grafana/
 
 patches:
   - target:
