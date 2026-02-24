@@ -1,0 +1,11 @@
+apiVersion: networking.cfargotunnel.com/v1alpha2
+kind: Tunnel
+metadata:
+  name: default-tunnel
+  namespace: cloudflare-operator-system
+spec:
+  cloudflare:
+    email: isning_sf@outlook.com
+    domain: isning.moe
+    secret: cloudflare-tunnel-secret
+    accountId: 0fa2f8672cf2637118d8cfee9fe6b95f

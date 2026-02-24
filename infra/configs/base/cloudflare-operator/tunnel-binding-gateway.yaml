@@ -1,0 +1,36 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: TunnelBinding
+metadata:
+  # At this time cloudflare-operator does not deterministically sort wildcards to the end of cloudflared's config file.
+  # This is important because cloudflared goes through the list in order, and this ingress being before the authelia ingress
+  # would mean authelia is impossible to reach.
+  # By prefixing with `zz-` we ensure this is the last route in the cloudflared config file
+  name: zz-clustername-gateway
+  namespace: cloudflare-operator-system
+subjects:
+  # Explicitly define all specs properties, workaround for https://github.com/adyanth/cloudflare-operator/issues/111
+  - name: wildcard-staging
+    spec:
+      fqdn: "*.staging.isning.moe"
+      protocol: https
+      target: https://default-gateway-istio.staging.svc.cluster.local:443
+      caPool: ""
+      noTlsVerify: false
+  - name: wildcard
+    spec:
+      fqdn: "*.isning.moe"
+      protocol: https
+      target: https://default-gateway-istio.prod.svc.cluster.local:443
+      caPool: ""
+      noTlsVerify: false
+  - name: wildcard-infra
+    spec:
+      # MUST be patched
+      fqdn: "*.clustername.isning.moe"
+      protocol: https
+      target: https://infra-gateway-istio.kube-system.svc.cluster.local:443
+      caPool: ""
+      noTlsVerify: false
+tunnelRef:
+  kind: Tunnel
+  name: default-tunnel

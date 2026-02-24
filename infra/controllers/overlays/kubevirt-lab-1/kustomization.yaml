@@ -9,6 +9,7 @@ resources:
   - ../../base/gateway-api/
   - ../../base/istio/
   - ../../base/kubevirt/
+  - ../../base/cloudflare-operator/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml
