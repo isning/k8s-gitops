@@ -5,8 +5,8 @@ metadata:
   namespace: kiali-operator
 spec:
   parentRefs:
-    - name: istio-default
-      namespace: istio-ingress
+    - name: infra-gateway
+      namespace: kube-system
   hostnames: ["kiali.isning.moe"]
   rules:
     - matches:
