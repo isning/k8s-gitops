@@ -1,0 +1,7 @@
+kind: will-be-ignored
+metadata:
+  name: will-be-ignored
+subjects:
+  - name: wildcard-infra
+    spec:
+      fqdn: "*.kubevirt-lab-1.isning.moe"

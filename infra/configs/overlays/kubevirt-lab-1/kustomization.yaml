@@ -6,10 +6,11 @@ resources:
   - ../../base/kubevirt/
   - ../../base/storageclasses/
   - ../../base/gateway/
+  - ./cloudflare-operator/
 
 patches:
   - target:
       kind: Gateway
       name: infra-gateway
       namespace: kube-system
-    path: gateway-infra-patch.yaml
+    path: ./gateway-infra-patch.yaml
