@@ -14,6 +14,15 @@ patches:
         path: /spec/dnsNames/0
         value: "*.kubevirt-lab-1.isning.moe"
 
+  - target:
+      kind: Service
+      name: i-reroute
+      namespace: i-reroute
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
+        value: "*.kubevirt-lab-1.isning.moe,*.i.isning.moe,*.i.staging.isning.moe"
+
   - path: ./nginx-subconfig-infra-patch.yaml
     target:
       kind: ConfigMap
