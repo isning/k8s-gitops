@@ -4,7 +4,7 @@ metadata:
   name: i-reroute-nginx-subconfig
   namespace: i-reroute
 data:
-  infra.conf: |
+  02-infra.conf: |
     # Define Upstreams
     upstream upstream_infra_http_backend {
         server infra-gateway-istio.kube-system.svc.cluster.local:80;
@@ -38,8 +38,9 @@ data:
 
     # HTTPS Server (QUIC/H3)
     server {
-        listen 443 quic reuseport;
-        listen 443 ssl http2;
+        listen 443 quic;
+        listen 443 ssl;
+        http2 on;
         server_name ~^(?<subdomain>[^.]+)\.i\.kubevirt-lab-1\.isning\.moe$;
 
         ssl_certificate /etc/nginx/certs/tls.crt;
