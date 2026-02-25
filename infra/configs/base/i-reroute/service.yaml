@@ -4,6 +4,7 @@ metadata:
   name: i-reroute
   annotations:
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false" # Disable Cloudflare proxy for this service
+    external-dns.alpha.kubernetes.io/cloudflare-tags: "Managed by external-dns from i-reroute service"
     # MUST be patched
     external-dns.alpha.kubernetes.io/hostname: "*.i.clustername.isning.moe,*.i.isning.moe,*.i.staging.isning.moe" # Set the desired hostnames for External DNS
 spec:
