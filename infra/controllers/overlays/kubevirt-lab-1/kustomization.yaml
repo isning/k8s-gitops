@@ -10,6 +10,7 @@ resources:
   - ../../base/istio/
   - ../../base/kubevirt/
   - ../../base/cloudflare-operator/
+  - ../../base/external-dns/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml

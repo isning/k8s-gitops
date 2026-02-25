@@ -77,4 +77,9 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: external-dns-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: i-reroute
