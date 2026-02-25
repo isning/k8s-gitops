@@ -4,27 +4,6 @@ kind: Kustomization
 resources:
   - ../../../base/i-reroute/
 
-configMapGenerator:
-- name: env-vars
-  namespace: i-reroute
-  literals:
-    - CLUSTER_NAME=kubevirt-lab-1
-
-replacements:
-  - source:
-      kind: ConfigMap
-      name: env-vars
-      namespace: i-reroute
-      fieldPath: data.CLUSTER_NAME
-    targets:
-      - select:
-          kind: ConfigMap
-          name: i-reroute-nginx-config
-        fieldPaths:
-          - data.nginx\.conf
-        options:
-          delimiter: "{CLUSTERNAME_PLACEHOLDER}"
-
 patches:
   - target:
       kind: Certificate
@@ -34,3 +13,9 @@ patches:
       - op: replace
         path: /spec/dnsNames/0
         value: "*.kubevirt-lab-1.isning.moe"
+
+  - path: ./nginx-subconfig-infra-patch.yaml
+    target:
+      kind: ConfigMap
+      name: i-reroute-nginx-subconfig
+      namespace: i-reroute

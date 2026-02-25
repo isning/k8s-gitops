@@ -39,6 +39,9 @@ spec:
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
           readOnly: true
+        - name: nginx-subconfig
+          mountPath: /etc/nginx/conf.d
+          readOnly: true
         - name: tls-certs
           mountPath: /etc/nginx/certs
           readOnly: true
@@ -46,6 +49,9 @@ spec:
       - name: nginx-config
         configMap:
           name: i-reroute-nginx-config
+      - name: nginx-subconfig
+        configMap:
+          name: i-reroute-nginx-subconfig
       - name: tls-certs
         secret:
           secretName: i-reroute-tls-secret
