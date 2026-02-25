@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../base/i-reroute/
+
+configMapGenerator:
+- name: env-vars
+  literals:
+    - CLUSTER_NAME=kubevirt-lab-1
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: env-vars
+      fieldPath: data.CLUSTER_NAME
+    targets:
+      - select:
+          kind: ConfigMap
+          name: raw-nginx-config
+        fieldPaths:
+          - data.nginx\.conf
+        options:
+          delimiter: "{CLUSTERNAME_PLACEHOLDER}"
+
+patches:
+  - target:
+      kind: Certificate
+      name: i-reroute-tls
+      namespace: i-reroute
+    patch: |-
+      - op: replace
+        path: /spec/dnsNames/0
+        value: "*.kubevirt-lab-1.isning.moe"
