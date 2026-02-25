@@ -4,7 +4,7 @@ metadata:
   name: i-reroute-nginx-subconfig
   namespace: i-reroute
 data:
-  prod.conf: |
+  00-prod.conf: |
     # Define Upstreams
     upstream upstream_prod_http_backend {
         server default-gateway-istio.prod.svc.cluster.local:80;
@@ -67,7 +67,7 @@ data:
             proxy_pass http://upstream_prod_https_backend;
         }
     }
-  staging.conf: |
+  01-staging.conf: |
     # Define Upstreams
     upstream upstream_staging_http_backend {
         server default-gateway-istio.staging.svc.cluster.local:80;
@@ -101,8 +101,9 @@ data:
 
     # HTTPS Server (QUIC/H3)
     server {
-        listen 443 quic reuseport;
-        listen 443 ssl http2;
+        listen 443 quic;
+        listen 443 ssl;
+        http2 on;
         server_name ~^(?<subdomain>[^.]+)\.i\.staging\.isning\.moe$;
 
         ssl_certificate /etc/nginx/certs/tls.crt;
