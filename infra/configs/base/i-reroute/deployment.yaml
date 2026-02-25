@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: i-reroute-proxy
-  namespace: i-reroute
 spec:
   replicas: 1
   selector:
