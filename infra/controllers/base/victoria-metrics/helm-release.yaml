@@ -52,10 +52,10 @@ spec:
       # https://docs.victoriametrics.com/operator/api.html#vmagentspec
       spec:
         # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
-        remoteWrite:
-        - url: https://prometheus.isning.moe/api/v1/write
-          tlsConfig:
-            caFile: /data/ca-certs/ca.crt
+        # remoteWrite:
+        # - url: https://prometheus.isning.moe/api/v1/write
+        #   tlsConfig:
+        #     caFile: /data/ca-certs/ca.crt
         selectAllByDefault: true
         scrapeInterval: 20s
         externalLabels:
@@ -101,7 +101,62 @@ spec:
         enabled: false
         ingressClassName: istio
 
-    # disable this , we use a external vmcluster instead.
+    vmsingle:
+      # Single-node VictoriaMetrics for storing metrics.
+      # https://docs.victoriametrics.com/faq/#which-victoriametrics-type-is-recommended-for-use-in-production---single-node-or-cluster
+      # vmsingle = vmcluster(vmselect + vmstorage + vminsert)
+      enabled: true
+      rententionPeriod: "7d"
+      resources:
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+        requests:
+          cpu: "100m"
+          memory: "64Mi"  
+      storage:
+        accessModes:
+            - ReadWriteOnce
+        resources:
+            requests:
+                storage: 20Gi
+
+    vmalert:
+      # vmalert is a Prometheus-compatible alertmanager
+      enabled: true
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+        requests:
+          cpu: "50m"
+          memory: "64Mi"
+    alertmanager:
+      enabled: true
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+        requests:
+          cpu: "50m"
+          memory: "64Mi"
+    defaultRules:
+      # disable all default vmrules(apply to vmalert)
+      create: true
+
+    # ================================================================
+    # Disabled components
+    # ================================================================
+
+    prometheus-node-exporter:
+      # instead of deploy node-exporter as pods, we do this via nixos module.
+      # At: nix-config/modules/nixos/base/monitoring.nix
+      enabled: false
+
+    # disable this, we use grafana deployed by grafana-operator instead.
+    grafana:
+      enabled: false
+    # disable this, we use a vmsingle instead.
     vmcluster:
       enabled: false
       # -- Full spec for VMCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api#vmclusterspec)
@@ -145,29 +200,3 @@ spec:
           extraArgs:
             maxInsertRequestSize: 32MB # default to 32MB
           resources: {}
-
-    # ================================================================
-    # Disabled components
-    # ================================================================
-
-    prometheus-node-exporter:
-      # instead of deploy node-exporter as pods, we do this via nixos module.
-      enabled: false
-
-    # Since we store metrics in a remote prometheus via remote write,
-    # we don't need to store & query metrics in VictoriaMetrics. so disable all components here.
-    grafana:
-      enabled: false
-    vmalert:
-      # vmalert is a Prometheus-compatible alertmanager
-      enabled: false
-    alertmanager:
-      enabled: false
-    defaultRules:
-      # disable all default vmrules(apply to vmalert)
-      create: false
-    vmsingle:
-      # Single-node VictoriaMetrics for storing metrics.
-      # https://docs.victoriametrics.com/faq/#which-victoriametrics-type-is-recommended-for-use-in-production---single-node-or-cluster
-      # vmsingle = vmcluster(vmselect + vmstorage + vminsert)
-      enabled: false
