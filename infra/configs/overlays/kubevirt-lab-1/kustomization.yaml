@@ -7,6 +7,7 @@ resources:
   - ../../base/storageclasses/
   - ../../base/gateway/
   - ./cloudflare-operator/
+  - ./i-reroute/
 
 patches:
   - target:
