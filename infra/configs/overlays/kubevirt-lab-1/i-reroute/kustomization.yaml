@@ -6,6 +6,7 @@ resources:
 
 configMapGenerator:
 - name: env-vars
+  namespace: i-reroute
   literals:
     - CLUSTER_NAME=kubevirt-lab-1
 
@@ -13,11 +14,12 @@ replacements:
   - source:
       kind: ConfigMap
       name: env-vars
+      namespace: i-reroute
       fieldPath: data.CLUSTER_NAME
     targets:
       - select:
           kind: ConfigMap
-          name: raw-nginx-config
+          name: i-reroute-nginx-config
         fieldPaths:
           - data.nginx\.conf
         options:
