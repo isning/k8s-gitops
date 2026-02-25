@@ -7,3 +7,5 @@ resources:
   - ./cert.yaml
   - ./deployment.yaml
   - ./service.yaml
+
+namespace: i-reroute

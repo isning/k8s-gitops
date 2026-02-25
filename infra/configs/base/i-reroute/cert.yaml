@@ -3,7 +3,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: i-reroute-tls
-  namespace: i-reroute
 spec:
   secretName: i-reroute-tls-secret
   issuerRef:
