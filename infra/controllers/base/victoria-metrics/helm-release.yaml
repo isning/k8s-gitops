@@ -116,10 +116,10 @@ spec:
           memory: "64Mi"  
       storage:
         accessModes:
-            - ReadWriteOnce
+          - ReadWriteOnce
         resources:
-            requests:
-                storage: 20Gi
+          requests:
+            storage: 20Gi
         storageClassName: local-path-nocow
 
     vmalert:
