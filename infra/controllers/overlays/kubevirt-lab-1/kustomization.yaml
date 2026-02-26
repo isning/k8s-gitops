@@ -11,6 +11,7 @@ resources:
   - ../../base/kubevirt/
   - ../../base/cloudflare-operator/
   - ../../base/external-dns/
+  - ../../base/generic-helm-repos/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml
