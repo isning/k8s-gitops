@@ -1,0 +1,46 @@
+# https://fluxcd.io/flux/components/helm/helmreleases/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: logto
+spec:
+  releaseName: logto
+  interval: 30m
+  chart:
+    spec:
+      chart: logto
+      sourceRef:
+        kind: HelmRepository
+        name: ccsn
+        namespace: flux-system
+      interval: 12h
+      version: "0.20.*"
+  values:
+    dbUrl:
+      valueFrom: 
+        secretKeyRef:
+          name: logto-pg-cluster-app
+          key: uri
+    endpoint: "https://logto.isning.moe"
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - name: default-gateway
+      hostnames:
+        - logto.isning.moe
+    console:
+      endpoint: "https://logto-dash.isning.moe"
+      httpRoute:
+        enabled: true
+        parentRefs:
+          - name: default-gateway
+        hostnames:
+          - logto-dash.isning.moe
+    resources:
+      limits:
+        cpu: 1500m
+        memory: 2Gi
+      requests:
+        cpu: 1m
+        memory: 128Mi
