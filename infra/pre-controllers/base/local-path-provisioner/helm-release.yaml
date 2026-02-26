@@ -19,6 +19,41 @@ spec:
       version: "0.0.34"
   # https://github.com/rancher/local-path-provisioner/tree/master/deploy/chart/local-path-provisioner
   values:
+    # Default value form k3s
+    nodePathMap: [{node: DEFAULT_PATH_FOR_NON_LISTED_NODES, paths: [/var/lib/rancher/k3s/storage]}]
+    ## For creating the StorageClass automatically:
+    storageClass:
+      create: true
+
+      ## Set a provisioner name. If unset, a name will be generated.
+      provisionerName: rancher.io/local-path
+
+      ## Set StorageClass as the default StorageClass
+      ## Ignored if storageClass.create is false
+      defaultClass: true
+
+      ## The default volume type this storage class creates, can be "local" or "hostPath"
+      defaultVolumeType: hostPath
+
+      ## Set a StorageClass name
+      ## Ignored if storageClass.create is false
+      name: local-path
+
+      ## ReclaimPolicy field of the class, which can be either Delete or Retain
+      reclaimPolicy: Delete
+
+      ## volumeBindingMode field controls when volume binding and dynamic provisioning should occur, can be  "Immediate" or "WaitForFirstConsumer"
+      volumeBindingMode: WaitForFirstConsumer
+
+      ## allowedTopologies field controls on which nodes the volumes can be dynamically provisioned, an empty value means no topology constraints
+      allowedTopologies: []
+
+      ## annotations to add to the StorageClass
+      annotations: {}
+
+      ## Set a path pattern, if unset the default will be used
+      # pathPattern: "{{ .PVC.Namespace }}-{{ .PVC.Name }}"
+
     resources:
       limits:
         cpu: 100m
@@ -26,8 +61,6 @@ spec:
       requests:
         cpu: 1m
         memory: 32Mi
-    # Default value form k3s
-    nodePathMap: [{node: DEFAULT_PATH_FOR_NON_LISTED_NODES, paths: [/var/lib/rancher/k3s/storage]}]
     configmap:
       # specify the config map name
       name: local-path-config
