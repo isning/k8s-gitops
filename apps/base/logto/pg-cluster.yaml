@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: logto-pg-cluster
+spec:
+  instances: 1
+
+  storage:
+    size: 10Gi
+    storageClass: local-path-nocow
