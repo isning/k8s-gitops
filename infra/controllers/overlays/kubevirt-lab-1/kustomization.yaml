@@ -12,6 +12,7 @@ resources:
   - ../../base/cloudflare-operator/
   - ../../base/external-dns/
   - ../../base/generic-helm-repos/
+  - ../../base/cloudnative-pg/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml
