@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - ../../base/cert-manager/
   - ../../base/kubevirt/
-  - ../../base/storageclasses/
   - ../../base/gateway/
   - ./cloudflare-operator/
   - ./i-reroute/

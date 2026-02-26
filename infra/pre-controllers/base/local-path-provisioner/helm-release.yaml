@@ -52,7 +52,44 @@ spec:
       annotations: {}
 
       ## Set a path pattern, if unset the default will be used
-      pathPattern: "00-{{ .PVC.Namespace }}-{{ .PVC.Name }}"
+      pathPattern: "default/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+    
+    storageClassConfigs:
+      local-path-critical:
+        storageClass:
+          create: true
+          defaultClass: false
+          defaultVolumeType: hostPath
+          reclaimPolicy: Retain
+          pathPattern: "critical/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+      local-path-test:
+        storageClass:
+          create: true
+          defaultClass: false
+          defaultVolumeType: hostPath
+          reclaimPolicy: Delete
+          pathPattern: "test/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+      local-path-nocow:
+        storageClass:
+          create: true
+          defaultClass: false
+          defaultVolumeType: hostPath
+          reclaimPolicy: Delete
+          pathPattern: "00-nocow/default/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+      local-path-nocow-critical:
+        storageClass:
+          create: true
+          defaultClass: false
+          defaultVolumeType: hostPath
+          reclaimPolicy: Retain
+          pathPattern: "00-nocow/critical/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+      local-path-nocow-test:
+        storageClass:
+          create: true
+          defaultClass: false
+          defaultVolumeType: hostPath
+          reclaimPolicy: Delete
+          pathPattern: "00-nocow/test/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
 
     resources:
       limits:
@@ -69,7 +106,7 @@ spec:
         #!/bin/sh
         set -eu
         mkdir -m 0777 -p "$VOL_DIR"
-        if echo "$VOL_DIR" | grep -q "^01-nocow-"; then
+        if echo "$VOL_DIR" | grep -q "00-nocow/"; then
           echo "Disabling COW for volume path: $VOL_DIR"
           chattr +C "$VOL_DIR" || true
         fi
