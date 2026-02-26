@@ -24,37 +24,17 @@ spec:
     ## For creating the StorageClass automatically:
     storageClass:
       create: true
-
       ## Set a provisioner name. If unset, a name will be generated.
       provisionerName: rancher.io/local-path
-
-      ## Set StorageClass as the default StorageClass
-      ## Ignored if storageClass.create is false
-      defaultClass: true
-
-      ## The default volume type this storage class creates, can be "local" or "hostPath"
-      defaultVolumeType: hostPath
-
-      ## Set a StorageClass name
-      ## Ignored if storageClass.create is false
-      name: local-path
-
-      ## ReclaimPolicy field of the class, which can be either Delete or Retain
-      reclaimPolicy: Delete
-
-      ## volumeBindingMode field controls when volume binding and dynamic provisioning should occur, can be  "Immediate" or "WaitForFirstConsumer"
-      volumeBindingMode: WaitForFirstConsumer
-
-      ## allowedTopologies field controls on which nodes the volumes can be dynamically provisioned, an empty value means no topology constraints
-      allowedTopologies: []
-
-      ## annotations to add to the StorageClass
-      annotations: {}
-
-      ## Set a path pattern, if unset the default will be used
-      pathPattern: "default/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
     
     storageClassConfigs:
+      local-path:
+        storageClass:
+          create: true
+          defaultClass: true
+          defaultVolumeType: hostPath
+          reclaimPolicy: Delete
+          pathPattern: "default/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
       local-path-critical:
         storageClass:
           create: true
