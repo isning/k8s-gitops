@@ -120,6 +120,7 @@ spec:
         resources:
             requests:
                 storage: 20Gi
+        storageClassName: local-path-nocow
 
     vmalert:
       # vmalert is a Prometheus-compatible alertmanager
