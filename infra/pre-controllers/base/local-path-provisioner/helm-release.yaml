@@ -52,7 +52,7 @@ spec:
       annotations: {}
 
       ## Set a path pattern, if unset the default will be used
-      # pathPattern: "{{ .PVC.Namespace }}-{{ .PVC.Name }}"
+      pathPattern: "00-{{ .PVC.Namespace }}-{{ .PVC.Name }}"
 
     resources:
       limits:
@@ -69,6 +69,10 @@ spec:
         #!/bin/sh
         set -eu
         mkdir -m 0777 -p "$VOL_DIR"
+        if echo "$VOL_DIR" | grep -q "^01-cowoff-"; then
+          echo "Disabling COW for volume path: $VOL_DIR"
+          chattr +C "$VOL_DIR" || true
+        fi
       teardown: |-
         #!/bin/sh
         set -eu
