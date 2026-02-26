@@ -69,7 +69,7 @@ spec:
         #!/bin/sh
         set -eu
         mkdir -m 0777 -p "$VOL_DIR"
-        if echo "$VOL_DIR" | grep -q "^01-cowoff-"; then
+        if echo "$VOL_DIR" | grep -q "^01-nocow-"; then
           echo "Disabling COW for volume path: $VOL_DIR"
           chattr +C "$VOL_DIR" || true
         fi
