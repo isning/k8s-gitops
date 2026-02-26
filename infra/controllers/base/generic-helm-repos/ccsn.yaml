@@ -1,0 +1,11 @@
+---
+# https://github.com/the-ccsn/helm-charts
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: ccsn
+  namespace: flux-system
+spec:
+  type: oci
+  interval: 12h
+  url: oci://ghcr.io/the-ccsn/charts
