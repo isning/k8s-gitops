@@ -31,7 +31,7 @@ spec:
       local-path:
         storageClass:
           create: true
-          defaultClass: true
+          defaultClass: false
           defaultVolumeType: hostPath
           reclaimPolicy: Delete
           pathPattern: "default/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
@@ -52,7 +52,7 @@ spec:
       local-path-nocow:
         storageClass:
           create: true
-          defaultClass: false
+          defaultClass: true
           defaultVolumeType: hostPath
           reclaimPolicy: Delete
           pathPattern: "00-nocow/default/{{ .PVC.Namespace }}/{{ .PVC.Name }}"
