@@ -1,11 +1,11 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: local-path-test
+  name: local-path-cowoff
 provisioner: rancher.io/local-path
 parameters:
-  # nodePath: /var/lib/local-path-test
-  pathPattern: "00-{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+  # nodePath: /var/lib/local-path-critical
+  pathPattern: "01-cowoff-{{ .PVC.Namespace }}/{{ .PVC.Name }}"
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true

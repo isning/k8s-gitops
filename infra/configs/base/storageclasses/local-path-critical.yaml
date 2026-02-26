@@ -5,7 +5,7 @@ metadata:
 provisioner: rancher.io/local-path
 parameters:
   # nodePath: /var/lib/local-path-critical
-  pathPattern: "{{ .PVC.Namespace }}/{{ .PVC.Name }}"
+  pathPattern: "00-{{ .PVC.Namespace }}/{{ .PVC.Name }}"
 # Retain critical volumes after deletion
 reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
