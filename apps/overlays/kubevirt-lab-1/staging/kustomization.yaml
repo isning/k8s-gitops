@@ -4,7 +4,8 @@ kind: Kustomization
 namespace: staging
 commonLabels:
   app.kubernetes.io/env: staging
-# resources:
+resources:
+  - ./echo/
   # - ./failed/
   # - ./test-controller/
   # - ./../../../base/debug/
