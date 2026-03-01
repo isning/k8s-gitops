@@ -23,6 +23,23 @@ spec:
           name: logto-pg-cluster-app
           key: uri
     endpoint: "https://logto.isning.moe"
+
+    autoSeeding:
+      enabled: true
+      dbUrl:
+        valueFrom: 
+          secretKeyRef:
+            name: logto-pg-cluster-superuser
+            key: uri
+
+    autoAlteration:
+      enabled: true
+      dbUrl:
+        valueFrom: 
+          secretKeyRef:
+            name: logto-pg-cluster-superuser
+            key: uri
+
     httpRoute:
       enabled: true
       parentRefs:

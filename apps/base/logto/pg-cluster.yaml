@@ -8,3 +8,5 @@ spec:
   storage:
     size: 10Gi
     storageClass: local-path-nocow
+  
+  enableSuperuserAccess: true
