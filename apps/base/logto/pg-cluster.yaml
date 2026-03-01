@@ -5,6 +5,13 @@ metadata:
 spec:
   instances: 1
 
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    # Logto requires PostgreSQL 14 https://docs.logto.io/logto-oss/get-started-with-oss#:~:text=PostgreSQL,%40%5E14.0
+    major: 14
+
   storage:
     size: 10Gi
     storageClass: local-path-nocow
