@@ -5,6 +5,7 @@ resources:
   - ../../base/cert-manager/
   - ../../base/kubevirt/
   - ../../base/gateway/
+  - ../../base/cloudnative-pg/
   - ./cloudflare-operator/
   - ./i-reroute/
 
