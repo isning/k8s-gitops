@@ -5,6 +5,9 @@ metadata:
 spec:
   instances: 1
 
+  # Logto requires superuser access:
+  # https://github.com/logto-io/logto/issues/6842
+  # https://github.com/logto-io/logto/issues/8275
   managed:
     roles:
       - name: app
