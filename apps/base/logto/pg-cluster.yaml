@@ -5,6 +5,15 @@ metadata:
 spec:
   instances: 1
 
+  managed:
+    roles:
+      - name: app
+        superuser: true
+
+  bootstrap:
+      initdb:
+        owner: app
+
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
