@@ -1,0 +1,36 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ClusterImageCatalog
+metadata:
+  name: postgresql-minimal-trixie
+  labels:
+    images.cnpg.io/date: "20260224"
+    images.cnpg.io/family: postgresql
+    images.cnpg.io/os: trixie
+    images.cnpg.io/publisher: cnpg.io
+    images.cnpg.io/type: minimal
+spec:
+  images:
+    - major: 13
+      image: ghcr.io/cloudnative-pg/postgresql:13.22-202511100817-minimal-trixie@sha256:68703fc0579e2f93379f94628092b5bde55d676e546feab1251c243f414a6a20
+    - major: 14
+      image: ghcr.io/cloudnative-pg/postgresql:14.21-202602230816-minimal-trixie@sha256:e80de20fb1218f714dce966e9d1aee8aeafc612c21b185606256f427d5434cb1
+    - major: 15
+      image: ghcr.io/cloudnative-pg/postgresql:15.16-202602230816-minimal-trixie@sha256:5d3f009009c5a383a241db4f93c03f9112bc79b9147d5df2f4a6f146c20c0d61
+    - major: 16
+      image: ghcr.io/cloudnative-pg/postgresql:16.12-202602241232-minimal-trixie@sha256:3399b6d3601d580244dc8429d8cbb95ad9f26d7137aa3659d2129f1116a3e3f7
+    - major: 17
+      image: ghcr.io/cloudnative-pg/postgresql:17.8-202602230816-minimal-trixie@sha256:3aaad050dfbd87e4b413901861d226bd949b26e6b2b8bef0f1a9afab32832246
+    - major: 18
+      image: ghcr.io/cloudnative-pg/postgresql:18.2-202602230816-minimal-trixie@sha256:495c49a2039e49acff448955ff4af6b94d2138630b84f5a32e7c701efc4ea257
+      extensions:
+        - name: pgaudit
+          image:
+            reference: ghcr.io/cloudnative-pg/pgaudit:18.0-202602242104-18-trixie@sha256:9b374dcf5109f081580f80bcbe7248d71f293e994c8350cfe6363662493edea4
+        - name: pgvector
+          image:
+            reference: ghcr.io/cloudnative-pg/pgvector:0.8.1-202602242104-18-trixie@sha256:860c76ab2673d63e6b12e5cac052be0618284d6ecd0099bda5fdc9cd4b12c7a8
+        - name: postgis
+          image:
+            reference: ghcr.io/cloudnative-pg/postgis-extension:3.6.2-202602242104-18-trixie@sha256:277d212880b56f081b275ed66b3bedd9a1f605bfed39925c72d649d1d25b9d60
+          ld_library_path:
+            - system
