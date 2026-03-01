@@ -9,6 +9,7 @@ spec:
     roles:
       - name: app
         superuser: true
+        login: true
 
   bootstrap:
       initdb:
