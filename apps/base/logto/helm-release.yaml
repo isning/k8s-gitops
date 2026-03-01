@@ -17,6 +17,9 @@ spec:
       interval: 12h
       version: "0.2.*"
   values:
+    # We have proxy set up, so we need to trust the proxy headers to get the correct client IP and protocol information.
+    trustProxyHeader: true
+
     dbUrl:
       valueFrom: 
         secretKeyRef:

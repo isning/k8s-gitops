@@ -74,3 +74,30 @@ spec:
       requestRedirect:
         scheme: https
         port: 443
+---
+# Set XFF for specific listener to get correct client IP and protocol information for the services behind the gateway.
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: set-xff-for-specific-listener
+  namespace: prod
+spec:
+  workloadSelector:
+    labels:
+      istio.io/gateway-name: default-gateway
+  configPatches:
+  - applyTo: NETWORK_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        portNumber: 8080
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: MERGE
+      value:
+        typed_config:
+          "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager"
+          use_remote_address: true
+          xff_num_trusted_hops: 1
