@@ -6,6 +6,9 @@ metadata:
     dashboards: "grafana"
 spec:
   config:
+    server:
+      root_url: "https://grafana.isning.moe"
+      enable_gzip: "true"
     log:
       mode: "console"
     auth:
