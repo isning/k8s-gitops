@@ -37,7 +37,7 @@ spec:
                 # IdP depended: Logto doesn't expect `:` to exist in username, so that we are able to use `:` as a separator.
                 # If your IdP allows `:` in username, you may need to choose a different separator and adjust the expression accordingly.
               - name: username
-                expression: 'has(claims.username) ? "flux:" + string(claims.username) : "flux:uid:" + claims.sub'
+                expression: '(has(claims.username) && type(claims.username) == string) ? "flux:" + string(claims.username) : "flux:uid:" + claims.sub'
               #   # IdP depended: Logto doesn't generate `:` in sub claim, so that we are able to isolate flux users with "flux:" prefix.
               #   # If your IdP generates `:` in sub claim, you may need to write a more complex expression to isolate flux users.
               # - name: uid
@@ -51,7 +51,7 @@ spec:
                       string(claims.roles).split(",").filter(r, r.startsWith("flux:")) : 
                     []
             profile:
-              name: "has(claims.name) ? claims.name : (has(claims.username) ? claims.username : claims.sub)"
+              name: "(has(claims.name) && type(claims.username) == string) ? claims.name : ((has(claims.username) && type(claims.username) == string) ? claims.username : claims.sub)"
             impersonation:
               username: "variables.username"
               # Seems like Flux doesn't support impersonating uid yet.
