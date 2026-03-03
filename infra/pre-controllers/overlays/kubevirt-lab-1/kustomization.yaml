@@ -6,6 +6,7 @@ resources:
   - ../../base/cilium/
   - ../../base/secrets/
   - ./cilium
+  - ../../base/flux/
 
 patches:
   - path: helmrelease-cilium-patch.yaml
