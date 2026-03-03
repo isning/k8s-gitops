@@ -7,3 +7,4 @@ commonLabels:
 resources:
   - ./../../../base/grafana/
   - ./../../../base/logto/
+  - ./../../../base/flux-operator/
