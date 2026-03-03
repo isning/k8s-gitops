@@ -1,0 +1,27 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+  annotations:
+    fluxcd.controlplane.io/reconcileEvery: "1h"
+    fluxcd.controlplane.io/reconcileArtifactEvery: "10m"
+    fluxcd.controlplane.io/reconcileTimeout: "5m"
+spec:
+  distribution:
+    version: "2.x"
+    registry: "ghcr.io/fluxcd"
+  sync:
+    kind: GitRepository
+    url: "https://github.com/isning/k8s-gitops"
+    ref: "refs/heads/main"
+    path: "clusters/kubevirt-lab-1"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+  cluster:
+    type: kubernetes
+    multitenant: false
+    networkPolicy: true
