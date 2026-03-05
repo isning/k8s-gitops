@@ -13,6 +13,7 @@ resources:
   - ../../base/external-dns/
   - ../../base/generic-helm-repos/
   - ../../base/cloudnative-pg/
+  - ../../base/redroid-operator/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml
