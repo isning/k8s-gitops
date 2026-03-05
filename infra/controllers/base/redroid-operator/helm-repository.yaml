@@ -7,5 +7,6 @@ metadata:
   name: redroid-operator
   namespace: flux-system
 spec:
+  type: oci
   interval: 12h
-  url: https://isning.github.io/redroid-operator
+  url: oci://ghcr.io/isning/charts
