@@ -20,6 +20,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: redroid-operator
+        namespace: flux-system
       interval: 12h
   install:
     crds: Create
