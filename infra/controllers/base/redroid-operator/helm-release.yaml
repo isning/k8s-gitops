@@ -1,0 +1,29 @@
+# Flux HelmRelease — installs/upgrades the redroid-operator controller.
+#
+# The operator manages RedroidInstance and RedroidTask CRDs.
+# CRDs are bundled in the chart (charts/redroid-operator/crds/).
+#
+# To upgrade: bump spec.chart.spec.version (or set to "*" to always track latest).
+# To customise: add values under spec.values — see:
+#   https://github.com/isning/redroid-operator/blob/main/charts/redroid-operator/values.yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: redroid-operator
+  namespace: redroid-operator
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: redroid-operator
+      version: "*"          # track latest; pin to e.g. "0.1.0" for stability
+      sourceRef:
+        kind: HelmRepository
+        name: redroid-operator
+      interval: 12h
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    replicaCount: 1

@@ -83,3 +83,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: i-reroute
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redroid-operator
