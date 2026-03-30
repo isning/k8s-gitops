@@ -8,4 +8,4 @@ resources:
   - ./../../../base/grafana/
   - ./../../../base/logto/
   - ./../../../base/flux-operator/
-  - ./../../../base/maa/
+  # - ./../../../base/maa/
