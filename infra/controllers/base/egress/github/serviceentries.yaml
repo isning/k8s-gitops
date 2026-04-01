@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: github-others
+  namespace: egress-system
+spec:
+  exportTo: ["*"]
+  hosts:
+    - api.github.com
+    - github.githubassets.com
+    - raw.githubusercontent.com
+    - objects.githubusercontent.com
+  location: MESH_EXTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS

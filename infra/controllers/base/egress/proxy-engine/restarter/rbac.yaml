@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: proxy-engine-restarter-sa
+  namespace: egress-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: proxy-engine-restarter-role
+  namespace: egress-system
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  resourceNames: ["proxy-engine"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: proxy-engine-restarter-binding
+  namespace: egress-system
+subjects:
+- kind: ServiceAccount
+  name: proxy-engine-restarter-sa
+roleRef:
+  kind: Role
+  name: proxy-engine-restarter-role
+  apiGroup: rbac.authorization.k8s.io

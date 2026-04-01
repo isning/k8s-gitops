@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-svc
+  namespace: egress-system
+  labels:
+    app: proxy-engine
+spec:
+  ports:
+  - port: 7890
+    name: http-proxy
+    appProtocol: http
+    protocol: TCP
+    targetPort: 7890
+  selector:
+    app: proxy-engine

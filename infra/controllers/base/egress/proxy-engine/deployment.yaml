@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-engine
+  namespace: egress-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy-engine
+  template:
+    metadata:
+      labels:
+        app: proxy-engine
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+      - name: fetch-nodes
+        image: python:3.10-alpine
+        envFrom:
+        - secretRef:
+            name: sub-converter-suburls-secret
+        env:
+        - name: HOME
+          value: /tmp
+        command: ["python3", "/scripts/update_sub.py"]
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          requests: 
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 64Mi
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+        - name: config-temp
+          mountPath: /shared-nodes
+        - name: tmp
+          mountPath: /tmp
+      containers:
+      - name: sing-box
+        image: ghcr.io/sagernet/sing-box:v1.13.5
+        command: 
+        - "sing-box"
+        - "run"
+        - "-c"
+        - "/etc/sing-box/main/main.json"
+        - "-c"
+        - "/etc/sing-box/temp/nodes.json"
+        ports:
+        - containerPort: 7890
+          name: mixed-proxy
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        livenessProbe:
+          tcpSocket:
+            port: 7890
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: 7890
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          requests: 
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 64Mi
+        volumeMounts:
+        - name: config-main
+          mountPath: /etc/sing-box/main
+          readOnly: true
+        - name: config-temp
+          mountPath: /etc/sing-box/temp
+          readOnly: true
+        - name: rule-set-cache
+          mountPath: /var/cache/sing-box/rule-set
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: config-main
+        configMap:
+          name: sing-box-main-config
+      - name: config-temp
+        emptyDir:
+          sizeLimit: 10Mi
+      - name: script-volume
+        configMap:
+          name: sub-converter-script-config
+      - name: tmp
+        emptyDir:
+          sizeLimit: 50Mi
+      - name: rule-set-cache
+        persistentVolumeClaim:
+          claimName: rule-set-cache

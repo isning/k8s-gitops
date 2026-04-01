@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: https-egress-gateway
+  namespace: egress-system
+spec:
+  gatewayClassName: istio
+  listeners:
+    # TLS traffic only in cluster
+    # - name: http
+    #   port: 80
+    #   protocol: HTTP
+    - name: https
+      protocol: TLS
+      port: 443
+      tls:
+        mode: Passthrough
