@@ -17,8 +17,8 @@ spec:
       path: /metrics
       interval: 30s
 ---
-# Alert when a URLTest group falls back to "direct" for more than 5 minutes.
-# This means ALL proxy nodes in that group are currently failing their health checks.
+# Alert when a soft Fallback group has activated its direct fallback for more than 5 minutes.
+# This means ALL proxy nodes in the inner urltest group are currently failing health checks.
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
@@ -37,7 +37,7 @@ spec:
           annotations:
             summary: "sing-box group {{ $labels.group }} is using direct fallback"
             description: >
-              All proxy outbounds in sing-box URLTest group '{{ $labels.group }}' have
-              been failing their URL-test health check for more than 5 minutes.
-              Traffic destined for this group is now routed directly (real IP exposed).
+              All proxy outbounds in the inner urltest group for sing-box Fallback group
+              '{{ $labels.group }}' have been failing their URL-test health check for more
+              than 5 minutes. Traffic is now routed directly (real IP exposed).
               Check subscription freshness and upstream proxy availability.

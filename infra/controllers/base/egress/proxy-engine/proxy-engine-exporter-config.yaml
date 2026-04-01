@@ -9,12 +9,15 @@ data:
     Sing-box Prometheus exporter.
 
     Polls the sing-box Clash-compatible REST API (/proxies) and exposes a
-    Prometheus gauge for every URLTest group that is currently routing through
+    Prometheus gauge for every Fallback group that is currently routing through
     the "direct" outbound – which means ALL proxy nodes in that group have
-    failed their URL-test health check.
+    failed their URL-test health check and the direct fallback has been activated.
+
+    Only outer Fallback groups are tracked. Internal proxy-only urltest groups
+    (*Proxies) are excluded — they never contain "direct" as a member.
 
     Metric:
-      singbox_group_direct_fallback{group="<name>"} 1.0  →  all proxies unhealthy
+      singbox_group_direct_fallback{group="<name>"} 1.0  →  all proxies unhealthy, using direct
       singbox_group_direct_fallback{group="<name>"} 0.0  →  at least one proxy healthy
     """
     import json
@@ -38,7 +41,9 @@ data:
                     data = json.loads(resp.read())
                 snapshot = {}
                 for name, proxy in data.get("proxies", {}).items():
-                    if proxy.get("type") in ("URLTest", "Fallback", "LoadBalance"):
+                    # Only track outer Fallback groups; internal *Proxies urltest groups
+                    # never contain "direct" so they would always be 0 — skip for clarity.
+                    if proxy.get("type") == "Fallback":
                         now = proxy.get("now", "")
                         snapshot[name] = 1 if now == "direct" else 0
                 with _lock:
@@ -56,8 +61,9 @@ data:
                 return
             lines = [
                 "# HELP singbox_group_direct_fallback "
-                "1 if the URLTest group's winning outbound is 'direct' "
-                "(i.e. all proxy nodes are currently unhealthy), 0 otherwise.",
+                "1 if the Fallback group's active outbound is 'direct' "
+                "(i.e. all proxy nodes are currently unhealthy and the direct fallback is active), "
+                "0 otherwise.",
                 "# TYPE singbox_group_direct_fallback gauge",
             ]
             with _lock:
