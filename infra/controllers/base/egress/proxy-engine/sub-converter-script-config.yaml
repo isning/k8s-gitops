@@ -145,17 +145,21 @@ data:
     # 1. Add all proxy nodes
     custom_outbounds.extend(all_nodes)
 
-    # 2. Add auto-test groups for each region.
-    # UnitedStates uses strict mode (no fallback) because it routes privacy-sensitive
-    # traffic (Anthropic, Google Gemini) that must not leak the real IP.
-    # All other regional groups use soft mode (fallback to direct with a warning).
+    # 2. Add auto-test groups for each region (soft + strict variants).
+    # - <GroupName>: soft fallback to ["direct"] with a Warning log.
+    # - Strict<GroupName>: hard fallback to ["block"] with an ERROR log; use this for
+    #   traffic where a direct connection would leak the real IP (e.g. Anthropic, Gemini).
     for group_name, pattern in groups.items():
         nodes = filter_nodes(pattern)
-        outbounds_fn = strict_outbounds if group_name == "UnitedStates" else safe_outbounds
         custom_outbounds.append({
             "type": "urltest",
             "tag": group_name,
-            "outbounds": outbounds_fn(group_name, nodes)
+            "outbounds": safe_outbounds(group_name, nodes)
+        })
+        custom_outbounds.append({
+            "type": "urltest",
+            "tag": f"Strict{group_name}",
+            "outbounds": strict_outbounds(f"Strict{group_name}", nodes)
         })
 
     # 3. Add Low-Rate group (Multiplier <= 0.5x)
@@ -166,7 +170,7 @@ data:
         "outbounds": safe_outbounds("LowRateNodes", low_rate_nodes)
     })
 
-    # 4. Global AllNodes (Fastest) UrlTest.
+    # 4a. Global AllNodes (Fastest) UrlTest — soft mode.
     # Always append "direct" as the last member so AllNodes never becomes fully empty
     # at runtime (e.g. when all proxy nodes are temporarily unhealthy). This provides
     # an observable, graceful fallback for DNS routing and other general traffic.
@@ -180,6 +184,14 @@ data:
         "type": "urltest",
         "tag": "AllNodes",
         "outbounds": all_node_tags + ["direct"]
+    })
+
+    # 4b. StrictAllNodes — strict mode (no "direct" fallback appended).
+    # Use when traffic must not fall back to the real IP even when all proxy nodes fail.
+    custom_outbounds.append({
+        "type": "urltest",
+        "tag": "StrictAllNodes",
+        "outbounds": strict_outbounds("StrictAllNodes", all_node_tags)
     })
 
     final_config = {"outbounds": custom_outbounds}
