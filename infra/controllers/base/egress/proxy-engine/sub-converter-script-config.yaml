@@ -91,9 +91,9 @@ data:
                         all_nodes.append(node)
                         count += 1
                 
-                print(f"[{sub_tag}] Successfully fetched {count} nodes from: {url[:40]}...")
+                print(f"[{sub_tag}] Successfully fetched {count} nodes.")
         except Exception as e:
-            print(f"[{sub_tag}] Failed to fetch {url[:40]}... Error: {e}")
+            print(f"[{sub_tag}] Failed to fetch subscription. Error: {e}")
 
     if not all_nodes:
         print("Critical: No nodes were retrieved. Exiting.")

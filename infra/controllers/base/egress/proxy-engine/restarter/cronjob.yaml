@@ -18,5 +18,5 @@ spec:
             command:
             - /bin/sh
             - -c
-            - "kubectl rollout restart deployment/proxy-engine -n egress-system && echo 'Triggered sing-box restart at $(date)'"
+            - "kubectl rollout restart deployment/proxy-engine -n egress-system && echo \"Triggered sing-box restart at $(date)\""
           restartPolicy: OnFailure
