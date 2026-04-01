@@ -88,3 +88,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: redroid-operator
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: egress-system
