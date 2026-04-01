@@ -116,9 +116,28 @@ data:
     }
 
     def safe_outbounds(group_name, node_list):
+        """
+        Soft fallback: returns node_list when non-empty, otherwise falls back to ["direct"].
+        Use for general-purpose groups (AllNodes, regional, LowRateNodes) where a direct
+        connection is acceptable if no proxy nodes are available.
+        Emits a warning when the fallback is activated so operators can observe the event.
+        """
         if not node_list:
-            print(f"Warning: No nodes found for group '{group_name}'. Falling back to 'direct'.")
+            print(f"Warning: [safe] No nodes found for group '{group_name}'. Falling back to 'direct'.")
         return node_list if node_list else ["direct"]
+
+    def strict_outbounds(group_name, node_list):
+        """
+        Strict (no-fallback) mode: returns node_list when non-empty, otherwise falls back to ["block"].
+        Use for privacy-sensitive groups whose traffic must NEVER reach the real IP
+        (e.g. UnitedStates used for Anthropic/Gemini). Blocking instead of direct-routing
+        prevents silent IP leakage when no qualifying proxy nodes are available.
+        Emits an error when the fallback is activated so operators can observe the event.
+        """
+        if not node_list:
+            print(f"ERROR: [strict] No nodes found for group '{group_name}'. "
+                  f"Traffic routed to this group will be BLOCKED to prevent real IP leakage.")
+        return node_list if node_list else ["block"]
 
     # Build Outbounds
     custom_outbounds = []
@@ -126,12 +145,17 @@ data:
     # 1. Add all proxy nodes
     custom_outbounds.extend(all_nodes)
 
-    # 2. Add auto-test groups for each region
+    # 2. Add auto-test groups for each region.
+    # UnitedStates uses strict mode (no fallback) because it routes privacy-sensitive
+    # traffic (Anthropic, Google Gemini) that must not leak the real IP.
+    # All other regional groups use soft mode (fallback to direct with a warning).
     for group_name, pattern in groups.items():
+        nodes = filter_nodes(pattern)
+        outbounds_fn = strict_outbounds if group_name == "UnitedStates" else safe_outbounds
         custom_outbounds.append({
             "type": "urltest",
             "tag": group_name,
-            "outbounds": safe_outbounds(group_name, filter_nodes(pattern))
+            "outbounds": outbounds_fn(group_name, nodes)
         })
 
     # 3. Add Low-Rate group (Multiplier <= 0.5x)
@@ -142,12 +166,20 @@ data:
         "outbounds": safe_outbounds("LowRateNodes", low_rate_nodes)
     })
 
-    # 4. Global AllNodes (Fastest) UrlTest for stateless usage
+    # 4. Global AllNodes (Fastest) UrlTest.
+    # Always append "direct" as the last member so AllNodes never becomes fully empty
+    # at runtime (e.g. when all proxy nodes are temporarily unhealthy). This provides
+    # an observable, graceful fallback for DNS routing and other general traffic.
+    # NOTE: safe_outbounds() is intentionally NOT used here because "direct" must always
+    # be present as the last urltest candidate even when proxy nodes exist, giving sing-box
+    # a guaranteed-healthy last resort rather than only a fallback when the list is empty.
     all_node_tags = [n['tag'] for n in all_nodes]
+    if not all_node_tags:
+        print("Warning: [safe] No proxy nodes available; AllNodes will only contain the 'direct' fallback.")
     custom_outbounds.append({
         "type": "urltest",
         "tag": "AllNodes",
-        "outbounds": safe_outbounds("AllNodes", all_node_tags)
+        "outbounds": all_node_tags + ["direct"]
     })
 
     final_config = {"outbounds": custom_outbounds}
