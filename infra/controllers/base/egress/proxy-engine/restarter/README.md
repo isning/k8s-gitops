@@ -1,0 +1,1 @@
+For automatically restarting the proxy engine to trigger the init container to fetch new nodes.

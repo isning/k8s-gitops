@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sing-box-main-config
+  namespace: egress-system
+data:
+  main.json: |
+    {
+      "dns": {
+        "rules": [
+          { "rule_set": ["geosite-cn"], "server": "local" }
+        ],
+        "servers": [
+          { "type": "tls", "address": "1.1.1.1", "detour": "AllNodes", "tag": "remote" },
+          { "type": "tls", "address": "223.5.5.5", "detour": "direct", "tag": "local-tls" },
+          { "type": "local", "tag": "local" }
+        ],
+        "final": "remote",
+        "strategy": "ipv4_only",
+        "disable_cache": false
+      },
+      "outbounds": [
+          { "type": "direct", "tag": "direct", "domain_resolver": "local" }
+      ],
+      "inbounds": [
+        {
+          "listen": "0.0.0.0",
+          "listen_port": 7890,
+          "tag": "mixed-in",
+          "type": "mixed"
+        }
+      ],
+      "route": {
+        "auto_detect_interface": true,
+        "default_domain_resolver": {
+          "server": "local-tls"
+        },
+        "rules": [
+          {
+            "action": "resolve",
+            "strategy": "prefer_ipv4"
+          },
+          { "action": "sniff" },
+          { "protocol": "dns", "action": "hijack-dns" },
+          { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" },
+          { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" },
+          { "ip_is_private": true, "outbound": "direct" }
+        ],
+        "rule_set": [
+          {
+            "tag": "geosite-cn",
+            "type": "remote",
+            "format": "binary",
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-cn.srs"
+          },
+          {
+            "tag": "anthropic",
+            "type": "remote",
+            "format": "binary",
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs"
+          },
+          {
+            "tag": "google-gemini",
+            "type": "remote",
+            "format": "binary",
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs"
+          },
+          {
+            "tag": "geoip-cn",
+            "type": "remote",
+            "format": "binary",
+            "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs"
+          }
+        ]
+      }
+    }

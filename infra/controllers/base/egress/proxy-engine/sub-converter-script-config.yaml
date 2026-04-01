@@ -1,0 +1,167 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sub-converter-script-config
+  namespace: egress-system
+data:
+  update_sub.py: |
+    import os
+    import json
+    import urllib.request
+    import re
+    import sys
+
+    # Configuration
+    URLS_ENV = os.environ.get('SUB_URLS', '')
+    OUTPUT_PATH = '/shared-nodes/nodes.json'
+    USER_AGENT = 'sing-box'
+    TIMEOUT = 15
+
+    if not URLS_ENV:
+        print("Error: SUB_URLS environment variable is empty!")
+        sys.exit(1)
+
+    # Parse SUB_URLS into a list of tuples: (sub_tag, sub_url)
+    sub_list = []
+    for i, item in enumerate(URLS_ENV.split(',')):
+        item = item.strip()
+        if not item:
+            continue
+        
+        # Check if a custom tag is provided (e.g., sub1:https://...)
+        if not item.startswith('http') and ':' in item:
+            parts = item.split(':', 1)
+            sub_tag = parts[0].strip()
+            sub_url = parts[1].strip()
+        else:
+            # Fallback if no tag is provided
+            sub_tag = f"Sub_{i+1}"
+            sub_url = item
+            
+        sub_list.append((sub_tag, sub_url))
+
+    all_nodes = []
+    seen_tags = set()
+
+    def get_multiplier(tag):
+        """
+        Extracts a multiplier suffix from the tag.
+        Matches patterns like [0.5x], (2x), or ' 1.5x' (with a preceding space) at the end of the string.
+        The multiplier must be preceded by '[', '(' or whitespace.
+        """
+        match = re.search(r'[\[\(\s]([0-9.]+)x[\]\)]?$', tag, re.IGNORECASE)
+        if match:
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return 1.0
+        return 1.0
+
+    print(f"Starting to process {len(sub_list)} subscriptions...")
+
+    for sub_tag, url in sub_list:
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+            with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+                content = resp.read().decode('utf-8')
+                sub_data = json.loads(content)
+                
+                count = 0
+                for node in sub_data.get('outbounds', []):
+                    # Basic validation: must have a server and tag
+                    if 'server' in node and 'tag' in node:
+                        original_tag = node['tag']
+                        
+                        # Detect Multiplier based on the original name
+                        rate = get_multiplier(original_tag)
+                        node['multiplier'] = rate
+                        
+                        # Prepend the subscription tag to the node name
+                        tagged_name = f"[{sub_tag}] {original_tag}"
+                        
+                        # Deduplicate tags
+                        final_tag = tagged_name
+                        counter = 1
+                        while final_tag in seen_tags:
+                            final_tag = f"{tagged_name}_{counter}"
+                            counter += 1
+                        
+                        node['tag'] = final_tag
+                        seen_tags.add(final_tag)
+                        all_nodes.append(node)
+                        count += 1
+                
+                print(f"[{sub_tag}] Successfully fetched {count} nodes from: {url[:40]}...")
+        except Exception as e:
+            print(f"[{sub_tag}] Failed to fetch {url[:40]}... Error: {e}")
+
+    if not all_nodes:
+        print("Critical: No nodes were retrieved. Exiting.")
+        sys.exit(1)
+
+    # Categorization using Regex
+    def filter_nodes(pattern):
+        return [n['tag'] for n in all_nodes if re.search(pattern, n['tag'], re.IGNORECASE)]
+
+    groups = {
+        "HongKong": r'🇭🇰|HK|Hong Kong|香港',
+        "Macau": r'🇲🇨|MC|Macau|澳门',
+        "Taiwan": r'🇹🇼|TW|Taiwan|台湾',
+        "Singapore": r'🇸🇬|SG|Singapore|狮城|新加坡',
+        "UnitedStates": r'🇺🇸|US|America|United States|美国',
+        "Japan": r'🇯🇵|JP|Japan|日本',
+        "Korea": r'🇰🇷|KR|Korea|韩国',
+        "UnitedKingdom": r'🇬🇧|UK|United Kingdom|英国',
+        "Germany": r'🇩🇪|DE|Germany|德国'
+    }
+
+    def safe_outbounds(node_list):
+        return node_list if node_list else ["direct"]
+
+    # Build Outbounds
+    custom_outbounds = []
+
+    # 1. Add all proxy nodes
+    custom_outbounds.extend(all_nodes)
+
+    # 2. Add auto-test groups for each region
+    for group_name, pattern in groups.items():
+        custom_outbounds.append({
+            "type": "urltest",
+            "tag": group_name,
+            "outbounds": safe_outbounds(filter_nodes(pattern))
+        })
+
+    # 3. Add Low-Rate group (Multiplier <= 0.5x)
+    low_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) <= 0.5]
+    custom_outbounds.append({
+        "type": "urltest",
+        "tag": "LowRateNodes",
+        "outbounds": safe_outbounds(low_rate_nodes)
+    })
+
+    # 4. Global AllNodes (Fastest) UrlTest for stateless usage
+    all_node_tags = [n['tag'] for n in all_nodes]
+    custom_outbounds.append({
+        "type": "urltest",
+        "tag": "AllNodes",
+        "outbounds": safe_outbounds(all_node_tags)
+    })
+
+    final_config = {"outbounds": custom_outbounds}
+
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+
+    with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
+        # Optional: remove the 'multiplier' helper key before writing to JSON if sing-box complains
+        for ob in final_config["outbounds"]:
+            if "multiplier" in ob:
+                del ob["multiplier"]
+                
+        json.dump(final_config, f, indent=2, ensure_ascii=False)
+
+    print(f"\nConfiguration generated successfully!")
+    print(f"Total nodes: {len(all_nodes)}")
+    print(f"Low-rate nodes detected: {len(low_rate_nodes)}")
+    print(f"Output saved to: {OUTPUT_PATH}")

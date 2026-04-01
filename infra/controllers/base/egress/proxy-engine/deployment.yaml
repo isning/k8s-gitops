@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-engine
+  namespace: egress-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy-engine
+  template:
+    metadata:
+      labels:
+        app: proxy-engine
+    spec:
+      initContainers:
+      - name: fetch-nodes
+        image: python:3.10-alpine
+        envFrom:
+        - secretRef:
+            name: sub-converter-suburls-secret
+        command: ["python3", "/scripts/update_sub.py"]
+        resources:
+          requests: 
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 64Mi
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+        - name: config-temp
+          mountPath: /shared-nodes
+          readOnly: false
+      containers:
+      - name: sing-box
+        image: ghcr.io/sagernet/sing-box:v1.13.5
+        command: 
+        - "sing-box"
+        - "run"
+        - "-c"
+        - "/etc/sing-box/main/main.json"
+        - "-c"
+        - "/etc/sing-box/temp/nodes.json"
+        ports:
+        - containerPort: 7890
+          name: mixed-proxy
+        resources:
+          requests: 
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 64Mi
+        volumeMounts:
+        - name: config-main
+          mountPath: /etc/sing-box/main
+          readOnly: true
+        - name: config-temp
+          mountPath: /etc/sing-box/temp
+          readOnly: true
+      volumes:
+      - name: config-main
+        configMap:
+          name: sing-box-main-config
+      - name: config-temp
+        emptyDir:
+          sizeLimit: 10Mi
+      - name: script-volume
+        configMap:
+          name: sub-converter-script-config

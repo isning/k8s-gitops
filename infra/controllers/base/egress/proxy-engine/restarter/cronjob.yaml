@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: proxy-engine-daily-restarter
+  namespace: egress-system
+spec:
+  schedule: "0 4 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: proxy-engine-restarter-sa
+          containers:
+          - name: restarter
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - "kubectl rollout restart deployment/proxy-engine -n egress-system && echo 'Triggered sing-box restart at $(date)'"
+          restartPolicy: OnFailure

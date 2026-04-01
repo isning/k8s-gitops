@@ -14,6 +14,7 @@ resources:
   - ../../base/generic-helm-repos/
   - ../../base/cloudnative-pg/
   - ../../base/redroid-operator/
+  - ../../base/egress/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml
