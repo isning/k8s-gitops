@@ -51,25 +51,33 @@ data:
             "tag": "geosite-cn",
             "type": "remote",
             "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-cn.srs"
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
+            "path": "/var/cache/sing-box/rule-set/geosite-cn.srs",
+            "download_detour": "direct"
           },
           {
             "tag": "anthropic",
             "type": "remote",
             "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs"
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs",
+            "path": "/var/cache/sing-box/rule-set/geosite-anthropic.srs",
+            "download_detour": "direct"
           },
           {
             "tag": "google-gemini",
             "type": "remote",
             "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs"
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs",
+            "path": "/var/cache/sing-box/rule-set/geosite-google-gemini.srs",
+            "download_detour": "direct"
           },
           {
             "tag": "geoip-cn",
             "type": "remote",
             "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs"
+            "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs",
+            "path": "/var/cache/sing-box/rule-set/geoip-cn.srs",
+            "download_detour": "direct"
           }
         ]
       }
