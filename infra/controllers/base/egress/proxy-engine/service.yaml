@@ -4,6 +4,8 @@ kind: Service
 metadata:
   name: proxy-svc
   namespace: egress-system
+  labels:
+    app: proxy-engine
 spec:
   ports:
   - port: 7890
@@ -11,5 +13,9 @@ spec:
     appProtocol: http
     protocol: TCP
     targetPort: 7890
+  - port: 8080
+    name: metrics
+    protocol: TCP
+    targetPort: 8080
   selector:
     app: proxy-engine

@@ -1,0 +1,43 @@
+---
+# Scrape sing-box proxy-engine metrics (singbox_group_direct_fallback gauge).
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: proxy-engine-metrics
+  namespace: egress-system
+spec:
+  selector:
+    matchLabels:
+      app: proxy-engine
+  namespaceSelector:
+    matchNames:
+      - egress-system
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+---
+# Alert when a URLTest group falls back to "direct" for more than 5 minutes.
+# This means ALL proxy nodes in that group are currently failing their health checks.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: proxy-engine-alerts
+  namespace: egress-system
+spec:
+  groups:
+    - name: singbox.fallback
+      rules:
+        - alert: SingBoxGroupDirectFallback
+          expr: singbox_group_direct_fallback == 1
+          for: 5m
+          labels:
+            severity: warning
+            namespace: egress-system
+          annotations:
+            summary: "sing-box group {{ $labels.group }} is using direct fallback"
+            description: >
+              All proxy outbounds in sing-box URLTest group '{{ $labels.group }}' have
+              been failing their URL-test health check for more than 5 minutes.
+              Traffic destined for this group is now routed directly (real IP exposed).
+              Check subscription freshness and upstream proxy availability.

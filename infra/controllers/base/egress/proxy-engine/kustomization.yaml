@@ -7,4 +7,6 @@ resources:
   - ./singbox-main.yaml
   - ./deployment.yaml
   - ./service.yaml
+  - ./proxy-engine-exporter-config.yaml
+  - ./proxy-engine-monitoring.yaml
   - ./restarter

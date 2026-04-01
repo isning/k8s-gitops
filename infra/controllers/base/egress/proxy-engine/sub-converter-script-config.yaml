@@ -117,14 +117,17 @@ data:
 
     def safe_outbounds(group_name, node_list):
         """
-        Soft fallback: returns node_list when non-empty, otherwise falls back to ["direct"].
+        Soft fallback: appends "direct" as the last member of the outbounds list so that
+        sing-box can fall back to a direct connection at runtime if all proxy nodes fail
+        their URL-test health check (they are still unhealthy but "direct" always passes).
+        When the list is completely empty at generation time, "direct" is the only entry
+        and a warning is emitted.
         Use for general-purpose groups (AllNodes, regional, LowRateNodes) where a direct
         connection is acceptable if no proxy nodes are available.
-        Emits a warning when the fallback is activated so operators can observe the event.
         """
         if not node_list:
             print(f"Warning: [safe] No nodes found for group '{group_name}'. Falling back to 'direct'.")
-        return node_list if node_list else ["direct"]
+        return node_list + ["direct"]
 
     def strict_outbounds(group_name, node_list):
         """
@@ -171,19 +174,14 @@ data:
     })
 
     # 4a. Global AllNodes (Fastest) UrlTest — soft mode.
-    # Always append "direct" as the last member so AllNodes never becomes fully empty
-    # at runtime (e.g. when all proxy nodes are temporarily unhealthy). This provides
-    # an observable, graceful fallback for DNS routing and other general traffic.
-    # NOTE: safe_outbounds() is intentionally NOT used here because "direct" must always
-    # be present as the last urltest candidate even when proxy nodes exist, giving sing-box
-    # a guaranteed-healthy last resort rather than only a fallback when the list is empty.
+    # "direct" is always included by safe_outbounds as the last candidate so AllNodes
+    # never becomes fully empty at runtime (e.g. when all proxy nodes are temporarily
+    # unhealthy). This provides an observable, graceful fallback for general traffic.
     all_node_tags = [n['tag'] for n in all_nodes]
-    if not all_node_tags:
-        print("Warning: [safe] No proxy nodes available; AllNodes will only contain the 'direct' fallback.")
     custom_outbounds.append({
         "type": "urltest",
         "tag": "AllNodes",
-        "outbounds": all_node_tags + ["direct"]
+        "outbounds": safe_outbounds("AllNodes", all_node_tags)
     })
 
     # 4b. StrictAllNodes — strict mode (no "direct" fallback appended).
