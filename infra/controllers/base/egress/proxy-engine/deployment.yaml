@@ -64,8 +64,6 @@ spec:
         ports:
         - containerPort: 7890
           name: mixed-proxy
-        - containerPort: 9090
-          name: clash-api
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
