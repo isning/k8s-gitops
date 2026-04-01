@@ -121,103 +121,33 @@ data:
     # 1. Add all proxy nodes
     custom_outbounds.extend(all_nodes)
 
-    # 2. Per-region groups (soft + strict variants).
-    #
-    # Two-layer architecture keeps "direct" out of urltest competition:
-    #
-    #   <GroupName>Proxies       — urltest, proxy nodes only.
-    #                              "direct" is NEVER a member so it cannot win on speed.
-    #   <GroupName>              — fallback wrapper: tries <GroupName>Proxies first;
-    #                              routes to "direct" ONLY when all proxies are unhealthy.
-    #
-    #   Strict<GroupName>Proxies — urltest, same proxy nodes (privacy-sensitive traffic).
-    #   Strict<GroupName>        — fallback wrapper: tries Strict<GroupName>Proxies only;
-    #                              NO direct fallback — connection fails when all proxies
-    #                              are down, preventing real-IP leakage.
-    #
-    # Edge case — 0 nodes for a region at generation time:
-    #   soft  → group routes directly (WARNING emitted, operator must fix subscription).
-    #   strict → group routes directly (ERROR emitted); without any proxy nodes we cannot
-    #            express "reject" as an outbound (the reject action is rule-only in sing-box).
-    #            Treat this as a misconfiguration that must be resolved.
+    # 2. Per-region urltest groups (proxy nodes only).
     for group_name, pattern in groups.items():
         nodes = filter_nodes(pattern)
-
-        if nodes:
-            custom_outbounds.append({
-                "type": "urltest",
-                "tag": f"{group_name}Proxies",
-                "outbounds": nodes
-            })
-            custom_outbounds.append({
-                "type": "urltest",
-                "tag": f"Strict{group_name}Proxies",
-                "outbounds": nodes
-            })
-        else:
-            print(f"Warning: [safe] No nodes found for group '{group_name}'. "
-                  f"Soft fallback group will route directly.")
-            print(f"ERROR: [strict] No nodes found for group 'Strict{group_name}'. "
-                  f"Strict group will use direct — real-IP leakage is possible. "
-                  f"Fix subscription to restore proxy routing.")
-
-        # Soft fallback: proxy urltest → direct (only when all proxies are unhealthy).
-        custom_outbounds.append({
-            "type": "fallback",
-            "tag": group_name,
-            "outbounds": [f"{group_name}Proxies", "direct"] if nodes else ["direct"]
-        })
-
-        # Strict fallback: proxy urltest only — connection fails when all proxies are down
-        # (no real-IP leakage). Falls to direct only if no nodes exist at generation time
-        # (misconfiguration — see error log above).
-        custom_outbounds.append({
-            "type": "fallback",
-            "tag": f"Strict{group_name}",
-            "outbounds": [f"Strict{group_name}Proxies"] if nodes else ["direct"]
-        })
-
-    # 3. Low-Rate group (Multiplier <= 0.5x) — soft fallback to direct.
-    low_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) <= 0.5]
-    if low_rate_nodes:
+        if not nodes:
+            print(f"Warning: No nodes found for group '{group_name}'.")
         custom_outbounds.append({
             "type": "urltest",
-            "tag": "LowRateNodesProxies",
-            "outbounds": low_rate_nodes
+            "tag": group_name,
+            "outbounds": nodes if nodes else []
         })
-    else:
-        print("Warning: [safe] No low-rate nodes found. LowRateNodes will route directly.")
+
+    # 3. Low-Rate group (Multiplier <= 0.5x).
+    low_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) <= 0.5]
+    if not low_rate_nodes:
+        print("Warning: No low-rate nodes found.")
     custom_outbounds.append({
-        "type": "fallback",
+        "type": "urltest",
         "tag": "LowRateNodes",
-        "outbounds": ["LowRateNodesProxies", "direct"] if low_rate_nodes else ["direct"]
+        "outbounds": low_rate_nodes
     })
 
-    # 4a. AllNodes — soft fallback (proxy urltest → direct).
-    # all_node_tags is always non-empty here (script exits above if all_nodes is empty).
+    # 4. Global AllNodes urltest group.
     all_node_tags = [n['tag'] for n in all_nodes]
     custom_outbounds.append({
         "type": "urltest",
-        "tag": "AllNodesProxies",
-        "outbounds": all_node_tags
-    })
-    custom_outbounds.append({
-        "type": "fallback",
         "tag": "AllNodes",
-        "outbounds": ["AllNodesProxies", "direct"]
-    })
-
-    # 4b. StrictAllNodes — strict fallback (proxy urltest only, no direct fallback).
-    # Connection fails when all proxy nodes are unhealthy — real IP is never exposed.
-    custom_outbounds.append({
-        "type": "urltest",
-        "tag": "StrictAllNodesProxies",
         "outbounds": all_node_tags
-    })
-    custom_outbounds.append({
-        "type": "fallback",
-        "tag": "StrictAllNodes",
-        "outbounds": ["StrictAllNodesProxies"]
     })
 
     final_config = {"outbounds": custom_outbounds}

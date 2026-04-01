@@ -106,30 +106,6 @@ spec:
           mountPath: /var/cache/sing-box/rule-set
         - name: tmp
           mountPath: /tmp
-      - name: metrics-exporter
-        image: python:3.10-alpine
-        command: ["python3", "/scripts/exporter.py"]
-        ports:
-        - containerPort: 8080
-          name: metrics
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
-        resources:
-          requests:
-            cpu: 10m
-            memory: 16Mi
-          limits:
-            cpu: 100m
-            memory: 32Mi
-        volumeMounts:
-        - name: exporter-script
-          mountPath: /scripts
-          readOnly: true
       volumes:
       - name: config-main
         configMap:
@@ -146,6 +122,3 @@ spec:
       - name: rule-set-cache
         emptyDir:
           sizeLimit: 100Mi
-      - name: exporter-script
-        configMap:
-          name: proxy-engine-exporter-config
