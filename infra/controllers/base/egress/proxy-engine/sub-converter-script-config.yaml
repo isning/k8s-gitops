@@ -76,6 +76,9 @@ data:
                         rate = get_multiplier(original_tag)
                         node['multiplier'] = rate
                         
+                        # Preserve the original tag for region matching (before prefixing)
+                        node['_original_tag'] = original_tag
+                        
                         # Prepend the subscription tag to the node name
                         tagged_name = f"[{sub_tag}] {original_tag}"
                         
@@ -99,13 +102,13 @@ data:
         print("Critical: No nodes were retrieved. Exiting.")
         sys.exit(1)
 
-    # Categorization using Regex
+    # Categorization using Regex: match against original (un-prefixed) tag
     def filter_nodes(pattern):
-        return [n['tag'] for n in all_nodes if re.search(pattern, n['tag'], re.IGNORECASE)]
+        return [n['tag'] for n in all_nodes if re.search(pattern, n.get('_original_tag', n['tag']), re.IGNORECASE)]
 
     groups = {
         "HongKong": r'🇭🇰|HK|Hong Kong|香港',
-        "Macau": r'🇲🇨|MC|Macau|澳门',
+        "Macau": r'🇲🇴|MO|Macau|澳门',
         "Taiwan": r'🇹🇼|TW|Taiwan|台湾',
         "Singapore": r'🇸🇬|SG|Singapore|狮城|新加坡',
         "UnitedStates": r'🇺🇸|US|America|United States|美国',
@@ -114,6 +117,9 @@ data:
         "UnitedKingdom": r'🇬🇧|UK|United Kingdom|英国',
         "Germany": r'🇩🇪|DE|Germany|德国'
     }
+
+    # Groups that must have at least one node; missing nodes are a hard error.
+    STRICT_GROUPS = {"UnitedStates"}
 
     # Build Outbounds
     custom_outbounds = []
@@ -125,22 +131,28 @@ data:
     for group_name, pattern in groups.items():
         nodes = filter_nodes(pattern)
         if not nodes:
-            print(f"Warning: No nodes found for group '{group_name}'.")
+            if group_name in STRICT_GROUPS:
+                print(f"Critical: No nodes found for strict group '{group_name}'. Aborting.")
+                sys.exit(1)
+            else:
+                print(f"Warning: No nodes found for group '{group_name}'. Skipping.")
+                continue
         custom_outbounds.append({
             "type": "urltest",
             "tag": group_name,
-            "outbounds": nodes if nodes else []
+            "outbounds": nodes
         })
 
     # 3. Low-Rate group (Multiplier <= 0.5x).
     low_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) <= 0.5]
     if not low_rate_nodes:
-        print("Warning: No low-rate nodes found.")
-    custom_outbounds.append({
-        "type": "urltest",
-        "tag": "LowRateNodes",
-        "outbounds": low_rate_nodes
-    })
+        print("Warning: No low-rate nodes found. Skipping LowRateNodes group.")
+    else:
+        custom_outbounds.append({
+            "type": "urltest",
+            "tag": "LowRateNodes",
+            "outbounds": low_rate_nodes
+        })
 
     # 4. Global AllNodes urltest group.
     all_node_tags = [n['tag'] for n in all_nodes]
@@ -156,10 +168,10 @@ data:
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
     with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
-        # Optional: remove the 'multiplier' helper key before writing to JSON if sing-box complains
+        # Remove internal helper keys before writing to JSON
         for ob in final_config["outbounds"]:
-            if "multiplier" in ob:
-                del ob["multiplier"]
+            ob.pop("multiplier", None)
+            ob.pop("_original_tag", None)
                 
         json.dump(final_config, f, indent=2, ensure_ascii=False)
 

@@ -7,4 +7,5 @@ resources:
   - ./singbox-main.yaml
   - ./deployment.yaml
   - ./service.yaml
+  - ./rule-set-cache-pvc.yaml
   - ./restarter

@@ -118,5 +118,5 @@ spec:
         emptyDir:
           sizeLimit: 50Mi
       - name: rule-set-cache
-        emptyDir:
-          sizeLimit: 100Mi
+        persistentVolumeClaim:
+          claimName: rule-set-cache
