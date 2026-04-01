@@ -80,7 +80,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: ssh-github-https-egress-gateway
+  name: ssh-github-egress-gateway
   namespace: egress-system
 spec:
   gatewayClassName: istio
@@ -92,7 +92,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
-  name: direct-ssh-github-to-https-egress-gateway
+  name: direct-ssh-github-to-egress-gateway
   namespace: egress-system
 spec:
   parentRefs:
@@ -102,17 +102,17 @@ spec:
       port: 22
   rules:
     - backendRefs:
-      - name: ssh-github-https-egress-gateway
+      - name: ssh-github-egress-gateway
         port: 22
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
-  name: forward-ssh-github-from-https-egress-gateway
+  name: forward-ssh-github-from-egress-gateway
   namespace: egress-system
 spec:
   parentRefs:
-    - name: ssh-github-https-egress-gateway
+    - name: ssh-github-egress-gateway
       sectionName: ssh
   rules:
     - backendRefs:
@@ -138,4 +138,4 @@ spec:
       targetPort: 7890
   workloadSelector:
     labels:
-      gateway.networking.k8s.io/gateway-name: ssh-github-https-egress-gateway
+      gateway.networking.k8s.io/gateway-name: ssh-github-egress-gateway
