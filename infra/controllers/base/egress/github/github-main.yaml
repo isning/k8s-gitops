@@ -63,7 +63,7 @@ metadata:
   namespace: egress-system
 spec:
   host: github.com
-  exportTo: ["*"]
+  exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
@@ -130,7 +130,7 @@ metadata:
   namespace: egress-system
 spec:
   host: github.com
-  exportTo: ["*"]
+  exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
