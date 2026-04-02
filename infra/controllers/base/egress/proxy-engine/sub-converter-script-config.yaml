@@ -40,6 +40,45 @@ data:
             
         sub_list.append((sub_tag, sub_url))
 
+    # ==========================================
+    # MIGRATION ARCHITECTURE
+    # ==========================================
+    
+    def migrate_domain_strategy_1_12_0(node):
+        """
+        Migrates the deprecated 'domain_strategy' dial field to the new 'domain_resolver' object.
+        Introduced in sing-box 1.12.0.
+        Reference: https://sing-box.sagernet.org/migration/#migrate-outbound-domain-strategy-option-to-domain-resolver
+        """
+        if 'domain_strategy' in node:
+            strategy = node.pop('domain_strategy')
+            # Only set it if the provider hasn't already included a domain_resolver
+            if 'domain_resolver' not in node:
+                node['domain_resolver'] = {
+                    "server": "local",
+                    "strategy": strategy
+                }
+
+    # Add future migration functions to this list
+    MIGRATIONS = [
+        migrate_domain_strategy_1_12_0
+    ]
+
+    def apply_migrations(node):
+        """
+        Safely applies all functions in the MIGRATIONS list to a node.
+        """
+        for migration in MIGRATIONS:
+            try:
+                migration(node)
+            except Exception as e:
+                # Silently pass to ensure a migration failure doesn't drop the node
+                pass
+
+    # ==========================================
+    # NODE PROCESSING
+    # ==========================================
+
     all_nodes = []
     seen_tags = set()
 
@@ -70,6 +109,9 @@ data:
                 for node in sub_data.get('outbounds', []):
                     # Basic validation: must have a server and tag
                     if 'server' in node and 'tag' in node:
+                        # Apply data schema migrations
+                        apply_migrations(node)
+                        
                         original_tag = node['tag']
                         
                         # Detect Multiplier based on the original name

@@ -11,12 +11,11 @@ data:
           { "rule_set": ["geosite-cn"], "server": "local" }
         ],
         "servers": [
-          { "type": "tls", "address": "1.1.1.1", "detour": "AllNodes", "tag": "remote" },
-          { "type": "tls", "address": "223.5.5.5", "detour": "direct", "tag": "local-tls" },
+          { "type": "tls", "server": "1.1.1.1", "detour": "AllNodes", "tag": "remote" },
+          { "type": "tls", "server": "223.5.5.5", "detour": "direct", "tag": "local-tls" },
           { "type": "local", "tag": "local" }
         ],
         "final": "remote",
-        "strategy": "ipv4_only",
         "disable_cache": false
       },
       "outbounds": [
@@ -52,7 +51,6 @@ data:
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
-            "path": "/var/cache/sing-box/rule-set/geosite-cn.srs",
             "download_detour": "direct"
           },
           {
@@ -60,7 +58,6 @@ data:
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs",
-            "path": "/var/cache/sing-box/rule-set/geosite-anthropic.srs",
             "download_detour": "direct"
           },
           {
@@ -68,7 +65,6 @@ data:
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs",
-            "path": "/var/cache/sing-box/rule-set/geosite-google-gemini.srs",
             "download_detour": "direct"
           },
           {
@@ -76,7 +72,6 @@ data:
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs",
-            "path": "/var/cache/sing-box/rule-set/geoip-cn.srs",
             "download_detour": "direct"
           }
         ]
