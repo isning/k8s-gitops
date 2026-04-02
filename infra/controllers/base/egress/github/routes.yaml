@@ -1,4 +1,4 @@
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: direct-github-other-to-https-egress-gateway
@@ -19,7 +19,7 @@ spec:
       - name: https-egress-gateway
         port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: forward-api-github-com-from-https-egress-gateway
@@ -37,7 +37,7 @@ spec:
           name: api.github.com
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: forward-github-githubassets-com-from-https-egress-gateway
@@ -55,7 +55,7 @@ spec:
           name: github.githubassets.com
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: forward-raw-githubusercontent-com-from-https-egress-gateway
@@ -73,7 +73,7 @@ spec:
           name: raw.githubusercontent.com
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: forward-objects-githubusercontent-com-from-https-egress-gateway

@@ -18,7 +18,7 @@ spec:
   resolution: DNS
 ---
 ########### HTTPS traffic to github.com ###########
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: direct-github-to-https-egress-gateway
@@ -36,7 +36,7 @@ spec:
       - name: https-egress-gateway
         port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: forward-github-com-from-https-egress-gateway
