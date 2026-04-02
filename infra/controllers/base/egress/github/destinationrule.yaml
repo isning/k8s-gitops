@@ -12,7 +12,7 @@ spec:
       targetHost: proxy-svc.egress-system.svc.cluster.local
       targetPort: 7890
   workloadSelector:
-    labels:
+    matchLabels:
       gateway.networking.k8s.io/gateway-name: https-egress-gateway
 ---
 apiVersion: networking.istio.io/v1
@@ -29,7 +29,7 @@ spec:
       targetHost: proxy-svc.egress-system.svc.cluster.local
       targetPort: 7890
   workloadSelector:
-    labels:
+    matchLabels:
       gateway.networking.k8s.io/gateway-name: https-egress-gateway
 ---
 apiVersion: networking.istio.io/v1
@@ -46,7 +46,7 @@ spec:
       targetHost: proxy-svc.egress-system.svc.cluster.local
       targetPort: 7890
   workloadSelector:
-    labels:
+    matchLabels:
       gateway.networking.k8s.io/gateway-name: https-egress-gateway
 ---
 apiVersion: networking.istio.io/v1
@@ -63,5 +63,5 @@ spec:
       targetHost: proxy-svc.egress-system.svc.cluster.local
       targetPort: 7890
   workloadSelector:
-    labels:
+    matchLabels:
       gateway.networking.k8s.io/gateway-name: https-egress-gateway
