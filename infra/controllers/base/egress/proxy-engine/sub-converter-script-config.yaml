@@ -1,0 +1,223 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sub-converter-script-config
+  namespace: egress-system
+data:
+  update_sub.py: |
+    import os
+    import json
+    import urllib.request
+    import re
+    import sys
+
+    # Configuration
+    URLS_ENV = os.environ.get('SUB_URLS', '')
+    OUTPUT_PATH = '/shared-nodes/nodes.json'
+    USER_AGENT = 'sing-box'
+    TIMEOUT = 15
+
+    if not URLS_ENV:
+        print("Error: SUB_URLS environment variable is empty!")
+        sys.exit(1)
+
+    # Parse SUB_URLS into a list of tuples: (sub_tag, sub_url)
+    sub_list = []
+    for i, item in enumerate(URLS_ENV.split(',')):
+        item = item.strip()
+        if not item:
+            continue
+        
+        # Check if a custom tag is provided (e.g., sub1:https://...)
+        if not item.startswith('http') and ':' in item:
+            parts = item.split(':', 1)
+            sub_tag = parts[0].strip()
+            sub_url = parts[1].strip()
+        else:
+            # Fallback if no tag is provided
+            sub_tag = f"Sub_{i+1}"
+            sub_url = item
+            
+        sub_list.append((sub_tag, sub_url))
+
+    # ==========================================
+    # MIGRATION ARCHITECTURE
+    # ==========================================
+    
+    def migrate_domain_strategy_1_12_0(node):
+        """
+        Migrates the deprecated 'domain_strategy' dial field to the new 'domain_resolver' object.
+        Introduced in sing-box 1.12.0.
+        Reference: https://sing-box.sagernet.org/migration/#migrate-outbound-domain-strategy-option-to-domain-resolver
+        """
+        if 'domain_strategy' in node:
+            strategy = node.pop('domain_strategy')
+            # Only set it if the provider hasn't already included a domain_resolver
+            if 'domain_resolver' not in node:
+                node['domain_resolver'] = {
+                    "server": "local",
+                    "strategy": strategy
+                }
+
+    # Add future migration functions to this list
+    MIGRATIONS = [
+        migrate_domain_strategy_1_12_0
+    ]
+
+    def apply_migrations(node):
+        """
+        Safely applies all functions in the MIGRATIONS list to a node.
+        """
+        for migration in MIGRATIONS:
+            try:
+                migration(node)
+            except Exception as e:
+                # Silently pass to ensure a migration failure doesn't drop the node
+                pass
+
+    # ==========================================
+    # NODE PROCESSING
+    # ==========================================
+
+    all_nodes = []
+    seen_tags = set()
+
+    def get_multiplier(tag):
+        """
+        Extracts a multiplier suffix from the tag.
+        Matches patterns like [0.5x], (2x), or ' 1.5x' (with a preceding space) at the end of the string.
+        The multiplier must be preceded by '[', '(' or whitespace.
+        """
+        match = re.search(r'[\[\(\s]([0-9.]+)x[\]\)]?$', tag, re.IGNORECASE)
+        if match:
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return 1.0
+        return 1.0
+
+    print(f"Starting to process {len(sub_list)} subscriptions...")
+
+    for sub_tag, url in sub_list:
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+            with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+                content = resp.read().decode('utf-8')
+                sub_data = json.loads(content)
+                
+                count = 0
+                for node in sub_data.get('outbounds', []):
+                    # Basic validation: must have a server and tag
+                    if 'server' in node and 'tag' in node:
+                        # Apply data schema migrations
+                        apply_migrations(node)
+                        
+                        original_tag = node['tag']
+                        
+                        # Detect Multiplier based on the original name
+                        rate = get_multiplier(original_tag)
+                        node['multiplier'] = rate
+                        
+                        # Preserve the original tag for region matching (before prefixing)
+                        node['_original_tag'] = original_tag
+                        
+                        # Prepend the subscription tag to the node name
+                        tagged_name = f"[{sub_tag}] {original_tag}"
+                        
+                        # Deduplicate tags
+                        final_tag = tagged_name
+                        counter = 1
+                        while final_tag in seen_tags:
+                            final_tag = f"{tagged_name}_{counter}"
+                            counter += 1
+                        
+                        node['tag'] = final_tag
+                        seen_tags.add(final_tag)
+                        all_nodes.append(node)
+                        count += 1
+                
+                print(f"[{sub_tag}] Successfully fetched {count} nodes.")
+        except Exception as e:
+            print(f"[{sub_tag}] Failed to fetch subscription. Error: {e}")
+
+    if not all_nodes:
+        print("Critical: No nodes were retrieved. Exiting.")
+        sys.exit(1)
+
+    # Categorization using Regex: match against original (un-prefixed) tag
+    def filter_nodes(pattern):
+        return [n['tag'] for n in all_nodes if re.search(pattern, n.get('_original_tag', n['tag']), re.IGNORECASE)]
+
+    groups = {
+        "HongKong": r'🇭🇰|HK|Hong Kong|香港',
+        "Macau": r'🇲🇴|MO|Macau|澳门',
+        "Taiwan": r'🇹🇼|TW|Taiwan|台湾',
+        "Singapore": r'🇸🇬|SG|Singapore|狮城|新加坡',
+        "UnitedStates": r'🇺🇸|US|America|United States|美国',
+        "Japan": r'🇯🇵|JP|Japan|日本',
+        "Korea": r'🇰🇷|KR|Korea|韩国',
+        "UnitedKingdom": r'🇬🇧|UK|United Kingdom|英国',
+        "Germany": r'🇩🇪|DE|Germany|德国'
+    }
+
+    # Groups that must have at least one node; missing nodes are a hard error.
+    STRICT_GROUPS = {"UnitedStates"}
+
+    # Build Outbounds
+    custom_outbounds = []
+
+    # 1. Add all proxy nodes
+    custom_outbounds.extend(all_nodes)
+
+    # 2. Per-region urltest groups (proxy nodes only).
+    for group_name, pattern in groups.items():
+        nodes = filter_nodes(pattern)
+        if not nodes:
+            if group_name in STRICT_GROUPS:
+                print(f"Critical: No nodes found for strict group '{group_name}'. Aborting.")
+                sys.exit(1)
+            else:
+                print(f"Warning: No nodes found for group '{group_name}'. Skipping.")
+                continue
+        custom_outbounds.append({
+            "type": "urltest",
+            "tag": group_name,
+            "outbounds": nodes
+        })
+
+    # 3. Low-Rate group (Multiplier <= 0.5x).
+    low_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) <= 0.5]
+    if not low_rate_nodes:
+        print("Warning: No low-rate nodes found. Skipping LowRateNodes group.")
+    else:
+        custom_outbounds.append({
+            "type": "urltest",
+            "tag": "LowRateNodes",
+            "outbounds": low_rate_nodes
+        })
+
+    # 4. Global AllNodes urltest group.
+    all_node_tags = [n['tag'] for n in all_nodes]
+    custom_outbounds.append({
+        "type": "urltest",
+        "tag": "AllNodes",
+        "outbounds": all_node_tags
+    })
+
+    final_config = {"outbounds": custom_outbounds}
+
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+
+    with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
+        # Remove internal helper keys before writing to JSON
+        for ob in final_config["outbounds"]:
+            ob.pop("multiplier", None)
+            ob.pop("_original_tag", None)
+                
+        json.dump(final_config, f, indent=2, ensure_ascii=False)
+
+    print(f"\nConfiguration generated successfully!")
+    print(f"Total nodes: {len(all_nodes)}")
+    print(f"Low-rate nodes detected: {len(low_rate_nodes)}")
+    print(f"Output saved to: {OUTPUT_PATH}")

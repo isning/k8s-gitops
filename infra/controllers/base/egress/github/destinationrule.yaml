@@ -1,0 +1,67 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: inject-connect-tunnel-api-github-com
+  namespace: egress-system
+spec:
+  host: api.github.com
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: proxy-svc.egress-system.svc.cluster.local
+      targetPort: 7890
+  workloadSelector:
+    matchLabels:
+      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: inject-connect-tunnel-github-githubassets-com
+  namespace: egress-system
+spec:
+  host: github.githubassets.com
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: proxy-svc.egress-system.svc.cluster.local
+      targetPort: 7890
+  workloadSelector:
+    matchLabels:
+      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: inject-connect-tunnel-raw-githubusercontent-com
+  namespace: egress-system
+spec:
+  host: raw.githubusercontent.com
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: proxy-svc.egress-system.svc.cluster.local
+      targetPort: 7890
+  workloadSelector:
+    matchLabels:
+      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: inject-connect-tunnel-objects-githubusercontent-com
+  namespace: egress-system
+spec:
+  host: objects.githubusercontent.com
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: proxy-svc.egress-system.svc.cluster.local
+      targetPort: 7890
+  workloadSelector:
+    matchLabels:
+      gateway.networking.k8s.io/gateway-name: https-egress-gateway
