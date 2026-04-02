@@ -70,7 +70,7 @@ spec:
       targetHost: proxy-svc.egress-system.svc.cluster.local
       targetPort: 7890
   workloadSelector:
-    labels:
+    matchLabels:
       gateway.networking.k8s.io/gateway-name: https-egress-gateway
 ---
 ########### SSH traffic to github.com ###########
@@ -137,5 +137,5 @@ spec:
       targetHost: proxy-svc.egress-system.svc.cluster.local
       targetPort: 7890
   workloadSelector:
-    labels:
+    matchLabels:
       gateway.networking.k8s.io/gateway-name: ssh-github-egress-gateway
