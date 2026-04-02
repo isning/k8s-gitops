@@ -16,7 +16,7 @@ spec:
     - objects.githubusercontent.com
   rules:
     - backendRefs:
-      - name: https-egress-gateway
+      - name: https-egress-gateway-istio
         port: 443
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
