@@ -9,8 +9,7 @@ metadata:
 spec:
   ports:
   - port: 7890
-    name: http-proxy
-    appProtocol: http
+    name: mixed-proxy
     protocol: TCP
     targetPort: 7890
   selector:
