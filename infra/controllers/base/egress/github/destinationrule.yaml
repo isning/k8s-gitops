@@ -5,7 +5,7 @@ metadata:
   namespace: egress-system
 spec:
   host: api.github.com
-  exportTo: ["*"]
+  exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
@@ -22,7 +22,7 @@ metadata:
   namespace: egress-system
 spec:
   host: github.githubassets.com
-  exportTo: ["*"]
+  exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
@@ -39,7 +39,7 @@ metadata:
   namespace: egress-system
 spec:
   host: raw.githubusercontent.com
-  exportTo: ["*"]
+  exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
@@ -56,7 +56,7 @@ metadata:
   namespace: egress-system
 spec:
   host: objects.githubusercontent.com
-  exportTo: ["*"]
+  exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
