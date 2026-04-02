@@ -11,8 +11,8 @@ data:
           { "rule_set": ["geosite-cn"], "server": "local" }
         ],
         "servers": [
-          { "type": "tls", "server": "1.1.1.1", "detour": "AllNodes", "tag": "remote" },
-          { "type": "tls", "server": "223.5.5.5", "detour": "direct", "tag": "local-tls" },
+          { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local-tls" },
+          { "type": "tls", "server": "dot.pub", "detour": "direct", "tag": "local-tls", "domain_resolver": "local" },
           { "type": "local", "tag": "local" }
         ],
         "final": "remote",
