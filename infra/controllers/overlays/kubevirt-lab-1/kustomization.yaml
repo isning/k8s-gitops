@@ -15,6 +15,7 @@ resources:
   - ../../base/cloudnative-pg/
   - ../../base/redroid-operator/
   - ../../base/egress/
+  - ../../base/kiali/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml
