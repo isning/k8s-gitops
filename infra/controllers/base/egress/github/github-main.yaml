@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
-  name: github
+  name: github.com
   namespace: egress-system
 spec:
   exportTo: ["*"]
@@ -21,121 +21,110 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: direct-github-to-https-egress-gateway
+  name: direct-to-encapsulated-https-github.com
   namespace: egress-system
 spec:
   parentRefs:
     - kind: ServiceEntry
       group: networking.istio.io
-      name: github
+      name: github.com
       port: 443
-  hostnames:
-    - github.com
-  rules:
-    - backendRefs:
-      - name: https-egress-gateway-istio
-        port: 443
----
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: TLSRoute
-metadata:
-  name: forward-github-com-from-https-egress-gateway
-  namespace: egress-system
-spec:
-  parentRefs:
-    - name: https-egress-gateway
-      sectionName: https
   hostnames:
     - github.com
   rules:
     - backendRefs:
         - kind: Hostname
           group: networking.istio.io
-          name: github.com
+          name: github.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-https-github.com
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - github.com.encapsulated-https.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        https: 7890
 ---
 # Encapsulate the egress traffic into CONNECT tunnel to forward all traffic to it.
 # Applies to HTTPS traffic to github.com.
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: inject-connect-github-com
+  name: encapsulate-https-github.com
   namespace: egress-system
 spec:
-  host: github.com
+  host: github.com.encapsulated-https.egress-gateway.mesh.internal
   exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
-      targetHost: proxy-svc.egress-system.svc.cluster.local
-      targetPort: 7890
-  workloadSelector:
-    matchLabels:
-      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+      targetHost: github.com
+      targetPort: 443
 ---
 ########### SSH traffic to github.com ###########
-
-# Dedicated egress gateway for SSH traffic to github.com
-# to avoid losing hostname information in CONNECT tunnel for SSH traffic.
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: ssh-github-egress-gateway
-  namespace: egress-system
-spec:
-  gatewayClassName: istio
-  listeners:
-    - name: ssh
-      protocol: TCP
-      port: 22
----
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TCPRoute
 metadata:
-  name: direct-ssh-github-to-egress-gateway
+  name: direct-to-encapsulated-ssh-github.com
   namespace: egress-system
 spec:
   parentRefs:
     - kind: ServiceEntry
       group: networking.istio.io
-      name: github
+      name: github.com
       port: 22
-  rules:
-    - backendRefs:
-      - name: ssh-github-egress-gateway-istio
-        port: 22
----
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
-metadata:
-  name: forward-ssh-github-from-egress-gateway
-  namespace: egress-system
-spec:
-  parentRefs:
-    - name: ssh-github-egress-gateway
-      sectionName: ssh
   rules:
     - backendRefs:
         - kind: Hostname
           group: networking.istio.io
-          name: github.com
+          name: github.com.encapsulated-ssh.egress-gateway.mesh.internal
           port: 22
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-ssh-github.com
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - github.com.encapsulated-ssh.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 22
+      name: ssh
+      protocol: TCP
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        ssh: 7890
 ---
 # Encapsulate the egress traffic into CONNECT tunnel to forward all traffic to it.
 # Applies to SSH traffic to github.com.
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: inject-connect-github-ssh
+  name: encapsulate-ssh-github.com
   namespace: egress-system
 spec:
-  host: github.com
+  host: github.com.encapsulated-ssh.egress-gateway.mesh.internal
   exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
-      targetHost: proxy-svc.egress-system.svc.cluster.local
-      targetPort: 7890
-  workloadSelector:
-    matchLabels:
-      gateway.networking.k8s.io/gateway-name: ssh-github-egress-gateway
+      targetHost: github.com
+      targetPort: 22
