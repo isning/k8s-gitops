@@ -47,6 +47,7 @@ data:
           { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" },
           { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" }
         ],
+        "final": "AllNodes",
         "rule_set": [
           {
             "tag": "geosite-cn",
