@@ -18,7 +18,7 @@ spec:
         namespace: flux-system
       # istio <=> kiali Version Compatibility
       # https://kiali.io/docs/installation/installation-guide/prerequisites/
-      version: "2.21.*"
+      version: "2.24.*"
       interval: 12h
   values:
     cr:
@@ -27,6 +27,8 @@ spec:
       # (the default will be the operator namespace).
       namespace: kiali-operator
       spec:
+        version: "default"
+
         auth:
           strategy: openid
           openid:
@@ -38,3 +40,79 @@ spec:
               - "email"
               - "roles"
             username_claim: "username"
+
+        deployment:
+          cluster_wide_access: true
+          ingress:
+            enabled: false
+          hpa:
+            api_version: "autoscaling/v1"
+            spec:
+              minReplicas: 1
+              maxReplicas: 2
+              targetCPUUtilizationPercentage: 80
+          instance_name: "kiali"
+          namespace: "kiali-operator"
+          network_policy:
+            enabled: true
+          replicas: 1
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "64Mi"
+            limits:
+              memory: "1Gi"
+          view_only_mode: false
+        
+        installation_tag: "Kiali@kubevirt-lab-1"
+
+        external_services:
+          # [Required] Kiali requires Prometheus to generate the topology graph,
+          # show metrics, calculate health and for several other features.
+          # If Prometheus is missing or Kiali can’t reach it, Kiali won’t work properly.
+          prometheus:
+            auth:
+              type: none
+            cache_duration: 10
+            cache_enabled: true
+            cache_expiration: 300
+            health_check_url: ""
+            is_core: true
+            query_scope:
+              cluster: "kubevirt-lab-1"
+            url: "http://vmsingle-victoriametrics-vmks.monitoring.svc.cluster.local:8428" # "https://prometheus.isning.moe"
+          # [Optional] Kiali will query Grafana and try to fetch the configured Istio dashboards.
+          # For this reason Kiali must be able to reach Grafana, authenticate, and find the Istio dashboards.
+          # https://kiali.io/docs/configuration/p8s-jaeger-grafana/grafana/
+          grafana:
+            auth:
+              type: bearer
+              use_kiali_token: true
+            enabled: true
+            is_core: false
+            # Grafana service name is "grafana" and is in the "telemetry" namespace.
+            internal_url: 'http://grafana-service.prod.svc.cluster.local:3000/'
+            # Public facing URL of Grafana
+            external_url: 'https://grafana.isning.moe'
+          # [Optional] Jaeger is a highly recommended service because Kiali uses distributed tracing data for
+          # several features, providing an enhanced experience.
+          tracing:
+            enabled: false
+
+        kiali_feature_flags:
+          istio_annotation_action: true
+          istio_injection_action: true
+          istio_upgrade_action: false
+          ui_defaults:
+            i18n:
+              language: "en"
+              show_selector: true
+
+        server:
+          audit_log: true
+          gzip_enabled: true
+          node_port: 32475
+          port: 20001
+          web_fqdn: ""
+          metrics_enabled: true
+          metrics_port: 9090

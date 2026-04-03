@@ -6,6 +6,7 @@ resources:
   - ../../base/cert-manager/
   - ../../base/kubevirt/
   - ../../base/gateway/
+  - ../../base/kiali/
   - ../../base/flux/
   - ../../base/cloudnative-pg/
   - ./cloudflare-operator/
