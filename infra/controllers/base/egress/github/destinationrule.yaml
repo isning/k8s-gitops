@@ -1,6 +1,20 @@
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
+  name: encapsulate-https-ghcr.io
+  namespace: egress-system
+spec:
+  host: ghcr.io.encapsulated-https.egress-gateway.mesh.internal
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: ghcr.io
+      targetPort: 443
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
   name: encapsulate-https-api.github.com
   namespace: egress-system
 spec:

@@ -21,6 +21,26 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
+  name: direct-to-encapsulated-https-ghcr.io
+  namespace: egress-system
+spec:
+  parentRefs:
+    - kind: ServiceEntry
+      group: networking.istio.io
+      name: github-others
+      port: 443
+  hostnames:
+    - ghcr.io
+  rules:
+    - backendRefs:
+        - kind: Hostname
+          group: networking.istio.io
+          name: ghcr.io.encapsulated-https.egress-gateway.mesh.internal
+          port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
   name: direct-to-encapsulated-https-github.githubassets.com
   namespace: egress-system
 spec:
