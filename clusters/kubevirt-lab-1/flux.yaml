@@ -27,3 +27,14 @@ spec:
     # Istio trasnport data on port different from the original one,
     # so we need to disable network policy to allow traffic between controllers and Istio
     networkPolicy: false
+  kustomize:
+    patches:
+      - target:
+          kind: Namespace
+        patch: |
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: flux-system
+            labels:
+              istio.io/dataplane-mode: ambient
