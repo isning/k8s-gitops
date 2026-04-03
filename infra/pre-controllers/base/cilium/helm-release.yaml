@@ -76,3 +76,10 @@ spec:
     k8sClientRateLimit:
       qps: 100
       burst: 200
+
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true
