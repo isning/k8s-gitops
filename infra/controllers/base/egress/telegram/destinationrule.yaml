@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: encapsulate-https-api.telegram.org
+  namespace: egress-system
+spec:
+  host: api.telegram.org.encapsulated-https.egress-gateway.mesh.internal
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: api.telegram.org
+      targetPort: 443
+  

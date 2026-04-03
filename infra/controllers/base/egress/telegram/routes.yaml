@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: direct-to-encapsulated-https-api.telegram.org
+  namespace: egress-system
+spec:
+  parentRefs:
+    - kind: ServiceEntry
+      group: networking.istio.io
+      name: telegram
+      port: 443
+  hostnames:
+    - api.telegram.org
+  rules:
+    - backendRefs:
+        - kind: Hostname
+          group: networking.istio.io
+          name: api.telegram.org.encapsulated-https.egress-gateway.mesh.internal
+          port: 443

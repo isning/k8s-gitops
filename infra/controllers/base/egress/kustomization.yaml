@@ -6,3 +6,4 @@ resources:
   - ./gateway.yaml
   - ./proxy-engine
   - ./github
+  - ./telegram
