@@ -28,4 +28,13 @@ spec:
       namespace: kiali-operator
       spec:
         auth:
-          strategy: anonymous
+          strategy: openid
+          openid:
+            client_id: "xktx7x81fvdwvx3a0ly62"
+            issuer_uri: "https://logto.isning.moe/oidc"
+            scopes:
+              - "openid"
+              - "profile"
+              - "email"
+              - "roles"
+            username_claim: "username"
