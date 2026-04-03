@@ -24,4 +24,6 @@ spec:
   cluster:
     type: kubernetes
     multitenant: false
-    networkPolicy: true
+    # Istio trasnport data on port different from the original one,
+    # so we need to disable network policy to allow traffic between controllers and Istio
+    networkPolicy: false
