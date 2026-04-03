@@ -17,7 +17,13 @@ spec:
         kinds:
           - kind: HTTPRoute
         namespaces:
-          from: Same
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: NotIn
+                values:
+                  - staging
     - name: https
       protocol: HTTPS
       port: 443
@@ -30,7 +36,13 @@ spec:
         kinds:
           - kind: HTTPRoute
         namespaces:
-          from: Same
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: NotIn
+                values:
+                  - staging
   allowedListeners:
     namespaces:
       from: Same # = same namespace
