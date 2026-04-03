@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: telegram
+  namespace: egress-system
+spec:
+  exportTo: ["*"]
+  hosts:
+    - api.telegram.org
+  location: MESH_EXTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-https-api.telegram.org
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - api.telegram.org.encapsulated-https.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        https: 7890
