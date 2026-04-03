@@ -13,7 +13,7 @@ data:
           { "rule_set": ["geosite-cn"], "server": "local" }
         ],
         "servers": [
-          { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local-tls" },
+          { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local" },
           { "type": "tls", "server": "dot.pub", "detour": "direct", "tag": "local", "domain_resolver": "local-raw" },
           { "type": "local", "detour": "direct", "tag": "local-raw" }
         ],
@@ -34,7 +34,7 @@ data:
       "route": {
         "auto_detect_interface": false,
         "default_domain_resolver": {
-          "server": "local-tls"
+          "server": "local"
         },
         "rules": [
           {
@@ -43,9 +43,9 @@ data:
           },
           { "action": "sniff" },
           { "protocol": "dns", "action": "hijack-dns" },
-          { "ip_is_private": true, "outbound": "direct" }
+          { "ip_is_private": true, "outbound": "direct" },
           { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" },
-          { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" },
+          { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" }
         ],
         "rule_set": [
           {
