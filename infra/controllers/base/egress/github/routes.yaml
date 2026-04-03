@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: direct-github-other-to-https-egress-gateway
+  name: direct-to-encapsulated-https-api.github.com
   namespace: egress-system
 spec:
   parentRefs:
@@ -11,82 +11,69 @@ spec:
       port: 443
   hostnames:
     - api.github.com
-    - github.githubassets.com
-    - raw.githubusercontent.com
-    - objects.githubusercontent.com
-  rules:
-    - backendRefs:
-      - name: https-egress-gateway-istio
-        port: 443
----
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: TLSRoute
-metadata:
-  name: forward-api-github-com-from-https-egress-gateway
-  namespace: egress-system
-spec:
-  parentRefs:
-    - name: https-egress-gateway
-      sectionName: https
-  hostnames:
-    - api.github.com
   rules:
     - backendRefs:
         - kind: Hostname
           group: networking.istio.io
-          name: api.github.com
+          name: api.github.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: forward-github-githubassets-com-from-https-egress-gateway
+  name: direct-to-encapsulated-https-github.githubassets.com
   namespace: egress-system
 spec:
   parentRefs:
-    - name: https-egress-gateway
-      sectionName: https
+    - kind: ServiceEntry
+      group: networking.istio.io
+      name: github-others
+      port: 443
   hostnames:
     - github.githubassets.com
   rules:
     - backendRefs:
         - kind: Hostname
           group: networking.istio.io
-          name: github.githubassets.com
+          name: github.githubassets.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: forward-raw-githubusercontent-com-from-https-egress-gateway
+  name: direct-to-encapsulated-https-raw.githubusercontent.com
   namespace: egress-system
 spec:
   parentRefs:
-    - name: https-egress-gateway
-      sectionName: https
+    - kind: ServiceEntry
+      group: networking.istio.io
+      name: github-others
+      port: 443
   hostnames:
     - raw.githubusercontent.com
   rules:
     - backendRefs:
         - kind: Hostname
           group: networking.istio.io
-          name: raw.githubusercontent.com
+          name: raw.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: forward-objects-githubusercontent-com-from-https-egress-gateway
+  name: direct-to-encapsulated-https-objects.githubusercontent.com
   namespace: egress-system
 spec:
   parentRefs:
-    - name: https-egress-gateway
-      sectionName: https
+    - kind: ServiceEntry
+      group: networking.istio.io
+      name: github-others
+      port: 443
   hostnames:
     - objects.githubusercontent.com
   rules:
     - backendRefs:
         - kind: Hostname
           group: networking.istio.io
-          name: objects.githubusercontent.com
+          name: objects.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443

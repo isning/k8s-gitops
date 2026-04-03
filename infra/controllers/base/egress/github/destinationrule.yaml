@@ -1,67 +1,55 @@
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: inject-connect-tunnel-api-github-com
+  name: encapsulate-https-api.github.com
   namespace: egress-system
 spec:
-  host: api.github.com
+  host: api.github.com.encapsulated-https.egress-gateway.mesh.internal
   exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
-      targetHost: proxy-svc.egress-system.svc.cluster.local
-      targetPort: 7890
-  workloadSelector:
-    matchLabels:
-      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+      targetHost: api.github.com
+      targetPort: 443
 ---
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: inject-connect-tunnel-github-githubassets-com
+  name: encapsulate-https-github.githubassets.com
   namespace: egress-system
 spec:
-  host: github.githubassets.com
+  host: github.githubassets.com.encapsulated-https.egress-gateway.mesh.internal
   exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
-      targetHost: proxy-svc.egress-system.svc.cluster.local
-      targetPort: 7890
-  workloadSelector:
-    matchLabels:
-      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+      targetHost: github.githubassets.com
+      targetPort: 443
 ---
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: inject-connect-tunnel-raw-githubusercontent-com
+  name: encapsulate-https-raw.githubusercontent.com
   namespace: egress-system
 spec:
-  host: raw.githubusercontent.com
+  host: raw.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
   exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
-      targetHost: proxy-svc.egress-system.svc.cluster.local
-      targetPort: 7890
-  workloadSelector:
-    matchLabels:
-      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+      targetHost: raw.githubusercontent.com
+      targetPort: 443
 ---
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: inject-connect-tunnel-objects-githubusercontent-com
+  name: encapsulate-https-objects.githubusercontent.com
   namespace: egress-system
 spec:
-  host: objects.githubusercontent.com
+  host: objects.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
   exportTo: ["."]
   trafficPolicy:
     tunnel:
       protocol: CONNECT
-      targetHost: proxy-svc.egress-system.svc.cluster.local
-      targetPort: 7890
-  workloadSelector:
-    matchLabels:
-      gateway.networking.k8s.io/gateway-name: https-egress-gateway
+      targetHost: objects.githubusercontent.com
+      targetPort: 443

@@ -16,3 +16,83 @@ spec:
       name: https
       protocol: TLS
   resolution: DNS
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-https-api.github.com
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - api.github.com.encapsulated-https.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        https: 7890
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-https-github.githubassets.com
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - github.githubassets.com.encapsulated-https.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        https: 7890
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-https-raw.githubusercontent.com
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - raw.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        https: 7890
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: encapsulated-https-objects.githubusercontent.com
+  namespace: egress-system
+spec:
+  exportTo: ["."]
+  hosts:
+    - objects.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
+  location: MESH_INTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: DNS
+  endpoints:
+    - address: proxy-svc.egress-system.svc.cluster.local
+      ports:
+        https: 7890
