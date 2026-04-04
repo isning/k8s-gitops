@@ -114,6 +114,10 @@ spec:
           port: 20001
           # Defines the public domain where Kiali is being served. This is the ‘domain’ part of the URL (usually it’s a fully-qualified domain name). For example, kiali.example.org. When empty, Kiali will try to guess this value from HTTP headers. On non-OpenShift clusters, you must populate this value if you want to enable cross-linking between Kiali instances in a multi-cluster setup.
           web_fqdn: ""
+          # Defines the ingress port where the connections come from. This is usually necessary when the application responds through a proxy/ingress, and it does not forward the correct headers (when this happens, Kiali cannot guess the port). When empty, Kiali will try to guess this value from HTTP headers.
+          web_port: ""
+          # Defines the context root path for the Kiali console and API endpoints and readiness probes. When providing a context root path that is not /, do not add a trailing slash (i.e. use /kiali not /kiali/). When empty, this will default to / on OpenShift and /kiali on other Kubernetes environments.
+          web_root: "/"
           observability:
             metrics:
               enabled: true
