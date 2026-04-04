@@ -91,8 +91,10 @@ metadata:
   namespace: kube-system
 spec:
   parentRefs:
-  - name: infra-gateway
-    sectionName: http-raw
+    - group: gateway.networking.x-k8s.io
+      kind: XListenerSet
+      name: http-listener-set
+      sectionName: http-raw
   hostnames:
   - "*.clustername.isning.moe"
   rules:
