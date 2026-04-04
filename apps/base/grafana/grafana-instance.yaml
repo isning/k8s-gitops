@@ -50,7 +50,7 @@ spec:
       # Assigns the Admin role to the operator service account, replace 'default' with the namespace of the operator
       role_attribute_path: >
         (
-          contains(sub, 'system:serviceaccount:istio-system:kiali') && 'Viewer' ||
+          contains(sub, 'system:serviceaccount:kiali-operator:kiali-service-account') && 'Viewer' ||
           'None'
         )
       jwk_set_url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/openid/v1/jwks
