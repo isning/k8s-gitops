@@ -49,11 +49,7 @@ spec:
       auto_sign_up: "true"
       role_attribute_strict: "true" # Disables auto_assign_org_role
       # Assigns the Admin role to the operator service account, replace 'default' with the namespace of the operator
-      role_attribute_path: >
-        (
-          contains(sub, 'system:serviceaccount:kiali-operator:kiali-service-account') && 'Viewer' ||
-          'None'
-        )
+      role_attribute_path: "contains(sub, 'system:serviceaccount:kiali-operator:kiali-service-account') && 'Viewer' || 'None'"
       jwk_set_url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/openid/v1/jwks
       jwk_set_bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       tls_client_ca: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
