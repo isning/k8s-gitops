@@ -33,7 +33,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /kiali
+            value: /
       backendRefs:
         - name: kiali
           port: 20001
