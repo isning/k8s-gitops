@@ -128,3 +128,66 @@ spec:
           "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager"
           use_remote_address: false
           xff_num_trusted_hops: 1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: set-xfp-for-specific-listener
+  namespace: kube-system
+spec:
+  workloadSelector:
+    labels:
+      gateway.networking.k8s.io/gateway-name: infra-gateway
+  configPatches:
+  - applyTo: ROUTE_CONFIGURATION
+    match:
+      context: GATEWAY
+      routeConfiguration:
+        portNumber: 80
+    patch:
+      operation: MERGE
+      value:
+        request_headers_to_add:
+        - header:
+            key: x-forwarded-port
+            value: "80"
+          append_action: OVERWRITE_IF_EXISTS_OR_ADD
+        - header:
+            key: x-forwarded-proto
+            value: "http"
+          append_action: OVERWRITE_IF_EXISTS_OR_ADD
+  - applyTo: ROUTE_CONFIGURATION
+    match:
+      context: GATEWAY
+      routeConfiguration:
+        portNumber: 443 
+    patch:
+      operation: MERGE
+      value:
+        request_headers_to_add:
+        - header:
+            key: x-forwarded-port
+            value: "443"
+          append_action: OVERWRITE_IF_EXISTS_OR_ADD
+        - header:
+            key: x-forwarded-proto
+            value: "https"
+          append_action: OVERWRITE_IF_EXISTS_OR_ADD
+  - applyTo: ROUTE_CONFIGURATION
+    match:
+      context: GATEWAY
+      routeConfiguration:
+        portNumber: 8080
+    patch:
+      operation: MERGE
+      value:
+        request_headers_to_add:
+        # Trust XFP from proxy before 8080 listener (e.g. cloudflare tunnel).
+        - header:
+            key: x-forwarded-port
+            value: "443"
+          append_action: ADD_IF_ABSENT
+        - header:
+            key: x-forwarded-proto
+            value: "https"
+          append_action: ADD_IF_ABSENT
