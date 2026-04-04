@@ -111,8 +111,13 @@ spec:
         server:
           audit_log: true
           gzip_enabled: true
-          node_port: 32475
           port: 20001
+          # Defines the public domain where Kiali is being served. This is the ‘domain’ part of the URL (usually it’s a fully-qualified domain name). For example, kiali.example.org. When empty, Kiali will try to guess this value from HTTP headers. On non-OpenShift clusters, you must populate this value if you want to enable cross-linking between Kiali instances in a multi-cluster setup.
           web_fqdn: ""
-          metrics_enabled: true
-          metrics_port: 9090
+          observability:
+            metrics:
+              enabled: true
+              health_status:
+                enabled: false
+                max_consecutive_na: 3
+              port: 9090
