@@ -17,6 +17,7 @@ resources:
   - ../../base/redroid-operator/
   - ../../base/egress/
   - ../../base/kiali/
+  - ../../base/oauth2-proxy/
 
 patches:
   - path: ./helmrelease-victoria-metrics.yaml

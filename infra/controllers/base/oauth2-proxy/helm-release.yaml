@@ -1,0 +1,57 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  releaseName: oauth2-proxy
+  interval: 30m
+  chart:
+    spec:
+      chart: oauth2-proxy
+      sourceRef:
+        kind: HelmRepository
+        name: oauth2-proxy
+        namespace: flux-system
+      interval: 12h
+      version: "10.4.2"
+  values:
+    replicaCount: 1
+    config:
+      existingSecret: oauth2-proxy-secrets
+      clientID: "m8rwqva1rsy9p2b3tbsad"
+      emailDomains:
+        - "*"
+      upstreams:
+        - "static://200"
+    extraArgs:
+      provider: oidc
+      oidc-issuer-url: "https://logto.isning.moe/oidc"
+      redirect-url: "https://oauth-gateway.isning.moe/oauth2/callback"
+      reverse-proxy: "true"
+      set-xauthrequest: "true"
+      pass-access-token: "true"
+      pass-authorization-header: "true"
+      skip-provider-button: "true"
+      cookie-secure: "true"
+      cookie-samesite: "lax"
+      cookie-domain: ".isning.moe"
+      whitelist-domain: ".isning.moe"
+    resources:
+      requests:
+        cpu: "10m"
+        memory: "64Mi"
+      limits:
+        memory: "256Mi"
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      enabled: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
