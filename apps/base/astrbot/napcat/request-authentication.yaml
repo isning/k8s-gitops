@@ -13,5 +13,4 @@ spec:
       audiences:
         - m8rwqva1rsy9p2b3tbsad
       fromHeaders:
-        - name: Authorization
-          prefix: "Bearer "
+        - name: X-Auth-Request-Id-Token
