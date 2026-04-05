@@ -6,3 +6,6 @@ resources:
   - ./deployment.yaml
   - ./service.yaml
   - ./httproute.yaml
+  - ./authz-policy.yaml
+  - ./webui-config.yaml
+  - ./onebot-secret.yaml

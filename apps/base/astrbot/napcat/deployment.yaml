@@ -41,6 +41,27 @@ spec:
           volumeMounts:
             - name: machine-id-data
               mountPath: /machine-id-data
+        - name: setup-onebot-config
+          image: ghcr.io/jqlang/jq:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # 使用 jq 遍历配置文件映射
+              jq -r 'to_entries[] | "\(.key)|\(.value | @json)"' /tmp/onebot/configs.json | while IFS='|' read -r filename content; do
+                # 将配置写入文件
+                echo "$content" | jq '.' > /config/"$filename"
+                echo "✓ OneBot config created: $filename"
+              done
+              
+              echo "Files in /config:"
+              ls -lah /config/
+          volumeMounts:
+            - name: onebot-config
+              mountPath: /tmp/onebot
+              readOnly: true
+            - name: napcat-config
+              mountPath: /config
       
       containers:
         - name: napcat
@@ -66,6 +87,10 @@ spec:
           volumeMounts:
             - name: napcat-config
               mountPath: /app/napcat/config
+            - name: webui-config
+              mountPath: /app/napcat/config/webui.json
+              subPath: webui.json
+              readOnly: true
             - name: napcat-qq
               mountPath: /app/.config/QQ
             - name: machine-id-data
@@ -80,6 +105,12 @@ spec:
         - name: napcat-config
           persistentVolumeClaim:
             claimName: napcat-config-pvc
+        - name: webui-config
+          configMap:
+            name: napcat-webui-config
+        - name: onebot-config
+          secret:
+            secretName: napcat-onebot-config
         - name: napcat-qq
           persistentVolumeClaim:
             claimName: napcat-qq-pvc
