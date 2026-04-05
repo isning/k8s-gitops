@@ -10,4 +10,4 @@ Manual operations needed for OneBot v11 adapters. Please refer to the following 
 ```url
 ws://astrbot.prod.svc.cluster.local:6199/ws
 ```
-4. Update the configuration of OneBot V11 implementation.
+4. Update the configuration of OneBot V11 implementation. (e.g. `napcat/onebot-secret.yaml` for Napcat).

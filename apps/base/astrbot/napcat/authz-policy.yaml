@@ -1,0 +1,35 @@
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: napcat-oauth2-auth
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: napcat
+  action: CUSTOM
+  provider:
+    name: oauth2-proxy
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: napcat-admin-only
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: napcat
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            requestPrincipals:
+              - "*"
+      when:
+        - key: request.auth.claims[roles]
+          values:
+            - napcat:admin
