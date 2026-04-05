@@ -21,7 +21,7 @@ spec:
       subdomain: napcat
       # 优雅关闭时间，给 NapCat 足够时间保存状态
       terminationGracePeriodSeconds: 60
-      
+
       # 初始化容器：首次生成随机 machine-id，后续复用
       initContainers:
         - name: init-machine-id
@@ -44,15 +44,13 @@ spec:
       
       containers:
         - name: napcat
-          image: mlikiowa/napcat-docker:latest
+          image: ghcr.io/isning/docker.io/mlikiowa/napcat-docker:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: NAPCAT_UID
               value: "1000"
             - name: NAPCAT_GID
               value: "1000"
-            - name: MODE
-              value: "astrbot"
             - name: TZ
               value: "Asia/Shanghai"
           ports:
@@ -66,8 +64,6 @@ spec:
               memory: "1Gi"
               cpu: "1000m"
           volumeMounts:
-            - name: astrbot-data
-              mountPath: /AstrBot/data
             - name: napcat-config
               mountPath: /app/napcat/config
             - name: napcat-qq
@@ -81,9 +77,6 @@ spec:
               readOnly: true
 
       volumes:
-        - name: astrbot-data
-          persistentVolumeClaim:
-            claimName: astrbot-data-pvc
         - name: napcat-config
           persistentVolumeClaim:
             claimName: napcat-config-pvc
