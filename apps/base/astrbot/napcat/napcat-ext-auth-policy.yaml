@@ -2,13 +2,15 @@
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: napcat-deny-non-admin
+  name: napcat-ext-auth
 spec:
   targetRef:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: default-gateway
-  action: DENY
+  action: CUSTOM
+  provider:
+    name: oauth2-proxy
   rules:
     - to:
         - operation:
@@ -16,7 +18,3 @@ spec:
               - napcat.isning.moe
             notPaths:
               - /oauth2/*
-      when:
-        - key: request.auth.claims[roles]
-          notValues:
-            - napcat:admin
