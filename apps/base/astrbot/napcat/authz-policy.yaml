@@ -6,29 +6,20 @@ metadata:
 spec:
   targetRef:
     group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: napcat
-  action: CUSTOM
-  provider:
-    name: oauth2-proxy
-  rules:
-    - {}
----
-apiVersion: security.istio.io/v1
-kind: AuthorizationPolicy
-metadata:
-  name: napcat-admin-only
-spec:
-  targetRef:
-    group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: napcat
+    kind: Gateway
+    name: default-gateway
   action: ALLOW
   rules:
     - from:
         - source:
             requestPrincipals:
               - "*"
+      to:
+        - operation:
+            hosts:
+              - napcat.isning.moe
+            notPaths:
+              - /oauth2/*
       when:
         - key: request.auth.claims[roles]
           values:
