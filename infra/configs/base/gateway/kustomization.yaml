@@ -6,3 +6,4 @@ resources:
   - ./gateway-prod.yaml
   - ./gateway-staging.yaml
   - ./oauth2/
+  - ./oauth2-proxy-header-transform.yaml

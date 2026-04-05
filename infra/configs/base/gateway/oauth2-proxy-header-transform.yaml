@@ -1,0 +1,80 @@
+---
+# Strip any inbound X-OAuth2-Gateway-* and X-Auth-Request-* headers sent by
+# external clients to prevent header spoofing.  After the ext_authz filter has
+# run (and added X-Auth-Request-* headers from the oauth2-proxy response), this
+# Lua filter renames them to the dedicated X-OAuth2-Gateway-* prefix so that:
+#   - X-OAuth2-Gateway-ID-Token  → raw ID-Token JWT for Istio RequestAuthentication
+#   - X-OAuth2-Gateway-User      → authenticated username
+#   - X-OAuth2-Gateway-Email     → authenticated email
+#   - X-OAuth2-Gateway-Groups    → roles/groups from the IDP
+#
+# The filter is inserted BEFORE istio_authn so the JWT in
+# X-OAuth2-Gateway-ID-Token is visible when Istio validates the token.
+# The original client Authorization header is left untouched so apps can still
+# use their own Bearer tokens.
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: oauth2-gateway-header-transform
+  namespace: prod
+spec:
+  workloadSelector:
+    labels:
+      gateway.networking.k8s.io/gateway-name: default-gateway
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: envoy.filters.network.http_connection_manager
+              subFilter:
+                name: istio_authn
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.lua
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+            inlineCode: |
+                function envoy_on_request(request_handle)
+                  local hdrs = request_handle:headers()
+
+                  -- Read trusted values injected by oauth2-proxy (via ext_authz
+                  -- headersToUpstreamOnAllow) before stripping anything.
+                  local id_token = hdrs:get("x-auth-request-id-token")
+                  local user     = hdrs:get("x-auth-request-user")
+                  local email    = hdrs:get("x-auth-request-email")
+                  local groups   = hdrs:get("x-auth-request-groups")
+
+                  -- Strip all X-Auth-Request-* headers (internal, not for apps).
+                  hdrs:remove("x-auth-request-id-token")
+                  hdrs:remove("x-auth-request-user")
+                  hdrs:remove("x-auth-request-email")
+                  hdrs:remove("x-auth-request-groups")
+                  hdrs:remove("x-auth-request-access-token")
+                  hdrs:remove("x-auth-request-preferred-username")
+
+                  -- Strip any X-OAuth2-Gateway-* headers from the client to
+                  -- prevent spoofing, then re-inject only the trusted values.
+                  hdrs:remove("x-oauth2-gateway-id-token")
+                  hdrs:remove("x-oauth2-gateway-user")
+                  hdrs:remove("x-oauth2-gateway-email")
+                  hdrs:remove("x-oauth2-gateway-groups")
+
+                  -- Re-inject trusted gateway headers (only when the auth
+                  -- service actually provided them, i.e. authenticated paths).
+                  if id_token ~= nil then
+                    hdrs:add("x-oauth2-gateway-id-token", id_token)
+                  end
+                  if user ~= nil then
+                    hdrs:add("x-oauth2-gateway-user", user)
+                  end
+                  if email ~= nil then
+                    hdrs:add("x-oauth2-gateway-email", email)
+                  end
+                  if groups ~= nil then
+                    hdrs:add("x-oauth2-gateway-groups", groups)
+                  end
+                end

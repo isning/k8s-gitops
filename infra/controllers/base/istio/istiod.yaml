@@ -60,12 +60,12 @@ spec:
               - x-forwarded-proto
               - x-forwarded-uri
             headersToUpstreamOnAllow:
-              - authorization
               - x-auth-request-user
               - x-auth-request-email
               - x-auth-request-preferred-username
               - x-auth-request-access-token
               - x-auth-request-groups
+              - x-auth-request-id-token
             headersToDownstreamOnDeny:
               - content-type
               - set-cookie
