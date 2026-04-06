@@ -64,15 +64,22 @@ spec:
             values:
               - claimSource:
                   claim: access_token
-
     extraArgs:
-      redirect-url: "https://oauth-gateway.isning.moe/oauth2/callback"
+      redirect-url: "https://oauth2-gateway.isning.moe/oauth2/callback"
       reverse-proxy: "true"
       skip-provider-button: "true"
       cookie-secure: "true"
       cookie-samesite: "lax"
       cookie-domain: ".isning.moe"
       whitelist-domain: ".isning.moe"
+    gatewayApi:
+      enabled: true
+      gatewayRef:
+        kind: Gateway
+        name: default-gateway
+        namespace: prod
+      hostnames:
+        - oauth2-gateway.isning.moe
     resources:
       requests:
         cpu: "10m"
