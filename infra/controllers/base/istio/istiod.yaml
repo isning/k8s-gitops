@@ -53,10 +53,7 @@ spec:
             pathPrefix: /oauth2/auth
             includeRequestHeadersInCheck:
               - cookie
-              - x-forwarded-for
-              - x-forwarded-host
-              - x-forwarded-proto
-              - x-forwarded-uri
+              - x-auth-request-redirect
             headersToUpstreamOnAllow:
               - x-oauth2-gateway-user
               - x-oauth2-gateway-email
