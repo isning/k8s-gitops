@@ -7,7 +7,6 @@ resources:
   - ./service.yaml
   - ./httproute.yaml
   - ./request-authentication.yaml
-  - ./napcat-ext-auth-policy.yaml
   - ./authz-policy.yaml
   - ./webui-config.yaml
   - ./onebot-secret.yaml

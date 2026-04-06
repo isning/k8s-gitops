@@ -12,5 +12,6 @@ spec:
     - issuer: https://logto.isning.moe/oidc
       audiences:
         - m8rwqva1rsy9p2b3tbsad
+      forwardOriginalToken: false
       fromHeaders:
-        - name: X-Auth-Request-Id-Token
+        - name: X-OAuth2-Gateway-Id-Token
