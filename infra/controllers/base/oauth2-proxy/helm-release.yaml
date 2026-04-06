@@ -46,19 +46,24 @@ spec:
         injectResponseHeaders:
           - name: X-OAuth2-Gateway-User
             values:
-              - claim: preferred_username
+              - claimSource:
+                  claim: preferred_username
           - name: X-OAuth2-Gateway-Email
             values:
-              - claim: email
+              - claimSource:
+                  claim: email
           - name: X-OAuth2-Gateway-Groups
             values:
-              - claim: roles
+              - claimSource:
+                  claim: roles
           - name: X-OAuth2-Gateway-Id-Token
             values:
-              - claim: id_token
+              - claimSource:
+                  claim: id_token
           - name: X-OAuth2-Gateway-Access-Token
             values:
-              - claim: access_token
+              - claimSource:
+                  claim: access_token
 
     extraArgs:
       redirect-url: "https://oauth-gateway.isning.moe/oauth2/callback"
