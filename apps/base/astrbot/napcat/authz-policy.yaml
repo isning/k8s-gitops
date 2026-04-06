@@ -16,8 +16,6 @@ spec:
         - operation:
             hosts:
               - napcat.isning.moe
-            notPaths:
-              - /oauth2/*
 ---
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
@@ -34,9 +32,7 @@ spec:
         - operation:
             hosts:
               - napcat.isning.moe
-            notPaths:
-              - /oauth2/*
       when:
-        - key: request.auth.claims[roles]
+        - key: request.headers[x-oauth2-gateway-groups]
           notValues:
             - napcat:admin
