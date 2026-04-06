@@ -68,22 +68,6 @@ spec:
       cookie-samesite: "lax"
       cookie-domain: ".isning.moe"
       whitelist-domain: ".isning.moe"
-    extraEnv:
-      - name: OAUTH2_PROXY_CLIENT_ID
-        valueFrom:
-          secretKeyRef:
-            name: oauth2-proxy-secrets
-            key: client-id
-      - name: OAUTH2_PROXY_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: oauth2-proxy-secrets
-            key: client-secret
-      - name: OAUTH2_PROXY_COOKIE_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: oauth2-proxy-secrets
-            key: cookie-secret
     resources:
       requests:
         cpu: "10m"
