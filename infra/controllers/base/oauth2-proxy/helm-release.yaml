@@ -19,22 +19,50 @@ spec:
   values:
     replicaCount: 1
     config:
+      forceLegacyConfig: false
       existingSecret: oauth2-proxy-secrets
-      clientID: "m8rwqva1rsy9p2b3tbsad"
       emailDomains:
         - "*"
-      upstreams:
-        - "static://200"
+    alphaConfig:
+      enabled: true
+      configData:
+        upstreamConfig:
+          upstreams:
+            - id: default
+              path: /
+              static: true
+              staticCode: 200
+        providers:
+          - id: oidc
+            provider: oidc
+            clientID: ${OAUTH2_PROXY_CLIENT_ID}
+            clientSecret: ${OAUTH2_PROXY_CLIENT_SECRET}
+            scope: openid profile email roles
+            additionalClaims:
+              - roles
+            oidcConfig:
+              issuerURL: https://logto.isning.moe/oidc
+              groupsClaim: roles
+        injectResponseHeaders:
+          - name: X-OAuth2-Gateway-User
+            values:
+              - claim: preferred_username
+          - name: X-OAuth2-Gateway-Email
+            values:
+              - claim: email
+          - name: X-OAuth2-Gateway-Groups
+            values:
+              - claim: roles
+          - name: X-OAuth2-Gateway-Id-Token
+            values:
+              - claim: id_token
+          - name: X-OAuth2-Gateway-Access-Token
+            values:
+              - claim: access_token
+
     extraArgs:
-      provider: oidc
-      oidc-issuer-url: "https://logto.isning.moe/oidc"
       redirect-url: "https://oauth-gateway.isning.moe/oauth2/callback"
       reverse-proxy: "true"
-      set-xauthrequest: "true"
-      pass-idtoken-header: "true"
-      pass-access-token: "true"
-      oidc-groups-claim: "roles"
-      scope: "openid profile email roles"
       skip-provider-button: "true"
       cookie-secure: "true"
       cookie-samesite: "lax"
