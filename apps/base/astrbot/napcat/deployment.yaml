@@ -42,20 +42,20 @@ spec:
             - name: machine-id-data
               mountPath: /machine-id-data
         - name: setup-onebot-config
-          image: ghcr.io/jqlang/jq:latest
+          image: mikefarah/yq:4
           command:
-            - /bin/sh
-            - -c
-            - |
-              # 使用 jq 遍历配置文件映射
-              jq -r 'to_entries[] | "\(.key)|\(.value | @json)"' /tmp/onebot/configs.json | while IFS='|' read -r filename content; do
-                # 将配置写入文件
-                echo "$content" | jq '.' > /config/"$filename"
-                echo "✓ OneBot config created: $filename"
-              done
-              
-              echo "Files in /config:"
-              ls -lah /config/
+          - /bin/sh
+          - -c
+          - |
+            filenames=$(yq 'keys | .[]' /tmp/onebot/configs.json)
+            
+            for filename in $filenames; do
+              yq -o=json ".[ \"$filename\" ]" /tmp/onebot/configs.json > "/config/$filename"
+              echo "✓ OneBot config created: $filename"
+            done
+            
+            echo "Files in /config:"
+            ls -lah /config/
           volumeMounts:
             - name: onebot-config
               mountPath: /tmp/onebot
