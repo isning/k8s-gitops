@@ -70,7 +70,7 @@ spec:
       reverse-proxy: "true"
       skip-provider-button: "true"
       cookie-secure: "true"
-      cookie-expire: "10d"
+      cookie-expire: "168h" # 7 days, no support for 'd' suffix
       cookie-refresh: "15m"
       cookie-samesite: "lax"
       cookie-domain: ".isning.moe"
