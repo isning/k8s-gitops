@@ -37,7 +37,7 @@ spec:
             provider: oidc
             clientID: ${OAUTH2_PROXY_CLIENT_ID}
             clientSecret: ${OAUTH2_PROXY_CLIENT_SECRET}
-            scope: openid profile email roles
+            scope: openid profile email roles offline_access
             additionalClaims:
               - roles
             oidcConfig:
@@ -70,6 +70,8 @@ spec:
       reverse-proxy: "true"
       skip-provider-button: "true"
       cookie-secure: "true"
+      cookie-expire: "10d"
+      cookie-refresh: "15m"
       cookie-samesite: "lax"
       cookie-domain: ".isning.moe"
       whitelist-domain: ".isning.moe"
