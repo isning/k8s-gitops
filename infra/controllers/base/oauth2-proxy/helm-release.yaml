@@ -43,6 +43,7 @@ spec:
             oidcConfig:
               issuerURL: https://logto.isning.moe/oidc
               groupsClaim: roles
+            profileURL: https://logto.isning.moe/oidc/me
         injectResponseHeaders:
           - name: X-OAuth2-Gateway-User
             values:
