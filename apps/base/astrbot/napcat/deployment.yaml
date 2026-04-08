@@ -74,6 +74,11 @@ spec:
               value: "1000"
             - name: TZ
               value: "Asia/Shanghai"
+            - name: ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: napcat-secret
+                  key: account
           ports:
             - containerPort: 6099
               name: napcat-web
