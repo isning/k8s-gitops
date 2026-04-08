@@ -33,6 +33,6 @@ spec:
             hosts:
               - napcat.isning.moe
       when:
-        - key: request.headers[x-oauth2-gateway-groups]
+        - key: request.auth.claims[roles]
           notValues:
             - napcat:admin
