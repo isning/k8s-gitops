@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clirelay
+  labels:
+    app: clirelay
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: clirelay
+  template:
+    metadata:
+      labels:
+        app: clirelay
+    spec:
+      containers:
+        - name: clirelay
+          image: ghcr.io/kittors/clirelay:latest
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -ec
+          args:
+            - |
+              cp /CLIProxyAPI/config.yaml /tmp/config.yaml
+              sed -i "s|__REMOTE_MANAGEMENT_SECRET_KEY__|${REMOTE_MANAGEMENT_SECRET_KEY}|g" /tmp/config.yaml
+              exec /CLIProxyAPI/CLIProxyAPI --config /tmp/config.yaml
+          env:
+            - name: DEPLOY
+              value: ""
+            - name: CLIRELAY_LOCALE
+              value: zh
+            - name: LANG
+              value: C.UTF-8
+            - name: LANGUAGE
+              value: en_US:en
+            - name: LC_ALL
+              value: C.UTF-8
+            - name: REMOTE_MANAGEMENT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clirelay-secret
+                  key: remote-management-secret-key
+          ports:
+            - name: http
+              containerPort: 8317
+          readinessProbe:
+            tcpSocket:
+              port: 8317
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8317
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          volumeMounts:
+            - name: config
+              mountPath: /CLIProxyAPI/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: auth
+              mountPath: /root/.cli-proxy-api
+            - name: logs
+              mountPath: /CLIProxyAPI/logs
+            - name: data
+              mountPath: /CLIProxyAPI/data
+      volumes:
+        - name: config
+          configMap:
+            name: clirelay-config
+        - name: auth
+          persistentVolumeClaim:
+            claimName: clirelay-auth-pvc
+        - name: logs
+          persistentVolumeClaim:
+            claimName: clirelay-logs-pvc
+        - name: data
+          persistentVolumeClaim:
+            claimName: clirelay-data-pvc
