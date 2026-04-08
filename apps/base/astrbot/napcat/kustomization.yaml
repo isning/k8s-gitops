@@ -8,5 +8,5 @@ resources:
   - ./httproute.yaml
   - ./request-authentication.yaml
   - ./authz-policy.yaml
-  - ./webui-secret.yaml
+  - ./webui-config.yaml
   - ./onebot-secret.yaml
