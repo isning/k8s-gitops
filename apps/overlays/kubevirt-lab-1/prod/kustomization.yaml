@@ -9,4 +9,5 @@ resources:
   - ./../../../base/logto/
   - ./../../../base/flux-operator/
   - ./../../../base/astrbot/
+  - ./../../../base/clirelay/
   # - ./../../../base/maa/
