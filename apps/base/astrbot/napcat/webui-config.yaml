@@ -8,7 +8,7 @@ data:
     {
       "host": "0.0.0.0",
       "port": 6099,
-      "token": "NapCat",
+      "token": "NapCat123",
       "loginRate": 3,
       "disableWebUI": false,
       "accessControlMode": "none",
