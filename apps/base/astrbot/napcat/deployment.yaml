@@ -47,14 +47,15 @@ spec:
           - /bin/sh
           - -c
           - |
-            yq -o=tsv 'keys | .[]' /tmp/onebot/configs.json | while IFS= read -r filename; do
+            filenames=$(yq 'keys | .[]' /tmp/onebot/configs.json)
             
-              # Skip empty filenames
-              [ -z "$filename" ] && continue
-              
+            for filename in $filenames; do
               yq -o=json ".[ \"$filename\" ]" /tmp/onebot/configs.json > "/config/$filename"
-              echo "✓ Config generated: $filename"
+              echo "✓ OneBot config created: $filename"
             done
+            
+            echo "Files in /config:"
+            ls -lah /config/
           volumeMounts:
             - name: onebot-config
               mountPath: /tmp/onebot
@@ -105,8 +106,8 @@ spec:
           persistentVolumeClaim:
             claimName: napcat-config-pvc
         - name: webui-config
-          secret:
-            secretName: napcat-webui-config
+          configMap:
+            name: napcat-webui-config
         - name: onebot-config
           secret:
             secretName: napcat-onebot-config
