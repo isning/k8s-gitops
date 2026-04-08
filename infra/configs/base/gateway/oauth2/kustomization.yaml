@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./oauth2-proxy-reference-grant.yaml
   - ./envoyfilter-redirect.yaml
+  - ./request-authentication.yaml

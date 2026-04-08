@@ -9,5 +9,4 @@ resources:
   - ./deployment.yaml
   - ./service.yaml
   - ./httproute.yaml
-  - ./request-authentication.yaml
   - ./authz-policy.yaml
