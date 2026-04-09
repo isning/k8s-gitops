@@ -14,18 +14,14 @@ spec:
   rules:
     - matches:
         - path:
-            type: Exact
+            type: PathPrefix
             value: /
       filters:
-        - type: RequestRedirect
-          requestRedirect:
+        - type: URLRewrite
+          urlRewrite:
             path:
-              type: ReplaceFullPath
-              replaceFullPath: /manage
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /manage
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /manage
       backendRefs:
         - name: clirelay
           port: 8317
