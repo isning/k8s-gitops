@@ -11,3 +11,5 @@ Manual operations needed for OneBot v11 adapters. Please refer to the following 
 ws://astrbot.prod.svc.cluster.local:6199/ws
 ```
 4. Update the configuration of OneBot V11 implementation. (e.g. `napcat/onebot-secret.yaml` for Napcat).
+
+See also apps/overlays/kubevirt-lab-1/crossns
