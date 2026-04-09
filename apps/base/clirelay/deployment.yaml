@@ -6,8 +6,6 @@ metadata:
     app: clirelay
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: clirelay
@@ -19,7 +17,7 @@ spec:
       containers:
         - name: clirelay
           image: ghcr.io/kittors/clirelay:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -ec
