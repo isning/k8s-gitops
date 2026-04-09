@@ -1,27 +1,476 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: clirelay-config
-data:
-  config.yaml: |
-    host: ""
-    port: 8317
+host: ""
+port: 8317
+remote-management:
+  # Behind OAuth gateway, allow non-localhost management access.
+  allow-remote: true
+  # Runtime-injected from Kubernetes Secret.
+  secret-key: "__REMOTE_MANAGEMENT_SECRET_KEY__"
+  disable-control-panel: false
+  panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
 
-    remote-management:
-      # Behind OAuth gateway, allow non-localhost management access.
-      allow-remote: true
-      # Runtime-injected from Kubernetes Secret.
-      secret-key: "__REMOTE_MANAGEMENT_SECRET_KEY__"
-      disable-control-panel: false
-      panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
+quota-exceeded:
+  switch-preview-model: true
+force-model-prefix: true
+proxy-url: "http://proxy-svc.egress-system.svc.cluster.local:7890"
 
-    # Persist credentials in mounted PVC.
-    auth-dir: "/root/.cli-proxy-api"
+# Persist credentials in mounted PVC.
+auth-dir: "/root/.cli-proxy-api"
 
-    api-keys: []
+api-keys: []
 
-    debug: false
-    commercial-mode: false
-    logging-to-file: true
-    logs-max-total-size-mb: 2048
-    usage-statistics-enabled: true
+debug: false
+commercial-mode: false
+logging-to-file: true
+logs-max-total-size-mb: 2048
+usage-statistics-enabled: true
+request-log-storage:
+  store-content: true
+  content-retention-days: 30
+  cleanup-interval-minutes: 1440
+  max-total-size-mb: 1024
+  vacuum-on-cleanup: true
+openai-compatibility:
+  - name: NVIDIA
+    base-url: https://integrate.api.nvidia.com/v1/
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_NVIDIA__
+    models:
+      - name: deepseek-ai/deepseek-coder-6.7b-instruct
+        alias: deepseek-coder-6.7b-instruct
+      - name: deepseek-ai/deepseek-r1-distill-llama-8b
+        alias: deepseek-r1-distill-llama-8b
+      - name: deepseek-ai/deepseek-r1-distill-qwen-14b
+        alias: deepseek-r1-distill-qwen-14b
+      - name: deepseek-ai/deepseek-r1-distill-qwen-32b
+        alias: deepseek-r1-distill-qwen-32b
+      - name: deepseek-ai/deepseek-r1-distill-qwen-7b
+        alias: deepseek-r1-distill-qwen-7b
+      - name: deepseek-ai/deepseek-v3.1
+        alias: deepseek-v3.1
+      - name: deepseek-ai/deepseek-v3.1-terminus
+        alias: deepseek-v3.1-terminus
+      - name: deepseek-ai/deepseek-v3.2
+        alias: deepseek-v3.2
+      - name: microsoft/phi-3.5-moe-instruct
+      - name: microsoft/phi-3.5-vision-instruct
+      - name: microsoft/phi-4-mini-flash-reasoning
+      - name: microsoft/phi-4-mini-instruct
+      - name: microsoft/phi-4-multimodal-instruct
+      - name: minimaxai/minimax-m2.5
+        alias: minimax-m2.5
+      - name: moonshotai/kimi-k2-instruct
+        alias: kimi-k2-instruct
+      - name: moonshotai/kimi-k2-instruct-0905
+        alias: kimi-k2-instruct-0905
+      - name: moonshotai/kimi-k2-thinking
+        alias: kimi-k2-thinking
+      - name: moonshotai/kimi-k2.5
+        alias: kimi-k2.5
+      - name: nvidia/embed-qa-4
+      - name: nvidia/nv-embed-v1
+      - name: nvidia/nv-embedcode-7b-v1
+      - name: nvidia/nv-embedqa-e5-v5
+      - name: nvidia/nv-embedqa-mistral-7b-v2
+      - name: nvidia/riva-translate-4b-instruct
+      - name: nvidia/riva-translate-4b-instruct-v1.1
+      - name: nvidia/vila
+      - name: openai/gpt-oss-120b
+        alias: gpt-oss-120b
+      - name: qwen/qwen3-coder-480b-a35b-instruct
+        alias: qwen3-coder-480b-a35b-instruct
+      - name: qwen/qwen3-next-80b-a3b-instruct
+        alias: qwen3-next-80b-a3b-instruct
+      - name: qwen/qwen3-next-80b-a3b-thinking
+        alias: qwen3-next-80b-a3b-thinking
+      - name: qwen/qwen3.5-122b-a10b
+        alias: qwen3.5-122b-a10b
+      - name: qwen/qwen3.5-397b-a17b
+        alias: qwen3.5-397b-a17b
+      - name: qwen/qwq-32b
+        alias: qwq-32b
+      - name: z-ai/glm4.7
+        alias: glm-4.7
+      - name: z-ai/glm5
+        alias: glm-5
+  - name: ModelScope Global
+    base-url: https://api-inference.modelscope.ai/v1/
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_MODELSCOPE_GLOBAL__
+    models:
+      - name: deepseek-ai/DeepSeek-R1-0528
+        alias: deepseek-r1-0528
+      - name: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+        alias: deepseek-r1-distill-llama-70b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+        alias: deepseek-r1-distill-llama-8b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+        alias: deepseek-r1-distill-qwen-1.5b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+        alias: deepseek-r1-distill-qwen-14b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+        alias: deepseek-r1-distill-qwen-32b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+        alias: deepseek-r1-distill-qwen-7b
+      - name: deepseek-ai/DeepSeek-V3.1
+        alias: deepseek-v3.1
+      - name: deepseek-ai/DeepSeek-V3.2
+        alias: deepseek-v3.2
+      - name: deepseek-ai/DeepSeek-V3.2-Exp
+        alias: deepseek-v3.2-exp
+      - name: iic/Tongyi-DeepResearch-30B-A3B
+        alias: tongyi-deepresearch-30b-a3b
+      - name: MiniMax/MiniMax-M1-80k
+        alias: minimax-m1-80k
+      - name: MusePublic/Qwen-Image-Edit
+        alias: qwen-image-edit
+      - name: PaddlePaddle/ERNIE-4.5-0.3B-PT
+        alias: ernie-4.5-0.3b-pt
+      - name: PaddlePaddle/ERNIE-4.5-21B-A3B-PT
+        alias: ernie-4.5-21b-a3b-pt
+      - name: PaddlePaddle/ERNIE-4.5-300B-A47B-PT
+        alias: ernie-4.5-300b-a47b-pt
+      - name: PaddlePaddle/ERNIE-4.5-VL-28B-A3B-PT
+        alias: ernie-4.5-vl-28b-a3b-pt
+      - name: Qwen/QVQ-72B-Preview
+        alias: qvq-72b-preview
+      - name: Qwen/Qwen-Image-Edit
+        alias: qwen-image-edit
+      - name: Qwen/Qwen3-1.7B
+        alias: qwen3-1.7b
+      - name: Qwen/Qwen3-14B
+        alias: qwen3-14b
+      - name: Qwen/Qwen3-235B-A22B
+        alias: qwen3-235b-a22b
+      - name: Qwen/Qwen3-235B-A22B-Instruct-2507
+        alias: qwen3-235b-a22b-instruct-2507
+      - name: Qwen/Qwen3-235B-A22B-Thinking-2507
+        alias: qwen3-235b-a22b-thinking-2507
+      - name: Qwen/Qwen3-30B-A3B
+        alias: qwen3-30b-a3b
+      - name: Qwen/Qwen3-30B-A3B-Thinking-2507
+        alias: qwen3-30b-a3b-thinking-2507
+      - name: Qwen/Qwen3-32B
+        alias: qwen3-32b
+      - name: Qwen/Qwen3-4B
+        alias: qwen3-4b
+      - name: Qwen/Qwen3-8B
+        alias: qwen3-8b
+      - name: Qwen/Qwen3-Coder-30B-A3B-Instruct
+        alias: qwen3-coder-30b-a3b-instruct
+      - name: Qwen/Qwen3-Coder-480B-A35B-Instruct
+        alias: qwen3-coder-480b-a35b-instruct
+      - name: Qwen/Qwen3-Next-80B-A3B-Instruct
+        alias: qwen3-next-80b-a3b-instruct
+      - name: Qwen/Qwen3-Next-80B-A3B-Thinking
+        alias: qwen3-next-80b-a3b-thinking
+      - name: Qwen/Qwen3-VL-235B-A22B-Instruct
+        alias: qwen3-vl-235b-a22b-instruct
+      - name: Qwen/Qwen3-VL-8B-Instruct
+        alias: qwen3-vl-8b-instruct
+      - name: Qwen/Qwen3-VL-8B-Thinking
+        alias: qwen3-vl-8b-thinking
+      - name: Qwen/QwQ-32B
+        alias: qwq-32b
+      - name: Qwen/QwQ-32B-Preview
+        alias: qwq-32b-preview
+      - name: XiaomiMiMo/MiMo-V2-Flash
+        alias: mimo-v2-flash
+      - name: zai-org/GLM-4.7-Flash
+        alias: glm-4.7-flash
+  - name: GitHub Models
+    base-url: https://models.github.ai/inference
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_GITHUB_MODELS__
+    models:
+      - name: openai/gpt-4.1
+        alias: gpt-4.1
+      - name: openai/gpt-4.1-mini
+        alias: gpt-4.1-mini
+      - name: openai/gpt-4.1-nano
+        alias: gpt-4.1-nano
+      - name: openai/gpt-4o
+        alias: gpt-4o
+      - name: openai/gpt-4o-mini
+        alias: gpt-4o-mini
+      - name: openai/gpt-5
+        alias: gpt-5
+      - name: openai/gpt-5-chat
+        alias: gpt-5-chat
+      - name: openai/gpt-5-mini
+        alias: gpt-5-mini
+      - name: openai/gpt-5-nano
+        alias: gpt-5-nano
+      - name: openai/o1
+        alias: o1
+      - name: openai/o1-mini
+        alias: o1-mini
+      - name: openai/o1-preview
+        alias: o1-preview
+      - name: openai/o3
+        alias: o3
+      - name: openai/o3-mini
+        alias: o3-mini
+      - name: openai/o4-mini
+        alias: o4-mini
+      - name: openai/text-embedding-3-large
+        alias: text-embedding-3-large
+      - name: openai/text-embedding-3-small
+        alias: text-embedding-3-small
+      - name: deepseek/deepseek-r1
+        alias: deepseek-r1
+      - name: deepseek/deepseek-r1-0528
+        alias: deepseek-r1-0528
+      - name: deepseek/deepseek-v3-0324
+        alias: deepseek-v3-0324
+      - name: xai/grok-3
+        alias: grok-3
+      - name: xai/grok-3-mini
+        alias: grok-3-mini
+      - name: microsoft/phi-4
+        alias: ""
+      - name: microsoft/phi-4-mini-instruct
+        alias: ""
+      - name: microsoft/phi-4-mini-reasoning
+        alias: ""
+      - name: microsoft/phi-4-multimodal-instruct
+        alias: ""
+      - name: microsoft/phi-4-reasoning
+        alias: ""
+  - name: BigModel.cn
+    base-url: https://open.bigmodel.cn/api/paas/v4
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_BIGMODEL_CN__
+    models:
+      - name: glm-4.6v-flash
+        alias: ""
+      - name: glm-4.7-flash
+        alias: ""
+  - name: ModelScope CN
+    base-url: https://api-inference.modelscope.cn/v1/
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_MODELSCOPE_CN__
+    models:
+      - name: deepseek-ai/DeepSeek-R1-0528
+        alias: deepseek-r1-0528
+      - name: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+        alias: deepseek-r1-distill-llama-70b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+        alias: deepseek-r1-distill-llama-8b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+        alias: deepseek-r1-distill-qwen-1.5b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+        alias: deepseek-r1-distill-qwen-14b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+        alias: deepseek-r1-distill-qwen-32b
+      - name: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+        alias: deepseek-r1-distill-qwen-7b
+      - name: deepseek-ai/DeepSeek-V3.2
+        alias: deepseek-v3.2
+      - name: MiniMax/MiniMax-M1-80k
+        alias: minimax-m1-80k
+      - name: MiniMax/MiniMax-M2.5
+        alias: minimax-m2.5
+      - name: moonshotai/Kimi-K2.5
+        alias: kimi-k2.5
+      - name: PaddlePaddle/ERNIE-4.5-0.3B-PT
+        alias: ernie-4.5-0.3b-pt
+      - name: PaddlePaddle/ERNIE-4.5-21B-A3B-PT
+        alias: ernie-4.5-21b-a3b-pt
+      - name: PaddlePaddle/ERNIE-4.5-300B-A47B-PT
+        alias: ernie-4.5-300b-a47b-pt
+      - name: PaddlePaddle/ERNIE-4.5-VL-28B-A3B-PT
+        alias: ernie-4.5-vl-28b-a3b-pt
+      - name: Qwen/QVQ-72B-Preview
+        alias: qvq-72b-preview
+      - name: Qwen/Qwen-Image-Edit
+        alias: qwen-image-edit
+      - name: Qwen/Qwen3-0.6B
+        alias: qwen3-0.6b
+      - name: Qwen/Qwen3-1.7B
+        alias: qwen3-1.7b
+      - name: Qwen/Qwen3-14B
+        alias: qwen3-14b
+      - name: Qwen/Qwen3-235B-A22B
+        alias: qwen3-235b-a22b
+      - name: Qwen/Qwen3-235B-A22B-Instruct-2507
+        alias: qwen3-235b-a22b-instruct-2507
+      - name: Qwen/Qwen3-235B-A22B-Thinking-2507
+        alias: qwen3-235b-a22b-thinking-2507
+      - name: Qwen/Qwen3-30B-A3B
+        alias: qwen3-30b-a3b
+      - name: Qwen/Qwen3-30B-A3B-Thinking-2507
+        alias: qwen3-30b-a3b-thinking-2507
+      - name: Qwen/Qwen3-32B
+        alias: qwen3-32b
+      - name: Qwen/Qwen3-4B
+        alias: qwen3-4b
+      - name: Qwen/Qwen3-8B
+        alias: qwen3-8b
+      - name: Qwen/Qwen3-Coder-30B-A3B-Instruct
+        alias: qwen3-coder-30b-a3b-instruct
+      - name: Qwen/Qwen3-Coder-480B-A35B-Instruct
+        alias: qwen3-coder-480b-a35b-instruct
+      - name: Qwen/Qwen3-Next-80B-A3B-Instruct
+        alias: qwen3-next-80b-a3b-instruct
+      - name: Qwen/Qwen3-Next-80B-A3B-Thinking
+        alias: qwen3-next-80b-a3b-thinking
+      - name: Qwen/Qwen3-VL-235B-A22B-Instruct
+        alias: qwen3-vl-235b-a22b-instruct
+      - name: Qwen/Qwen3-VL-8B-Instruct
+        alias: qwen3-vl-8b-instruct
+      - name: Qwen/Qwen3-VL-8B-Thinking
+        alias: qwen3-vl-8b-thinking
+      - name: Qwen/Qwen3.5-122B-A10B
+        alias: qwen3.5-122b-a10b
+      - name: Qwen/Qwen3.5-27B
+        alias: qwen3.5-27b
+      - name: Qwen/Qwen3.5-35B-A3B
+        alias: qwen3.5-35b-a3b
+      - name: Qwen/Qwen3.5-397B-A17B
+        alias: qwen3.5-397b-a17b
+      - name: Qwen/QwQ-32B
+        alias: qwq-32b
+      - name: Qwen/QwQ-32B-Preview
+        alias: qwq-32b-preview
+      - name: XiaomiMiMo/MiMo-V2-Flash
+        alias: mimo-v2-flash
+      - name: ZhipuAI/GLM-4.7-Flash
+        alias: glm-4.7-flash
+      - name: ZhipuAI/GLM-5
+        alias: glm-5
+  - name: Groq
+    base-url: https://api.groq.com/openai/v1
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_GROQ__
+    proxy-url: http://proxy-svc.egress-system.svc.cluster.local:7890
+    models:
+      - name: openai/gpt-oss-120b
+        alias: gpt-oss-120b
+      - name: groq/whisper-large-v3
+        alias: whisper-large-v3
+      - name: groq/deepseek-r1
+        alias: deepseek-r1
+      - name: groq/deepseek-r1-distill-llama-70b
+        alias: deepseek-r1-distill-llama-70b
+      - name: groq/gemma-2-9b-it
+        alias: gemma-2-9b-it
+      - name: groq/llama-3.1-70b-versatile
+        alias: llama-3.1-70b-versatile
+      - name: groq/llama-3.1-8b-instant
+        alias: llama-3.1-8b-instant
+      - name: groq/llama-3.3-70b-versatile
+        alias: llama-3.3-70b-versatile
+      - name: groq/llama3-70b-8192
+        alias: llama3-70b-8192
+      - name: groq/llama3-8b-8192
+        alias: llama3-8b-8192
+      - name: groq/whisper-large-v3-turbo
+        alias: whisper-large-v3-turbo
+  - name: Google AI Studio
+    base-url: https://generativelanguage.googleapis.com/v1beta/openai/
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_GOOGLE_AI_STUDIO__
+    proxy-url: http://proxy-svc.egress-system.svc.cluster.local:7890
+    models:
+      - name: models/gemini-2.5-flash
+        alias: gemini-2.5-flash
+      - name: models/gemini-2.5-pro
+        alias: gemini-2.5-pro
+      - name: models/gemini-2.0-flash
+        alias: gemini-2.0-flash
+      - name: models/gemini-2.0-flash-001
+        alias: gemini-2.0-flash-001
+      - name: models/gemini-2.0-flash-lite-001
+        alias: gemini-2.0-flash-lite-001
+      - name: models/gemini-2.0-flash-lite
+        alias: gemini-2.0-flash-lite
+      - name: models/gemini-2.5-flash-preview-tts
+        alias: gemini-2.5-flash-preview-tts
+      - name: models/gemini-2.5-pro-preview-tts
+        alias: gemini-2.5-pro-preview-tts
+      - name: models/gemma-3-1b-it
+        alias: gemma-3-1b-it
+      - name: models/gemma-3-4b-it
+        alias: gemma-3-4b-it
+      - name: models/gemma-3-12b-it
+        alias: gemma-3-12b-it
+      - name: models/gemma-3-27b-it
+        alias: gemma-3-27b-it
+      - name: models/gemma-3n-e4b-it
+        alias: gemma-3n-e4b-it
+      - name: models/gemma-3n-e2b-it
+        alias: gemma-3n-e2b-it
+      - name: models/gemma-4-26b-a4b-it
+        alias: gemma-4-26b-a4b-it
+      - name: models/gemma-4-31b-it
+        alias: gemma-4-31b-it
+      - name: models/gemini-flash-latest
+        alias: gemini-flash-latest
+      - name: models/gemini-flash-lite-latest
+        alias: gemini-flash-lite-latest
+      - name: models/gemini-pro-latest
+        alias: gemini-pro-latest
+      - name: models/gemini-2.5-flash-lite
+        alias: gemini-2.5-flash-lite
+      - name: models/gemini-2.5-flash-image
+        alias: gemini-2.5-flash-image
+      - name: models/gemini-3-pro-preview
+        alias: gemini-3-pro-preview
+      - name: models/gemini-3-flash-preview
+        alias: gemini-3-flash-preview
+      - name: models/gemini-3.1-pro-preview
+        alias: gemini-3.1-pro-preview
+      - name: models/gemini-3.1-pro-preview-customtools
+        alias: gemini-3.1-pro-preview-customtools
+      - name: models/gemini-3.1-flash-lite-preview
+        alias: gemini-3.1-flash-lite-preview
+      - name: models/gemini-3-pro-image-preview
+        alias: gemini-3-pro-image-preview
+      - name: models/nano-banana-pro-preview
+        alias: nano-banana-pro-preview
+      - name: models/gemini-3.1-flash-image-preview
+        alias: gemini-3.1-flash-image-preview
+      - name: models/lyria-3-clip-preview
+        alias: lyria-3-clip-preview
+      - name: models/lyria-3-pro-preview
+        alias: lyria-3-pro-preview
+      - name: models/gemini-robotics-er-1.5-preview
+        alias: gemini-robotics-er-1.5-preview
+      - name: models/gemini-2.5-computer-use-preview-10-2025
+        alias: gemini-2.5-computer-use-preview-10-2025
+      - name: models/deep-research-pro-preview-12-2025
+        alias: deep-research-pro-preview-12-2025
+      - name: models/gemini-embedding-001
+        alias: gemini-embedding-001
+      - name: models/gemini-embedding-2-preview
+        alias: gemini-embedding-2-preview
+      - name: models/aqa
+        alias: aqa
+      - name: models/imagen-4.0-generate-001
+        alias: imagen-4.0-generate-001
+      - name: models/imagen-4.0-ultra-generate-001
+        alias: imagen-4.0-ultra-generate-001
+      - name: models/imagen-4.0-fast-generate-001
+        alias: imagen-4.0-fast-generate-001
+      - name: models/veo-2.0-generate-001
+        alias: veo-2.0-generate-001
+      - name: models/veo-3.0-generate-001
+        alias: veo-3.0-generate-001
+      - name: models/veo-3.0-fast-generate-001
+        alias: veo-3.0-fast-generate-001
+      - name: models/veo-3.1-generate-preview
+        alias: veo-3.1-generate-preview
+      - name: models/veo-3.1-fast-generate-preview
+        alias: veo-3.1-fast-generate-preview
+      - name: models/veo-3.1-lite-generate-preview
+        alias: veo-3.1-lite-generate-preview
+      - name: models/gemini-2.5-flash-native-audio-latest
+        alias: gemini-2.5-flash-native-audio-latest
+      - name: models/gemini-2.5-flash-native-audio-preview-09-2025
+        alias: gemini-2.5-flash-native-audio-preview-09-2025
+      - name: models/gemini-2.5-flash-native-audio-preview-12-2025
+        alias: gemini-2.5-flash-native-audio-preview-12-2025
+      - name: models/gemini-3.1-flash-live-preview
+        alias: gemini-3.1-flash-live-preview
+      - name: models/lyria-realtime-exp
+        alias: lyria-realtime-exp

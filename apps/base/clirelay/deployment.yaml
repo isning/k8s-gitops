@@ -27,6 +27,24 @@ spec:
             - |
               cp /CLIProxyAPI/config.yaml /tmp/config.yaml
               sed -i "s|__REMOTE_MANAGEMENT_SECRET_KEY__|${REMOTE_MANAGEMENT_SECRET_KEY}|g" /tmp/config.yaml
+
+              # Inject all CLIRELAY_API_KEY_* values into matching placeholders.
+              env | while IFS='=' read -r key value; do
+                case "$key" in
+                  CLIRELAY_API_KEY_*)
+                    escaped_value=$(printf '%s' "$value" | sed 's/[\\/&|]/\\&/g')
+                    sed -i "s|__${key}__|${escaped_value}|g" /tmp/config.yaml
+                    ;;
+                esac
+              done
+
+              missing_placeholders="$(grep -o '__CLIRELAY_API_KEY_[A-Z0-9_]*__' /tmp/config.yaml | sort -u || true)"
+              if [ -n "$missing_placeholders" ]; then
+                echo "Missing secret values for placeholders:"
+                echo "$missing_placeholders"
+                exit 1
+              fi
+
               exec /CLIProxyAPI/CLIProxyAPI --config /tmp/config.yaml
           env:
             - name: DEPLOY
@@ -44,6 +62,9 @@ spec:
                 secretKeyRef:
                   name: clirelay-secret
                   key: remote-management-secret-key
+          envFrom:
+            - secretRef:
+                name: clirelay-secret
           ports:
             - name: http
               containerPort: 8317
