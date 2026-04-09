@@ -38,11 +38,11 @@ spec:
               readOnly: true
           resources:
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "4096Mi"
+              cpu: "800m"
             requests:
               memory: "256Mi"
-              cpu: "250m"
+              cpu: "50m"
       volumes:
         - name: data
           persistentVolumeClaim:
