@@ -10,14 +10,14 @@ data:
     {
       "dns": {
         "rules": [
-          { "rule_set": ["geosite-cn"], "server": "local" }
+          { "rule_set": ["geosite-geolocation-cn"], "server": "local" }
         ],
         "servers": [
           { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local" },
           { "type": "tls", "server": "dot.pub", "detour": "direct", "tag": "local", "domain_resolver": "local-raw" },
           { "type": "local", "detour": "direct", "tag": "local-raw" }
         ],
-        "final": "remote",
+        "final": "local",
         "disable_cache": false
       },
       "outbounds": [
@@ -37,23 +37,29 @@ data:
           "server": "local"
         },
         "rules": [
-          {
-            "action": "resolve",
-            "strategy": "prefer_ipv4"
-          },
           { "action": "sniff" },
           { "protocol": "dns", "action": "hijack-dns" },
+          { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" },
+          { "rule_set": ["geosite-geolocation-!cn"], "outbound": "AllNodes" },
+          { "rule_set": ["geosite-geolocation-cn", "geoip-cn"], "outbound": "direct" },
+          { "action": "resolve", "strategy": "prefer_ipv4"},
           { "ip_is_private": true, "outbound": "direct" },
-          { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" },
-          { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" }
+          { "rule_set": ["geoip-cn"], "outbound": "direct" }
         ],
         "final": "AllNodes",
         "rule_set": [
           {
-            "tag": "geosite-cn",
+            "tag": "geosite-geolocation-cn",
             "type": "remote",
             "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-cn.srs",
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-cn.srs",
+            "download_detour": "AllNodes"
+          },
+          {
+            "tag": "geosite-geolocation-!cn",
+            "type": "remote",
+            "format": "binary",
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-!cn.srs",
             "download_detour": "AllNodes"
           },
           {
