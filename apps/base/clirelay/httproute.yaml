@@ -15,13 +15,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /manage
+            value: /manage
       backendRefs:
         - name: clirelay
           port: 8317
