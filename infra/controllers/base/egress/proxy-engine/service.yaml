@@ -10,6 +10,7 @@ spec:
   ports:
   - port: 7890
     name: mixed-proxy
+    appProtocol: tcp # Avoid sniffing this as HTTP by Istio, which causes 404
     protocol: TCP
     targetPort: 7890
   selector:
