@@ -1,0 +1,54 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor
+  namespace: harbor
+spec:
+  releaseName: harbor
+  interval: 30m
+  chart:
+    spec:
+      chart: harbor
+      sourceRef:
+        kind: HelmRepository
+        name: harbor
+        namespace: flux-system
+      version: "1.*"
+      interval: 12h
+  values:
+    expose:
+      type: clusterIP
+      tls:
+        enabled: false
+    externalURL: https://harbor.isning.moe
+
+    # Route Harbor's outbound requests through the cluster egress proxy.
+    proxy:
+      httpProxy: http://proxy-svc.egress-system.svc.cluster.local:7890
+      httpsProxy: http://proxy-svc.egress-system.svc.cluster.local:7890
+      noProxy: 127.0.0.1,localhost,.svc,.cluster.local,harbor.harbor.svc,core,jobservice,registry,portal
+
+    # Keep internal dependencies for simpler bootstrap.
+    database:
+      type: internal
+    redis:
+      type: internal
+
+    # Disable scanners to reduce footprint; can be enabled later.
+    trivy:
+      enabled: false
+
+    persistence:
+      enabled: true
+      resourcePolicy: keep
+      persistentVolumeClaim:
+        registry:
+          size: 100Gi
+        jobservice:
+          jobLog:
+            size: 5Gi
+        database:
+          size: 10Gi
+        redis:
+          size: 5Gi
