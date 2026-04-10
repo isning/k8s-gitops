@@ -10,4 +10,5 @@ resources:
   - ./../../../base/flux-operator/
   - ./../../../base/astrbot/
   - ./../../../base/clirelay/
+  - ./../../../base/speaches/
   # - ./../../../base/maa/
