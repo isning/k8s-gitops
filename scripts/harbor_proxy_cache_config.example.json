@@ -1,0 +1,86 @@
+{
+  "registries": [
+    {
+      "name": "dockerhub-upstream",
+      "provider": "docker-hub",
+      "endpoint": "https://hub.docker.com",
+      "insecure": false,
+      "access_key_env": "DOCKERHUB_USERNAME",
+      "access_secret_env": "DOCKERHUB_TOKEN"
+    },
+    {
+      "name": "ghcr-upstream",
+      "provider": "github",
+      "endpoint": "https://ghcr.io",
+      "insecure": false,
+      "access_key_env": "GHCR_USERNAME",
+      "access_secret_env": "GHCR_TOKEN"
+    },
+    {
+      "name": "quay-upstream",
+      "provider": "quay",
+      "endpoint": "https://quay.io",
+      "insecure": false,
+      "access_key_env": "QUAY_USERNAME",
+      "access_secret_env": "QUAY_TOKEN"
+    },
+    {
+      "name": "k8s-registry-upstream",
+      "provider": "docker-registry",
+      "endpoint": "https://registry.k8s.io",
+      "insecure": false
+    },
+    {
+      "name": "gcr-upstream",
+      "provider": "gcr",
+      "endpoint": "https://gcr.io",
+      "insecure": false,
+      "access_key_env": "GCR_USERNAME",
+      "access_secret_env": "GCR_TOKEN"
+    },
+    {
+      "name": "mcr-upstream",
+      "provider": "docker-registry",
+      "endpoint": "https://mcr.microsoft.com",
+      "insecure": false
+    }
+  ],
+  "projects": [
+    {
+      "name": "dockerhub",
+      "registry": "dockerhub-upstream",
+      "public": false,
+      "storage_limit": -1
+    },
+    {
+      "name": "ghcr",
+      "registry": "ghcr-upstream",
+      "public": false,
+      "storage_limit": -1
+    },
+    {
+      "name": "quay",
+      "registry": "quay-upstream",
+      "public": false,
+      "storage_limit": -1
+    },
+    {
+      "name": "registry-k8s",
+      "registry": "k8s-registry-upstream",
+      "public": false,
+      "storage_limit": -1
+    },
+    {
+      "name": "gcr",
+      "registry": "gcr-upstream",
+      "public": false,
+      "storage_limit": -1
+    },
+    {
+      "name": "mcr",
+      "registry": "mcr-upstream",
+      "public": false,
+      "storage_limit": -1
+    }
+  ]
+}

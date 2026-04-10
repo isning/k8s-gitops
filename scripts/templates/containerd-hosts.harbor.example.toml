@@ -1,0 +1,42 @@
+# containerd hosts config template
+#
+# Suggested path layout:
+# - /etc/containerd/certs.d/docker.io/hosts.toml
+# - /etc/containerd/certs.d/ghcr.io/hosts.toml
+# - /etc/containerd/certs.d/quay.io/hosts.toml
+# - /etc/containerd/certs.d/registry.k8s.io/hosts.toml
+# - /etc/containerd/certs.d/gcr.io/hosts.toml
+# - /etc/containerd/certs.d/k8s.gcr.io/hosts.toml
+# - /etc/containerd/certs.d/mcr.microsoft.com/hosts.toml
+#
+# For docker.io, set SERVER to "https://registry-1.docker.io" and project to dockerhub.
+# For ghcr.io, set SERVER to "https://ghcr.io" and project to ghcr.
+# For quay.io, set SERVER to "https://quay.io" and project to quay.
+# For registry.k8s.io, set SERVER to "https://registry.k8s.io" and project to registry-k8s.
+# For gcr.io and k8s.gcr.io, set project to gcr.
+# For mcr.microsoft.com, set project to mcr.
+#
+# Replace placeholders before use:
+# - __SERVER__
+# - harbor.isning.moe (already set in this template)
+# - __HARBOR_PROJECT__      (dockerhub or ghcr)
+# - __HARBOR_USERNAME__
+# - __HARBOR_PASSWORD__
+#
+# After writing hosts.toml files, restart containerd:
+#   sudo systemctl restart containerd
+
+server = "__SERVER__"
+
+[host."https://harbor.isning.moe/v2/__HARBOR_PROJECT__"]
+  capabilities = ["pull", "resolve"]
+  override_path = true
+  skip_verify = false
+
+  [host."https://harbor.isning.moe/v2/__HARBOR_PROJECT__".header]
+    authorization = "Basic __BASE64_HARBOR_CREDENTIALS__"
+
+# Optional fallback to upstream if Harbor cache is unavailable.
+# Uncomment if you prefer availability over strict cache-only behavior.
+# [host."__SERVER__"]
+#   capabilities = ["pull", "resolve"]

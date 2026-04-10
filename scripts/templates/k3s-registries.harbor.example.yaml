@@ -1,0 +1,69 @@
+# k3s registries mirror config (for /etc/rancher/k3s/registries.yaml)
+#
+# This template routes common upstream registries through Harbor proxy cache projects:
+# - docker.io -> harbor project "dockerhub"
+# - ghcr.io   -> harbor project "ghcr"
+# - quay.io   -> harbor project "quay"
+# - registry.k8s.io -> harbor project "registry-k8s"
+# - gcr.io -> harbor project "gcr"
+# - k8s.gcr.io -> harbor project "gcr"
+# - mcr.microsoft.com -> harbor project "mcr"
+#
+# Replace placeholders before use:
+# - harbor.isning.moe (already set in this template)
+# - __HARBOR_USERNAME__
+# - __HARBOR_PASSWORD__
+#
+# After updating this file on node, restart k3s:
+#   sudo systemctl restart k3s
+
+mirrors:
+  docker.io:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "dockerhub/$1"
+
+  ghcr.io:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "ghcr/$1"
+
+  quay.io:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "quay/$1"
+
+  registry.k8s.io:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "registry-k8s/$1"
+
+  gcr.io:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "gcr/$1"
+
+  k8s.gcr.io:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "gcr/$1"
+
+  mcr.microsoft.com:
+    endpoint:
+      - "https://harbor.isning.moe"
+    rewrite:
+      "^(.*)$": "mcr/$1"
+
+configs:
+  "harbor.isning.moe":
+    auth:
+      username: "__HARBOR_USERNAME__"
+      password: "__HARBOR_PASSWORD__"
+    tls:
+      insecure_skip_verify: false

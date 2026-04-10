@@ -1,0 +1,67 @@
+# Harbor Mirror Templates
+
+This folder contains node-level mirror templates for Harbor proxy-cache.
+
+Files:
+
+- `k3s-registries.harbor.example.yaml`
+  - target path: `/etc/rancher/k3s/registries.yaml`
+- `containerd-hosts.harbor.example.toml`
+  - target path: `/etc/containerd/certs.d/<upstream-registry>/hosts.toml`
+
+Supported upstream registries and Harbor projects:
+
+- `docker.io` -> `dockerhub`
+- `ghcr.io` -> `ghcr`
+- `quay.io` -> `quay`
+- `registry.k8s.io` -> `registry-k8s`
+- `gcr.io` -> `gcr`
+- `k8s.gcr.io` -> `gcr`
+- `mcr.microsoft.com` -> `mcr`
+
+## k3s
+
+1. Copy template:
+
+```bash
+sudo cp scripts/templates/k3s-registries.harbor.example.yaml /etc/rancher/k3s/registries.yaml
+```
+
+2. Replace credentials placeholders:
+
+- `__HARBOR_USERNAME__`
+- `__HARBOR_PASSWORD__`
+
+3. Restart k3s:
+
+```bash
+sudo systemctl restart k3s
+```
+
+## containerd
+
+1. Create one `hosts.toml` per upstream registry:
+
+```bash
+sudo mkdir -p /etc/containerd/certs.d/docker.io
+sudo cp scripts/templates/containerd-hosts.harbor.example.toml /etc/containerd/certs.d/docker.io/hosts.toml
+```
+
+2. For each upstream registry, replace:
+
+- `__SERVER__` (example: `https://registry-1.docker.io`)
+- `__HARBOR_PROJECT__` (example: `dockerhub`)
+- `__BASE64_HARBOR_CREDENTIALS__` (`base64(username:password)`)
+
+3. Restart containerd:
+
+```bash
+sudo systemctl restart containerd
+```
+
+## Operational Notes
+
+- Use Harbor robot account with pull-only permission.
+- Keep proxy-cache projects private if your egress bandwidth is limited.
+- Plan yearly manual token rotation if you do not need high-frequency rotate.
+- If Harbor uses private CA, install CA cert on nodes and keep `skip_verify = false`.
