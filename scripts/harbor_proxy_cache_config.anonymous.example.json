@@ -3,24 +3,18 @@
     {
       "name": "dockerhub-upstream",
       "provider": "docker-hub",
-      "insecure": false,
-      "access_key_env": "DOCKERHUB_USERNAME",
-      "access_secret_env": "DOCKERHUB_TOKEN"
+      "insecure": false
     },
     {
       "name": "ghcr-upstream",
       "provider": "github-ghcr",
-      "insecure": false,
-      "access_key_env": "GHCR_USERNAME",
-      "access_secret_env": "GHCR_TOKEN"
+      "insecure": false
     },
     {
       "name": "quay-registry-upstream",
       "provider": "docker-registry",
       "endpoint": "https://quay.io",
-      "insecure": false,
-      "access_key_env": "QUAY_USERNAME",
-      "access_secret_env": "QUAY_TOKEN"
+      "insecure": false
     },
     {
       "name": "k8s-registry-upstream",
@@ -32,9 +26,7 @@
       "name": "gcr-registry-upstream",
       "provider": "docker-registry",
       "endpoint": "https://gcr.io",
-      "insecure": false,
-      "access_key_env": "GCR_USERNAME",
-      "access_secret_env": "GCR_TOKEN"
+      "insecure": false
     },
     {
       "name": "mcr-upstream",

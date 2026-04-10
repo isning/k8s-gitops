@@ -19,6 +19,25 @@ Supported upstream registries and Harbor projects:
 - `k8s.gcr.io` -> `gcr`
 - `mcr.microsoft.com` -> `mcr`
 
+## Initialize Proxy Cache Projects
+
+Use robot-account-only script auth:
+
+```bash
+HARBOR_ROBOT_NAME='robot$init' \
+HARBOR_ROBOT_SECRET='replace-me' \
+python3 scripts/harbor_init_proxy_cache.py \
+  --harbor-url https://harbor.isning.moe \
+  --config scripts/harbor_proxy_cache_config.example.json
+```
+
+Available config examples:
+
+- `scripts/harbor_proxy_cache_config.example.json`
+  - credentialed upstreams (recommended for stable native providers)
+- `scripts/harbor_proxy_cache_config.anonymous.example.json`
+  - anonymous-first, native-where-supported, fallback to `docker-registry` where needed
+
 ## k3s
 
 1. Copy template:
