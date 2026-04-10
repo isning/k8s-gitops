@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./grafana-credentials.yaml
   - ./grafana-instance.yaml
+  - ./grafana-datasource-victoriametrics.yaml
