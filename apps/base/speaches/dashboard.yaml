@@ -1,0 +1,68 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: speaches-overview
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  json: |
+    {
+      "dashboard": {
+        "title": "Speaches Overview",
+        "tags": ["speaches", "application"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "CPU Usage",
+            "targets": [
+              {
+                "expr": "rate(container_cpu_usage_seconds_total{pod=~\"speaches.*\"}[5m]) * 100",
+                "legendFormat": "{{pod}}"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "title": "Memory Usage",
+            "targets": [
+              {
+                "expr": "container_memory_usage_bytes{pod=~\"speaches.*\"} / 1024 / 1024",
+                "legendFormat": "{{pod}} (MB)"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "title": "Request Rate",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total{job=\"speaches\"}[5m])",
+                "legendFormat": "{{method}} {{path}}"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+          },
+          {
+            "title": "Request Duration (p95)",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"speaches\"}[5m]))",
+                "legendFormat": "p95"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+          }
+        ],
+        "refresh": "30s",
+        "schemaVersion": 35,
+        "version": 0
+      }
+    }
+  datasource:
+    inputName: "DS_PROMETHEUS"
+    value: VictoriaMetrics
