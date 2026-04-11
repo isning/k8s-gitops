@@ -12,12 +12,29 @@ Files:
 Supported upstream registries and Harbor projects:
 
 - `docker.io` -> `dockerhub`
-- `ghcr.io` -> `ghcr`
+- `ghcr.io` -> `ghcr` (Harbor native provider: `github-ghcr`, upstream `https://ghcr.io`)
 - `quay.io` -> `quay`
 - `registry.k8s.io` -> `registry-k8s`
 - `gcr.io` -> `gcr`
 - `k8s.gcr.io` -> `gcr`
 - `mcr.microsoft.com` -> `mcr`
+
+## How To Test
+
+Test the mirror by pulling the upstream image name on a node that has the mirror
+config installed. Do **not** use the Harbor project path as the image reference for
+the primary test.
+
+Examples:
+
+```bash
+sudo crictl pull ghcr.io/speaches-ai/speaches:latest-cpu
+sudo crictl pull docker.io/library/busybox:latest
+```
+
+These pulls should be rewritten by the node runtime to Harbor automatically.
+If you pull `harbor.i.isning.moe/ghcr/...` directly, you are bypassing the mirror
+rewrite path and testing Harbor project resolution instead.
 
 ## Initialize Proxy Cache Projects
 
