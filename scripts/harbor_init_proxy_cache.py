@@ -21,7 +21,7 @@ from typing import Any
 
 _NATIVE_PROVIDER_DEFAULT_URL: dict[str, str] = {
     "docker-hub": "https://hub.docker.com",
-    "github-ghcr": "https://github.com",
+    "github-ghcr": "https://ghcr.io",
     "quay": "https://quay.io",
     "gcr": "https://gcr.io",
 }
