@@ -1,0 +1,138 @@
+name: Update Image Lock
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      cluster:
+        description: "Cluster name under clusters/ (or 'all')"
+        required: true
+        default: "all"
+      arch:
+        description: "Container architecture"
+        required: true
+        default: "amd64"
+      os:
+        description: "Container OS"
+        required: true
+        default: "linux"
+
+permissions:
+  contents: write
+  checks: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v12
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+
+      - name: Cache uv tools (flux-local)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-flux-local-8.2.0
+
+      - name: Generate lock
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            nix run .#gen-image-lock-all -- --include-helm 1 --auto-discover 1
+          else
+            cluster="${{ github.event.inputs.cluster || 'all' }}"
+            arch="${{ github.event.inputs.arch || 'amd64' }}"
+            os="${{ github.event.inputs.os || 'linux' }}"
+            if [[ "$cluster" == "all" ]]; then
+              nix run .#gen-image-lock-all -- --arch "$arch" --os "$os" --include-helm 1 --auto-discover 1
+            else
+              nix run .#gen-image-lock -- --cluster "$cluster" --arch "$arch" --os "$os" --include-helm 1 --auto-discover 1
+            fi
+          fi
+
+      - name: Commit changes & Trigger checks
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add clusters/**/images.lock.nix
+          if git diff --cached --quiet; then
+            echo "No lock changes"
+            exit 0
+          fi
+
+          git commit -m "chore(lock): refresh flux image lock"
+          git push
+
+          # --- CI Workflow Loophole Fix ---
+          # GITHUB_TOKEN stops newly pushed lock commits from triggering their own test checks.
+          # To ensure we don't accidentally bypass the 'manifests' tests for a broken user commit,
+          # we MUST wait for the parent commit's 'manifests' tests to pass before granting this commit a fake pass.
+          
+          NEW_SHA=$(git rev-parse HEAD)
+          PARENT_SHA=$(git rev-parse HEAD~1)
+          
+          echo "Waiting for parent commit ($PARENT_SHA) 'manifests' check to complete..."
+          
+          max_retries=60
+          sleep_sec=15
+          conclusion="failure"
+          
+          # Force English output to avoid text-parsing issues if system locale is different
+          export LC_ALL=C
+          
+          for ((i=1; i<=max_retries; i++)); do
+            # Fetch all check runs attached to the parent commit
+            checks_json=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/commits/$PARENT_SHA/check-runs --paginate)
+            
+            # Find the check run(s) named 'manifests' (there could be multiple on PR + push events)
+            manifests_checks=$(printf '%s\n' "$checks_json" | jq '[.check_runs[] | select(.name == "manifests")]')
+            num_checks=$(printf '%s\n' "$manifests_checks" | jq 'length')
+            
+            if [[ "$num_checks" -eq 0 ]]; then
+              echo "No 'manifests' checks found yet. Waiting... ($i/$max_retries)"
+            else
+              all_completed=$(printf '%s\n' "$manifests_checks" | jq 'all(.status == "completed")')
+              if [[ "$all_completed" == "true" ]]; then
+                any_failed=$(printf '%s\n' "$manifests_checks" | jq 'any(.conclusion != "success" and .conclusion != "skipped")')
+                if [[ "$any_failed" == "true" ]]; then
+                  echo "Parent commit ($PARENT_SHA) failed the 'manifests' check."
+                  conclusion="failure"
+                else
+                  echo "Parent commit ($PARENT_SHA) passed the 'manifests' check!"
+                  conclusion="success"
+                fi
+                break
+              else
+                echo "Checks are still running. Waiting... ($i/$max_retries)"
+              fi
+            fi
+            sleep $sleep_sec
+          done
+          
+          if [[ "$i" -gt "$max_retries" ]]; then
+            echo "Timeout waiting for parent commit checks to complete."
+            conclusion="failure"
+          fi
+          
+          echo "Setting 'manifests' check on the new lock commit ($NEW_SHA) to $conclusion"
+          gh api --method POST -H "Accept: application/vnd.github+json" \
+            /repos/${{ github.repository }}/check-runs \
+            -f name='manifests' \
+            -f head_sha="$NEW_SHA" \
+            -f status='completed' \
+            -f conclusion="$conclusion"
+            
+          if [[ "$conclusion" == "failure" ]]; then
+             exit 1
+          fi
