@@ -32,6 +32,54 @@ Steps to bootstrap a new cluster:
    ```
 1. Add the printed public key to the git repository, as a deploy key with write access.
 
+### Bootstrap Flow (Recommended)
+
+Use a phased flow and keep dependency breakers in the flow itself (no hard cut-over
+until dependencies are healthy):
+
+1. Bootstrap Flux itself (`flux-system`) and verify source/controller health.
+2. Reconcile `infra-namespaces` first.
+3. Reconcile `infra-pre-controllers` (networking/storage foundations).
+4. Reconcile `infra-controllers` (operators and Harbor HelmRelease).
+5. Reconcile `infra-configs`, but apply in this order:
+   - 5.1 Networking and ingress routes first (Gateway/HTTPRoute/DNS paths).
+   - 5.2 Harbor runtime mirror configs only in non-enforcing mode first.
+   - 5.3 Logto/OIDC providers and clients after ingress is confirmed reachable.
+6. Validate service readiness before hard dependencies:
+   - Harbor core/registry healthy and serving API.
+   - Logto issuer URL reachable from cluster and admin workstation.
+7. Initialize Harbor proxy-cache projects (`scripts/harbor_init_proxy_cache.py`).
+8. Switch node mirror config to Harbor-first only after step 6-7 pass, and keep
+   a break-glass upstream fallback during first rollout.
+9. Enable OIDC-dependent login paths (API server OIDC login flow and related client
+   settings) only after Logto is healthy and reachable.
+10. Reconcile `apps` and `vms`.
+11. Perform all items listed in the Manual Steps Index.
+
+Suggested verification commands:
+
+```bash
+flux get ks
+flux get all -A
+flux events
+```
+
+### Manual Steps Index (Post-Bootstrap)
+
+The following items currently require manual operation and are not fully automated by
+GitOps manifests. Review them after a fresh bootstrap:
+
+1. Harbor initial login and OIDC manual setup:
+   - `infra/controllers/base/harbor/README.md`
+2. Harbor node mirror templates and credential rotation notes:
+   - `scripts/templates/README-harbor-mirror.md`
+3. Astrbot Bay and OneBot adapter manual setup:
+   - `apps/base/astrbot/README.md`
+4. API server OIDC login helper (kubectl oidc-login):
+   - `infra/configs/base/apiserver-oidc/README.md`
+5. KubeVirt dynamic-networks-controller manual workaround notes:
+   - `infra/controllers/base/kubevirt/README.md`
+
 ## Usage
 
 Add your configs into those directories, fluxcd will take care of the rest:
