@@ -3,7 +3,7 @@ kind: Grafana
 metadata:
   name: grafana
   labels:
-    version: v1
+    app.kubernetes.io/version: v1
     dashboards: "grafana"
 spec:
   client:
@@ -61,7 +61,7 @@ spec:
         metadata:
           labels:
             app: grafana
-            version: v1
+            app.kubernetes.io/version: v1
         spec:
           containers:
             - name: grafana
