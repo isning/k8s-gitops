@@ -34,3 +34,4 @@ subjects:
 tunnelRef:
   kind: Tunnel
   name: default-tunnel
+  disableDNSUpdates: true
