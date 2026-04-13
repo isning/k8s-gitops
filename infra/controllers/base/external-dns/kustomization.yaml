@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - ./cloudflare-dns-secret.yaml
   - ./deployment.yaml
+  - ./crd-manifest.yaml
 
 namespace: external-dns-system
