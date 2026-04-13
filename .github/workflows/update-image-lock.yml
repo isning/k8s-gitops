@@ -44,6 +44,14 @@ jobs:
           path: ~/.cache/uv
           key: ${{ runner.os }}-uv-flux-local-8.2.0
 
+      - name: Restore image digest/hash cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/nixos-image-lock
+          key: nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-
+
       - name: Generate lock
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -58,6 +66,13 @@ jobs:
               nix run .#gen-image-lock -- --cluster "$cluster" --arch "$arch" --os "$os" --include-helm 1 --auto-discover 1
             fi
           fi
+
+      - name: Save image digest/hash cache
+        if: always() && !cancelled()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/nixos-image-lock
+          key: ${{ runner.os }}-nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Commit changes & Trigger checks
         env:
