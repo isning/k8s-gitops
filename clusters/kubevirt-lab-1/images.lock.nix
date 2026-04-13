@@ -7,14 +7,27 @@
     hash = "sha256-zl2hbA0oVHgmT9vguQ934ashRjznU2nSQQTqKgEfrBs=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cloudflare-operator-system";
+        name = "cloudflare-operator-controller-manager";
       }
     ];
   }
@@ -26,20 +39,44 @@
     hash = "sha256-VuVDROnZDEl+0jLpdiIUeAzPqwa3hZK/nu/KQppcWGk=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-      "prod";
-    ];
     sources = [
       {
-        namespace = "prod";
         kind = "HelmRelease";
+        namespace = "prod";
         name = "logto";
       }
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "prod";
+          name = "logto";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "CronJob";
+        namespace = "egress-system";
+        name = "proxy-engine-daily-restarter";
       }
     ];
   }
@@ -51,14 +88,27 @@
     hash = "sha256-uJjZL1+txeyHfM7tMgt6IUeX7c2KushI8QT1E36Dtmc=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "napcat";
       }
     ];
   }
@@ -67,18 +117,31 @@
     imageDigest = "sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e";
     finalImageName = "busybox";
     finalImageTag = "latest";
-    hash = "sha256-LJdlc+B/2oa11Kud1GdRsf5S3J3gNOxCTvEc5AqiGp0=";
+    hash = "sha256-uJjZL1+txeyHfM7tMgt6IUeX7c2KushI8QT1E36Dtmc=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "prod";
-    ];
     sources = [
       {
-        namespace = "prod";
         kind = "HelmRelease";
+        namespace = "prod";
         name = "logto";
       }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "prod";
+          name = "logto";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
     ];
   }
   {
@@ -89,14 +152,32 @@
     hash = "sha256-kESXROmAoqGh+sl//Ey/TlpvCiYsBnNTFN2tvMZadt0=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "istio-system";
-    ];
     sources = [
       {
-        namespace = "istio-system";
         kind = "HelmRelease";
+        namespace = "istio-system";
         name = "istio-cni";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "istio-system";
+          name = "istio-cni";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "DaemonSet";
+        namespace = "istio-system";
+        name = "istio-cni-node";
       }
     ];
   }
@@ -108,13 +189,31 @@
     hash = "sha256-Rr68S2AePT+KaE7OFwoogEP6nZrKN5DWevRzskLOEuc=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "istio-system";
-    ];
     sources = [
       {
-        namespace = "istio-system";
         kind = "HelmRelease";
+        namespace = "istio-system";
+        name = "istiod";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "istio-system";
+          name = "istiod";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "istio-system";
         name = "istiod";
       }
     ];
@@ -127,13 +226,31 @@
     hash = "sha256-OwNnmCzA3h0cyW1Pven7TfrK7Z2pvMe0eHcr5Udfka0=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "istio-system";
-    ];
     sources = [
       {
-        namespace = "istio-system";
         kind = "HelmRelease";
+        namespace = "istio-system";
+        name = "ztunnel";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "istio-system";
+          name = "ztunnel";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "DaemonSet";
+        namespace = "istio-system";
         name = "ztunnel";
       }
     ];
@@ -146,14 +263,27 @@
     hash = "sha256-guJ5jsg1FalGQTWqEMM6GkWpfSK+mV5R5YfV2mH/u/E=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "bay";
       }
     ];
   }
@@ -165,14 +295,32 @@
     hash = "sha256-UWieKoPlh4RvK73QJcOC9+76kYzKruSsh5+uZZELVnU=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "cnpg-system";
-    ];
     sources = [
       {
-        namespace = "cnpg-system";
         kind = "HelmRelease";
+        namespace = "cnpg-system";
         name = "cnpg";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "cnpg-system";
+          name = "cnpg";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cnpg-system";
+        name = "cnpg-cloudnative-pg";
       }
     ];
   }
@@ -184,13 +332,31 @@
     hash = "sha256-GJts3vBYyOyH+nJSM5c2KGVfaYX0vAYwr0lFkfv42Yg=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "HelmRelease";
+        namespace = "flux-system";
+        name = "flux-operator";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "flux-system";
+          name = "flux-operator";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "flux-system";
         name = "flux-operator";
       }
     ];
@@ -203,13 +369,31 @@
     hash = "sha256-J88jET9uPCAJbPmLdash71MzA/4c+pEG827rUSis2ZE=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "grafana-operator";
-    ];
     sources = [
       {
-        namespace = "grafana-operator";
         kind = "HelmRelease";
+        namespace = "grafana-operator";
+        name = "grafana-operator";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "grafana-operator";
+          name = "grafana-operator";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "grafana-operator";
         name = "grafana-operator";
       }
     ];
@@ -222,14 +406,27 @@
     hash = "sha256-sDJPnEk+aoT8EFw638ky3P/9RPGcJItsBUkiIYF3kxA=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "napcat";
       }
     ];
   }
@@ -241,13 +438,31 @@
     hash = "sha256-HN4uduyR6OArr7aG/lHx/ToOnGNsByOc/E0BbZ7Xb68=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "redroid-operator";
-    ];
     sources = [
       {
-        namespace = "redroid-operator";
         kind = "HelmRelease";
+        namespace = "redroid-operator";
+        name = "redroid-operator";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "redroid-operator";
+          name = "redroid-operator";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "redroid-operator";
         name = "redroid-operator";
       }
     ];
@@ -260,33 +475,59 @@
     hash = "sha256-eAVu/iZmdVhvEQpsSPtm1J22LC0+UtwfmmzFCIxbasA=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "DaemonSet";
+        namespace = "cluster-network-addons";
+        name = "dynamic-networks-controller-ds";
       }
     ];
   }
   {
     imageName = "ghcr.io/kittors/clirelay";
-    imageDigest = "sha256:4f7bf43f78ad751594d12ba3d00f075b25020a732c8d6bf8ff31daee70afa6be";
+    imageDigest = "sha256:a8d8fffc2615921892c1812fccee430005e231cc2f69a94af4ab84e18d5995ff";
     finalImageName = "ghcr.io/kittors/clirelay";
     finalImageTag = "latest";
-    hash = "sha256-Pq6trtpl0cvnGVB0GHu8kLQXtbmdMpRF3nNp5877DCs=";
+    hash = "sha256-eCfZ6e+giZ1A2k9cW7lfHXSHhQcXlYdudKnvGRemDD4=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "clirelay";
       }
     ];
   }
@@ -298,15 +539,28 @@
     hash = "sha256-EERmVFATbtdb3DaY4IB9L1YXfhcFy8Q+P0QzmeQKkfs=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "prod";
-    ];
     sources = [
       {
-        namespace = "prod";
         kind = "HelmRelease";
+        namespace = "prod";
         name = "logto";
       }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "prod";
+          name = "logto";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
     ];
   }
   {
@@ -317,14 +571,27 @@
     hash = "sha256-pVi72HFlsDLl414pPIDT56nyvNHNFeMtZhVSYUM7ONU=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "egress-system";
+        name = "proxy-engine";
       }
     ];
   }
@@ -336,14 +603,27 @@
     hash = "sha256-8goziYRspCXPHF9PGVV+4Bdf8EKXoQgYan0FsiFpDX0=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "speaches";
       }
     ];
   }
@@ -355,14 +635,32 @@
     hash = "sha256-uQkEAdoIKXEQgcU3E+wWwBjrfu+ncSY+0eCwb3AEpwA=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "harbor";
+        name = "harbor-core";
       }
     ];
   }
@@ -374,14 +672,32 @@
     hash = "sha256-ywLcy3oOUaTdyuWlybW6rfyYo+OJJ/oAI9kLxx6yt3M=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "StatefulSet";
+        namespace = "harbor";
+        name = "harbor-database";
       }
     ];
   }
@@ -393,14 +709,32 @@
     hash = "sha256-ZwHaNk1dHTTSHMfLvnn7R1pJQpsHbet9f+DObhtH2+Y=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "harbor";
+        name = "harbor-jobservice";
       }
     ];
   }
@@ -412,14 +746,32 @@
     hash = "sha256-1pBce12mcZjubGIj2DF+Bvo1nMGhy48/DlmWY5MVFgs=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "harbor";
+        name = "harbor-portal";
       }
     ];
   }
@@ -431,14 +783,32 @@
     hash = "sha256-HV8wL0shS04MW7DGk47kDfzImspy8alYMnHdDwZvyuc=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "harbor";
+        name = "harbor-registry";
       }
     ];
   }
@@ -450,14 +820,32 @@
     hash = "sha256-lkNGHuKXeSfIXKpIhj2+wtf3gxR949P2K5lw6Hh582M=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "harbor";
+        name = "harbor-nginx";
       }
     ];
   }
@@ -469,14 +857,32 @@
     hash = "sha256-qnI2gD6HIgH8YNH1VQyYnhDT1gS9K1w3hGP9AE8AyzM=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "StatefulSet";
+        namespace = "harbor";
+        name = "harbor-redis";
       }
     ];
   }
@@ -488,14 +894,32 @@
     hash = "sha256-s1NxDzEjgYKAFRvIwPvbqeg4wnYbfEKagGimGX4bnpU=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "harbor";
-    ];
     sources = [
       {
-        namespace = "harbor";
         kind = "HelmRelease";
+        namespace = "harbor";
         name = "harbor";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "harbor";
+          name = "harbor";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "harbor";
+        name = "harbor-registry";
       }
     ];
   }
@@ -507,14 +931,27 @@
     hash = "sha256-FfSV4h1dyHsPBIyS8mkdywnanwameGQrAu4zmd5zFu4=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "staging";
+        name = "echo";
       }
     ];
   }
@@ -526,14 +963,27 @@
     hash = "sha256-wvriDcQMZ30rLUwjzQAkZq/sTiwv/4+u9BRa99nPjsQ=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "napcat";
       }
     ];
   }
@@ -545,14 +995,27 @@
     hash = "sha256-SjvAkyqXaLDMIUJY8s/8HU1PNVmYuitTUQ3BId4TEbk=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-configs";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-configs";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "i-reroute";
+        name = "i-reroute-proxy";
       }
     ];
   }
@@ -564,15 +1027,28 @@
     hash = "sha256-1g7d6yAuLKJVPbCRRiHniT1r7ya95grFw9k6tFvdvro=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "prod";
-    ];
     sources = [
       {
-        namespace = "prod";
         kind = "HelmRelease";
+        namespace = "prod";
         name = "logto";
       }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "prod";
+          name = "logto";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
     ];
   }
   {
@@ -583,14 +1059,27 @@
     hash = "sha256-M3YcTJ6QVVuRZM1JAMDExOONsGj6b2JbHGBnSitcfII=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "egress-system";
+        name = "proxy-engine";
       }
     ];
   }
@@ -602,14 +1091,27 @@
     hash = "sha256-+O+wEwPUkrMBh+zMSKNpypkUsoY9hEMEy6FaA//8das=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cluster-network-addons";
+        name = "cluster-network-addons-operator";
       }
     ];
   }
@@ -621,13 +1123,31 @@
     hash = "sha256-lXN5D2G9nuk3isd01SFoYY02ckjKAPcJ/zZqf3ibf9A=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kube-system";
-    ];
     sources = [
       {
-        namespace = "kube-system";
         kind = "HelmRelease";
+        namespace = "kube-system";
+        name = "cilium";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kube-system";
+          name = "cilium";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "DaemonSet";
+        namespace = "kube-system";
         name = "cilium";
       }
     ];
@@ -640,14 +1160,32 @@
     hash = "sha256-7xR/tMwiGPtjwsXxHv/u5HFfCYcXkFxk1E4lXlIOSW8=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kube-system";
-    ];
     sources = [
       {
-        namespace = "kube-system";
         kind = "HelmRelease";
+        namespace = "kube-system";
         name = "cilium";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kube-system";
+          name = "cilium";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kube-system";
+        name = "hubble-relay";
       }
     ];
   }
@@ -659,14 +1197,32 @@
     hash = "sha256-NZsXrJVdOx5pezgaW0FkkH2lswpkLsDGdv6OPjVoax0=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kube-system";
-    ];
     sources = [
       {
-        namespace = "kube-system";
         kind = "HelmRelease";
+        namespace = "kube-system";
         name = "cilium";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kube-system";
+          name = "cilium";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kube-system";
+        name = "hubble-ui";
       }
     ];
   }
@@ -678,14 +1234,32 @@
     hash = "sha256-p83b5NrzuWjRjs4FMrYAmOkQKUsc4EYCxv55cchF9Vg=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kube-system";
-    ];
     sources = [
       {
-        namespace = "kube-system";
         kind = "HelmRelease";
+        namespace = "kube-system";
         name = "cilium";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kube-system";
+          name = "cilium";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kube-system";
+        name = "hubble-ui";
       }
     ];
   }
@@ -697,14 +1271,32 @@
     hash = "sha256-7w75MJ0AFGfRAzmg3beRea7b/lAE/dIr2wpgtmgyiE0=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kube-system";
-    ];
     sources = [
       {
-        namespace = "kube-system";
         kind = "HelmRelease";
+        namespace = "kube-system";
         name = "cilium";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kube-system";
+          name = "cilium";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kube-system";
+        name = "cilium-operator";
       }
     ];
   }
@@ -716,14 +1308,32 @@
     hash = "sha256-T1N61mUjeAZ1e8JXQQjSnJ+vncYb++TcHHwDF7/S6es=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "cert-manager";
-    ];
     sources = [
       {
-        namespace = "cert-manager";
         kind = "HelmRelease";
+        namespace = "cert-manager";
         name = "cert-manager";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "cert-manager";
+          name = "cert-manager";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cert-manager";
+        name = "cert-manager-cainjector";
       }
     ];
   }
@@ -735,13 +1345,31 @@
     hash = "sha256-Y62uJTWMBJam9SNgbA/3DK30SreMs4Ad69qDGTeVL/U=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "cert-manager";
-    ];
     sources = [
       {
-        namespace = "cert-manager";
         kind = "HelmRelease";
+        namespace = "cert-manager";
+        name = "cert-manager";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "cert-manager";
+          name = "cert-manager";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cert-manager";
         name = "cert-manager";
       }
     ];
@@ -754,14 +1382,32 @@
     hash = "sha256-MH60aRDXMGI33VmKDwEVFqHUBdPcGOyfvA8ISP0y32g=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "cert-manager";
-    ];
     sources = [
       {
-        namespace = "cert-manager";
         kind = "HelmRelease";
+        namespace = "cert-manager";
         name = "cert-manager";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "cert-manager";
+          name = "cert-manager";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Job";
+        namespace = "cert-manager";
+        name = "cert-manager-startupapicheck";
       }
     ];
   }
@@ -773,14 +1419,32 @@
     hash = "sha256-o/D7ReLs3gAfdTbTb5Fdz7/vJ31ca0+tawnMsylpHvM=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "cert-manager";
-    ];
     sources = [
       {
-        namespace = "cert-manager";
         kind = "HelmRelease";
+        namespace = "cert-manager";
         name = "cert-manager";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "cert-manager";
+          name = "cert-manager";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cert-manager";
+        name = "cert-manager-webhook";
       }
     ];
   }
@@ -792,14 +1456,32 @@
     hash = "sha256-OQtEE0NsmPFhLrc6SoTwhiD8dm+ZGfX2MKwvi6wxt8g=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kiali-operator";
-    ];
     sources = [
       {
-        namespace = "kiali-operator";
         kind = "HelmRelease";
+        namespace = "kiali-operator";
         name = "kiali";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kiali-operator";
+          name = "kiali";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kiali-operator";
+        name = "kiali-kiali-operator";
       }
     ];
   }
@@ -811,14 +1493,27 @@
     hash = "sha256-YKpZirzLyomsyEMqIUoSV1SYxCQ/pRf2e6zQQrtMYIY=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cdi";
+        name = "cdi-operator";
       }
     ];
   }
@@ -830,14 +1525,27 @@
     hash = "sha256-JT6//fF6omOR82ZzJrDuiNXX6xpT6TSNYlFr36HHbGc=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "cluster-network-addons";
+        name = "cluster-network-addons-operator";
       }
     ];
   }
@@ -849,14 +1557,27 @@
     hash = "sha256-p1PZQqHV82rhhpD2L+FC/3eMKtiv628o+iMme77DjDg=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kubevirt";
+        name = "virt-operator";
       }
     ];
   }
@@ -868,13 +1589,31 @@
     hash = "sha256-fLOp2k0MVhLmqZZ+OKfBT3t7JXrusyCF0pdgcZRPqpU=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "oauth2-proxy";
-    ];
     sources = [
       {
-        namespace = "oauth2-proxy";
         kind = "HelmRelease";
+        namespace = "oauth2-proxy";
+        name = "oauth2-proxy";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "oauth2-proxy";
+          name = "oauth2-proxy";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "oauth2-proxy";
         name = "oauth2-proxy";
       }
     ];
@@ -887,14 +1626,32 @@
     hash = "sha256-Qh6QZ0X1aACeJHCz1w1MVm+0qEGXZigZ0eDJwMVxdcA=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "monitoring";
-    ];
     sources = [
       {
-        namespace = "monitoring";
         kind = "HelmRelease";
+        namespace = "monitoring";
         name = "victoria-metrics-k8s-stack";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "monitoring";
+          name = "victoria-metrics-k8s-stack";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Job";
+        namespace = "monitoring";
+        name = "victoria-metrics-k8s-stack-victoria-metrics-operator-cleanup-hook";
       }
     ];
   }
@@ -906,13 +1663,31 @@
     hash = "sha256-4gMpoTOHWF2NK8X01GuOvN6SBDDPsa+0q67KfAdl48c=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "kube-system";
-    ];
     sources = [
       {
-        namespace = "kube-system";
         kind = "HelmRelease";
+        namespace = "kube-system";
+        name = "local-path-provisioner";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "kube-system";
+          name = "local-path-provisioner";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-pre-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "kube-system";
         name = "local-path-provisioner";
       }
     ];
@@ -925,14 +1700,27 @@
     hash = "sha256-fZgKbdEPEx4ejmEbQ7INtXgudd7m7USGTUdf+ivXup0=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "external-dns-system";
+        name = "external-dns";
       }
     ];
   }
@@ -944,14 +1732,32 @@
     hash = "sha256-7zJYcxg+KQtO20erjX5y9X1ymZdNSaJC8jiGnvRiS+s=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "monitoring";
-    ];
     sources = [
       {
-        namespace = "monitoring";
         kind = "HelmRelease";
+        namespace = "monitoring";
         name = "victoria-metrics-k8s-stack";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "monitoring";
+          name = "victoria-metrics-k8s-stack";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "monitoring";
+        name = "victoria-metrics-k8s-stack-kube-state-metrics";
       }
     ];
   }
@@ -963,14 +1769,27 @@
     hash = "sha256-uzE5/jAbe5r22a5uX5Yokfv5LmesmC35WqhEfGUkMY8=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "apps";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "apps";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "prod";
+        name = "astrbot";
       }
     ];
   }
@@ -982,14 +1801,27 @@
     hash = "sha256-fc3RACrMwKa85gil58Q/Lg7SFYeuTX6jDPTHPfbstwc=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "flux-system";
-    ];
     sources = [
       {
-        namespace = "flux-system";
         kind = "Kustomization";
+        namespace = "flux-system";
         name = "infra-controllers";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "DaemonSet";
+        namespace = "kube-system";
+        name = "generic-device-plugin";
       }
     ];
   }
@@ -1001,14 +1833,32 @@
     hash = "sha256-IVsRx/6MozR9MwLtNsuAZkzQ3xH0BFaAbG8IHyuwhf4=";
     os = "linux";
     arch = "amd64";
-    namespaces = [
-      "monitoring";
-    ];
     sources = [
       {
-        namespace = "monitoring";
         kind = "HelmRelease";
+        namespace = "monitoring";
         name = "victoria-metrics-k8s-stack";
+      }
+    ];
+    sourceChains = [
+      [
+        {
+          kind = "HelmRelease";
+          namespace = "monitoring";
+          name = "victoria-metrics-k8s-stack";
+        }
+        {
+          kind = "Kustomization";
+          namespace = "flux-system";
+          name = "infra-controllers";
+        }
+      ]
+    ];
+    targets = [
+      {
+        kind = "Deployment";
+        namespace = "monitoring";
+        name = "victoria-metrics-k8s-stack-victoria-metrics-operator";
       }
     ];
   }
