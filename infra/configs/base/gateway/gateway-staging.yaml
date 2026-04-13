@@ -6,6 +6,10 @@ metadata:
   annotations:
     cert-manager.io/issuer: letsencrypt
 spec:
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false" # Disable Cloudflare proxy for this service
+      external-dns.alpha.kubernetes.io/hostname: "staging.ingress.internal.isning.moe" # Set the desired hostnames for External DNS
   gatewayClassName: istio
   listeners:
     # Used for internal reroute

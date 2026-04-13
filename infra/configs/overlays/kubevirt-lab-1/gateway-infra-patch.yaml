@@ -2,6 +2,11 @@ kind: will-be-ignored
 metadata:
   name: will-be-ignored
 spec:
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false" # Disable Cloudflare proxy for this service
+      # MUST be patched
+      external-dns.alpha.kubernetes.io/hostname: "kubevirt-lab-1.ingress.internal.isning.moe" # Set the desired hostnames for External DNS
   listeners:
     - name: http
       hostname: "*.kubevirt-lab-1.isning.moe"
