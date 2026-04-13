@@ -10,7 +10,6 @@ data:
     {
       "dns": {
         "rules": [
-          { "rule_set": ["geosite-geolocation-cn"], "server": "local" }
         ],
         "servers": [
           { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local" },
@@ -53,35 +52,35 @@ data:
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-cn.srs",
-            "download_detour": "AllNodes"
+            "download_detour": "direct"
           },
           {
             "tag": "geosite-geolocation-!cn",
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-!cn.srs",
-            "download_detour": "AllNodes"
+            "download_detour": "direct"
           },
           {
             "tag": "anthropic",
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-anthropic.srs",
-            "download_detour": "AllNodes"
+            "download_detour": "direct"
           },
           {
             "tag": "google-gemini",
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-gemini.srs",
-            "download_detour": "AllNodes"
+            "download_detour": "direct"
           },
           {
             "tag": "geoip-cn",
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs",
-            "download_detour": "AllNodes"
+            "download_detour": "direct"
           }
         ]
       }
