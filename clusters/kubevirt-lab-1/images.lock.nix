@@ -1795,10 +1795,10 @@
   }
   {
     imageName = "squat/generic-device-plugin";
-    imageDigest = "sha256:c4e3a24a5f20449e027b9de2c3cee790169ab42220818315f5f8ee9830788981";
+    imageDigest = "sha256:e11621c21460d231a9d3acfa6fc34be34111fadb85f6842e7c01b3f94899f003";
     finalImageName = "squat/generic-device-plugin";
     finalImageTag = "latest";
-    hash = "sha256-fc3RACrMwKa85gil58Q/Lg7SFYeuTX6jDPTHPfbstwc=";
+    hash = "sha256-qp/MPhQ0P42vyaD/RaVax75R26Zcog7QcJhhw88uz/U=";
     os = "linux";
     arch = "amd64";
     sources = [
