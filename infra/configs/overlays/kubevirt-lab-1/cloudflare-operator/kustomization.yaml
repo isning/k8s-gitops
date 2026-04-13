@@ -29,4 +29,13 @@ patches:
       - op: replace
         path: /subjects/0/spec/fqdn
         value: "*.kubevirt-lab-1.isning.moe"
+  - target:
+      group: externaldns.k8s.io
+      kind: DNSEndpoint
+      name: cloudflare-tunnel-dns-binding
+      namespace: cloudflare-operator-system
+    patch: |-
+      - op: replace
+        path: /spec/endpoints/0/dnsName
+        value: "*.kubevirt-lab-1.isning.moe"
     
