@@ -16,7 +16,8 @@ proxy-url: "http://proxy-svc.egress-system.svc.cluster.local:7890"
 # Persist credentials in mounted PVC.
 auth-dir: "/root/.cli-proxy-api"
 
-api-keys: []
+api-keys:
+  - __CLIRELAY_API_KEY_CLIENT_ASTRBOT__
 
 debug: false
 commercial-mode: false
