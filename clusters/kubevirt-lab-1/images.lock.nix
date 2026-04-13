@@ -117,7 +117,7 @@
     imageDigest = "sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e";
     finalImageName = "busybox";
     finalImageTag = "latest";
-    hash = "sha256-uJjZL1+txeyHfM7tMgt6IUeX7c2KushI8QT1E36Dtmc=";
+    hash = "sha256-LJdlc+B/2oa11Kud1GdRsf5S3J3gNOxCTvEc5AqiGp0=";
     os = "linux";
     arch = "amd64";
     sources = [
