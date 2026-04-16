@@ -11,7 +11,7 @@ remote-management:
 quota-exceeded:
   switch-preview-model: true
 force-model-prefix: true
-proxy-url: "http://proxy-svc.egress-system.svc.cluster.local:7890"
+proxy-url: "socks5://proxy-svc.egress-system.svc.cluster.local:7890"
 
 # Persist credentials in mounted PVC.
 auth-dir: "/root/.cli-proxy-api"
