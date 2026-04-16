@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: clirelay
-          image: ghcr.io/kittors/clirelay:latest
+          image: ghcr.io/kittors/clirelay:main-de96948
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
