@@ -59,7 +59,27 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: clirelay-secret
-                  key: remote-management-secret-key
+                  key: ENV_REMOTE_MANAGEMENT_SECRET_KEY
+            - name: CLIRELAY_GEMINI_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: clirelay-secret
+                  key: ENV_CLIRELAY_GEMINI_OAUTH_CLIENT_ID
+            - name: CLIRELAY_GEMINI_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: clirelay-secret
+                  key: ENV_CLIRELAY_GEMINI_OAUTH_CLIENT_SECRET
+            - name: CLIRELAY_ANTIGRAVITY_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: clirelay-secret
+                  key: ENV_CLIRELAY_ANTIGRAVITY_OAUTH_CLIENT_ID
+            - name: CLIRELAY_ANTIGRAVITY_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: clirelay-secret
+                  key: ENV_CLIRELAY_ANTIGRAVITY_OAUTH_CLIENT_SECRET
           envFrom:
             - secretRef:
                 name: clirelay-secret
