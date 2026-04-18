@@ -38,7 +38,7 @@ data:
         "rules": [
           { "action": "sniff" },
           { "protocol": "dns", "action": "hijack-dns" },
-          { "rule_set": ["anthropic", "google-gemini"], "outbound": "UnitedStates" },
+          { "rule_set": ["anthropic", "google-gemini", "google-deepmind"], "outbound": "UnitedStates" },
           { "rule_set": ["geosite-geolocation-!cn"], "outbound": "AllNodes" },
           { "rule_set": ["geosite-geolocation-cn", "geoip-cn"], "outbound": "direct" },
           { "action": "resolve", "strategy": "prefer_ipv4"},
@@ -73,6 +73,13 @@ data:
             "type": "remote",
             "format": "binary",
             "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-gemini.srs",
+            "download_detour": "direct"
+          },
+          {
+            "tag": "google-deepmind",
+            "type": "remote",
+            "format": "binary",
+            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-deepmind.srs",
             "download_detour": "direct"
           },
           {
