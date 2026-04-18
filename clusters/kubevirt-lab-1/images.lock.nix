@@ -33,10 +33,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:8affbdae5326dc4d3dab460a0ae70ee6ee47110d8294c5c0d9cdabcf43ca4a8c";
+    imageDigest = "sha256:175d3e94e675f4d078c60fe097087a2d77dbc9f76d49d4185c83ca79489c2a46";
     finalImageName = "bitnami/kubectl";
     finalImageTag = "latest";
-    hash = "sha256-VuVDROnZDEl+0jLpdiIUeAzPqwa3hZK/nu/KQppcWGk=";
+    hash = "sha256-JRa1L9by9ELuUSpJB1BE5Wf6lSvRaiipfIQ9zzvsPEY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -146,10 +146,10 @@
   }
   {
     imageName = "docker.io/istio/install-cni";
-    imageDigest = "sha256:88fb8849f6b2aa7343e36385b9adb3f4d9166a1f26432becee035997a0ac31cf";
+    imageDigest = "sha256:ffd908373e71733ac5ac5a55872191f57a41ddb6e9862f6e85fff768ed65ba2d";
     finalImageName = "docker.io/istio/install-cni";
-    finalImageTag = "1.29.1-distroless";
-    hash = "sha256-kESXROmAoqGh+sl//Ey/TlpvCiYsBnNTFN2tvMZadt0=";
+    finalImageTag = "1.29.2-distroless";
+    hash = "sha256-/HezjraR9xM7WnSXn3LkZPFx2mZXS02Pf91L4cAxeV4=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -183,10 +183,10 @@
   }
   {
     imageName = "docker.io/istio/pilot";
-    imageDigest = "sha256:80d6fcb2116aef065a8001ce055f55a6feac498c2aace222e637c7339c68cd56";
+    imageDigest = "sha256:1378e20bee98ae325d8f3c3324b7f5f1dcc46a6d3ddeb701d2cafc8468f8e486";
     finalImageName = "docker.io/istio/pilot";
-    finalImageTag = "1.29.1-distroless";
-    hash = "sha256-Rr68S2AePT+KaE7OFwoogEP6nZrKN5DWevRzskLOEuc=";
+    finalImageTag = "1.29.2-distroless";
+    hash = "sha256-d+zoGi0WQV9gZDeV9WQx2QV3kMMhs7r6/rwgVfm9wcQ=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -220,10 +220,10 @@
   }
   {
     imageName = "docker.io/istio/ztunnel";
-    imageDigest = "sha256:5bf7a3561bd631b8add353468e738e2e4755f2ed8a10948eaffbe312f3d23f27";
+    imageDigest = "sha256:3db3cd9e5426f8ac1bd7e8aaa9ad3edfe0b5045d19016d2e4378701354fc6640";
     finalImageName = "docker.io/istio/ztunnel";
-    finalImageTag = "1.29.1";
-    hash = "sha256-OwNnmCzA3h0cyW1Pven7TfrK7Z2pvMe0eHcr5Udfka0=";
+    finalImageTag = "1.29.2";
+    hash = "sha256-hwxTlIGmRxRoQxK0/17QDhAWSJqwQ97XWnbF1z03pGs=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -400,10 +400,10 @@
   }
   {
     imageName = "ghcr.io/isning/docker.io/mlikiowa/napcat-docker";
-    imageDigest = "sha256:b98d613f25ec92ad90ca85a55105068e103fd8638595237e157efff433f5fba3";
+    imageDigest = "sha256:29ef959c1e59318d280891b08523f8e2258bbab7717992969811e45f30f81ceb";
     finalImageName = "ghcr.io/isning/docker.io/mlikiowa/napcat-docker";
     finalImageTag = "latest";
-    hash = "sha256-sDJPnEk+aoT8EFw638ky3P/9RPGcJItsBUkiIYF3kxA=";
+    hash = "sha256-utt7fE5dW148/CLpABdJ5WaXjOOZX6NgUAIBr4YSays=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -501,10 +501,10 @@
   }
   {
     imageName = "ghcr.io/kittors/clirelay";
-    imageDigest = "sha256:a8d8fffc2615921892c1812fccee430005e231cc2f69a94af4ab84e18d5995ff";
+    imageDigest = "sha256:8e885b164fc6735f8083c142644b71d98da7a77eeb2217bf25fd6967a4d83ddf";
     finalImageName = "ghcr.io/kittors/clirelay";
-    finalImageTag = "latest";
-    hash = "sha256-eCfZ6e+giZ1A2k9cW7lfHXSHhQcXlYdudKnvGRemDD4=";
+    finalImageTag = "main-de96948";
+    hash = "sha256-UZ4HNjDcTlPdsGiLVYZKEjQt+Qe77Jv6CEYy9Zf6bQ0=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -957,10 +957,10 @@
   }
   {
     imageName = "mikefarah/yq";
-    imageDigest = "sha256:603ebff15eb308a05f1c5b8b7613179cad859aed3ec9fdd04f2ef5d32345950e";
+    imageDigest = "sha256:0cb4a78491b6e62ee8a9bf4fbeacbd15b5013d19bc420591b05383a696315e60";
     finalImageName = "mikefarah/yq";
     finalImageTag = "4";
-    hash = "sha256-wvriDcQMZ30rLUwjzQAkZq/sTiwv/4+u9BRa99nPjsQ=";
+    hash = "sha256-VYByjagthIZTkVClw9xcIjyvzt0laC6TCBIWpO8D4qY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -989,10 +989,10 @@
   }
   {
     imageName = "nginx";
-    imageDigest = "sha256:582c496ccf79d8aa6f8203a79d32aaf7ffd8b13362c60a701a2f9ac64886c93d";
+    imageDigest = "sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de";
     finalImageName = "nginx";
     finalImageTag = "mainline-alpine";
-    hash = "sha256-SjvAkyqXaLDMIUJY8s/8HU1PNVmYuitTUQ3BId4TEbk=";
+    hash = "sha256-sTqDj59r/MKEdeYADDkbHkdgcBdiHpsQKofD92a+J5Q=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1021,10 +1021,10 @@
   }
   {
     imageName = "postgres";
-    imageDigest = "sha256:fceb6f86328c36f2438fae3b851b0cc57c4a7e69a58c866d9ce24281f2cf0c9c";
+    imageDigest = "sha256:1c52f5ad23db5d7648a63634444af76de48e63b860fccbe3e3a5458b2812eaed";
     finalImageName = "postgres";
     finalImageTag = "15-alpine";
-    hash = "sha256-1g7d6yAuLKJVPbCRRiHniT1r7ya95grFw9k6tFvdvro=";
+    hash = "sha256-Fvvv53+q/7gy8PhAmaU/Fapj/LkSaKftG/SEa9fgOF0=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1053,10 +1053,10 @@
   }
   {
     imageName = "python";
-    imageDigest = "sha256:c99275d6bc0c37d8e98b388d4c404861fda7dad5ff87e2995fe7b7bb33898aed";
+    imageDigest = "sha256:b974a5de91b4ac6da8313502cd5bfe65c499e390d32658e1f2deea26fa5afb14";
     finalImageName = "python";
     finalImageTag = "3.10-alpine";
-    hash = "sha256-M3YcTJ6QVVuRZM1JAMDExOONsGj6b2JbHGBnSitcfII=";
+    hash = "sha256-/MOdp0Fg5gCRHtvzMHBK61sO81YApPrMtkTa2PiH7E4=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1117,10 +1117,10 @@
   }
   {
     imageName = "quay.io/cilium/cilium";
-    imageDigest = "sha256:7bc7e0be845cae0a70241e622cd03c3b169001c9383dd84329c59ca86a8b1341";
+    imageDigest = "sha256:2e61680593cddca8b6c055f6d4c849d87a26a1c91c7e3b8b56c7fb76ab7b7b10";
     finalImageName = "quay.io/cilium/cilium";
-    finalImageTag = "v1.19.2";
-    hash = "sha256-lXN5D2G9nuk3isd01SFoYY02ckjKAPcJ/zZqf3ibf9A=";
+    finalImageTag = "v1.19.3";
+    hash = "sha256-5idFC5Ep/bVC2qvblX38jI1STzwMEKgVYwUioFRnegs=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1154,10 +1154,10 @@
   }
   {
     imageName = "quay.io/cilium/hubble-relay";
-    imageDigest = "sha256:9987c73bad48c987fd065185535fd15a6717cbe8a8caf7fc7ef0413532cf490e";
+    imageDigest = "sha256:5ee21d57b6ef2aa6db67e603a735fdceb162454b352b7335b651456e308f681b";
     finalImageName = "quay.io/cilium/hubble-relay";
-    finalImageTag = "v1.19.2";
-    hash = "sha256-7xR/tMwiGPtjwsXxHv/u5HFfCYcXkFxk1E4lXlIOSW8=";
+    finalImageTag = "v1.19.3";
+    hash = "sha256-ENwlZSRGdxW0oDoq3znKE6Zqdxb7I6q+C8ssFG1ZQII=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1265,10 +1265,10 @@
   }
   {
     imageName = "quay.io/cilium/operator-generic";
-    imageDigest = "sha256:e363f4f634c2a66a36e01618734ea17e7b541b949b9a5632f9c180ab16de23f0";
+    imageDigest = "sha256:205b09b0ed6accbf9fe688d312a9f0fcfc6a316fc081c23fbffb472af5dd62cd";
     finalImageName = "quay.io/cilium/operator-generic";
-    finalImageTag = "v1.19.2";
-    hash = "sha256-7w75MJ0AFGfRAzmg3beRea7b/lAE/dIr2wpgtmgyiE0=";
+    finalImageTag = "v1.19.3";
+    hash = "sha256-UKGlhslatXOawVR/soWCOqtYJaDOnNF6QogHMwe3eYU=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1763,10 +1763,10 @@
   }
   {
     imageName = "soulter/astrbot";
-    imageDigest = "sha256:66c39096e34e1231a071a75812c884bb75fffc166a2e4c736878377a589ebfcf";
+    imageDigest = "sha256:ded346583c3322adfecb34fd17de00dd8188999cdc46cde14feaad9e1563c61e";
     finalImageName = "soulter/astrbot";
     finalImageTag = "latest";
-    hash = "sha256-uzE5/jAbe5r22a5uX5Yokfv5LmesmC35WqhEfGUkMY8=";
+    hash = "sha256-Hz0gEQcAkFLNr026ot0FQDkhusm/g/ndyFiL32uJiJo=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1795,10 +1795,10 @@
   }
   {
     imageName = "squat/generic-device-plugin";
-    imageDigest = "sha256:e11621c21460d231a9d3acfa6fc34be34111fadb85f6842e7c01b3f94899f003";
+    imageDigest = "sha256:d9e098e33a20c32a561adb1ef8cace7d5912cd5ffb38f07dd9f83af4bdf38505";
     finalImageName = "squat/generic-device-plugin";
     finalImageTag = "latest";
-    hash = "sha256-qp/MPhQ0P42vyaD/RaVax75R26Zcog7QcJhhw88uz/U=";
+    hash = "sha256-T6NltbA3RO/9qY9I7zuigahHOhuKrhUP2iCQ1OPk2Yw=";
     os = "linux";
     arch = "amd64";
     sources = [
