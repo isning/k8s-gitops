@@ -65,7 +65,7 @@ spec:
       
       containers:
         - name: napcat
-          image: ghcr.io/isning/docker.io/mlikiowa/napcat-docker:latest
+          image: mlikiowa/napcat-docker:v4.18.0
           imagePullPolicy: IfNotPresent
           env:
             - name: NAPCAT_UID
