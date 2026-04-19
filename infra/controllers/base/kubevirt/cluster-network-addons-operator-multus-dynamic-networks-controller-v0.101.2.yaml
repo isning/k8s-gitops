@@ -89,7 +89,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-          image: ghcr.io/k8snetworkplumbingwg/multus-dynamic-networks-controller@sha256:2a2bb32c0ea8b232b3dbe81c0323a107e8b05f8cad06704fca2efd0d993a87be
+          image: ghcr.io/k8snetworkplumbingwg/multus-dynamic-networks-controller@sha256:18a8c50b4eebf89989a8416442c2a963f05c19092bee9e174483c797da58c33a
           command: ["/dynamic-networks-controller"]
           args:
             - "-config=/etc/dynamic-networks-controller/dynamic-networks-config.json"
