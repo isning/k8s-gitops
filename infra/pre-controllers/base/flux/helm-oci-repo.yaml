@@ -12,4 +12,3 @@ spec:
   url: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
   ref:
     tag: "0.47.0"
-    digest: "sha256:a0bcc6ff0cbf1d825ba15afc7565b36786fd0a10b3c567d7008e0ca4dec12a7d"
