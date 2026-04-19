@@ -8,7 +8,7 @@
   },
   "kubernetes": {
     "managerFilePatterns": ["/\\.yaml$/"]
-  }
+  },
   "packageRules": [
     {
       "description": "Automerge non-major updates",
