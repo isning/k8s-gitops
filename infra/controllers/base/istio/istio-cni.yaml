@@ -8,15 +8,10 @@ metadata:
 spec:
   releaseName: istio-cni
   interval: 30m
-  chart:
-    spec:
-      chart: cni
-      sourceRef:
-        kind: HelmRepository
-        name: istio
-        namespace: flux-system
-      interval: 12h
-      version: "*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-cni
+    namespace: istio-system
   values:
     profile: ambient
     # https://istio.io/latest/docs/ambient/install/platform-prerequisites/#k3s

@@ -1,0 +1,14 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-cilium
+  namespace: kube-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://quay.io/cilium/charts/cilium
+  ref:
+    tag: "1.19.3"

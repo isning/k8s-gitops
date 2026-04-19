@@ -8,12 +8,7 @@ metadata:
 spec:
   releaseName: ztunnel
   interval: 30m
-  chart:
-    spec:
-      chart: ztunnel
-      sourceRef:
-        kind: HelmRepository
-        name: istio
-        namespace: flux-system
-      interval: 12h
-      version: "*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-ztunnel
+    namespace: istio-system

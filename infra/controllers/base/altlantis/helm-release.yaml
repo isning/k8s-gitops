@@ -9,13 +9,8 @@ metadata:
 spec:
   releaseName: cert-manager
   interval: 30m
-  chart:
-    spec:
-      chart: atlantis
-      sourceRef:
-        kind: HelmRepository
-        name: runatlantis
-        namespace: flux-system
-      interval: 12h
-      version: "5.17.*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-atlantis
+    namespace: runatlantis
 

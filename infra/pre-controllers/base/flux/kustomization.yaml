@@ -4,6 +4,6 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - ./flux-oauth-secret.yaml
-  - ./helm-repo.yaml
   - ./helm-release.yaml
+  - ./helm-oci-repo.yaml
   - ./cluster-role-binding.yaml

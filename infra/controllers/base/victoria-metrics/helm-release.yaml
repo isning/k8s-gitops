@@ -11,15 +11,10 @@ spec:
     replace: true
   releaseName: victoriametrics
   interval: 30m
-  chart:
-    spec:
-      chart: victoria-metrics-k8s-stack
-      sourceRef:
-        kind: HelmRepository
-        name: victoria-metrics
-        namespace: flux-system
-      version: "0.72.*"
-      interval: 12h
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-victoria-metrics-k8s-stack
+    namespace: monitoring
   # https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack
   values:
     nameOverride: vmks # avoid hitting resource name limits of 63 characters

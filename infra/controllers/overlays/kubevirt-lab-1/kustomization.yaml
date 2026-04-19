@@ -13,7 +13,6 @@ resources:
   - ../../base/cloudflare-operator/
   - ../../base/external-dns/
   - ../../base/harbor/
-  - ../../base/generic-helm-repos/
   - ../../base/cloudnative-pg/
   - ../../base/redroid-operator/
   - ../../base/egress/

@@ -7,15 +7,9 @@ metadata:
 spec:
   releaseName: logto
   interval: 30m
-  chart:
-    spec:
-      chart: logto
-      sourceRef:
-        kind: HelmRepository
-        name: ccsn
-        namespace: flux-system
-      interval: 12h
-      version: "0.2.*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-logto
   values:
     # We have proxy set up, so we need to trust the proxy headers to get the correct client IP and protocol information.
     trustProxyHeader: true

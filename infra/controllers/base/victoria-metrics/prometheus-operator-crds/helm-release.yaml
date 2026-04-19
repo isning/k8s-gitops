@@ -11,16 +11,10 @@ spec:
     replace: true
   releaseName: prometheus-operator-crds
   interval: 30m
-  chart:
-    # https://artifacthub.io/packages/helm/prometheus-community/prometheus-operator-crds
-    spec:
-      chart: prometheus-operator-crds
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: flux-system
-      version: "*"
-      interval: 12h
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-prometheus-operator-crds
+    namespace: monitoring
   values:
     crds:
       # https://docs.victoriametrics.com/operator/integrations/prometheus/

@@ -8,15 +8,10 @@ metadata:
 spec:
   releaseName: flux-operator
   interval: 30m
-  chart:
-    spec:
-      chart: flux-operator
-      sourceRef:
-        kind: HelmRepository
-        name: flux-operator
-        namespace: flux-system
-      interval: 12h
-      version: "0.43.*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-flux-operator
+    namespace: kube-system
   values:
     web:
       config:

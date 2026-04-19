@@ -7,15 +7,10 @@ metadata:
 spec:
   releaseName: oauth2-proxy
   interval: 30m
-  chart:
-    spec:
-      chart: oauth2-proxy
-      sourceRef:
-        kind: HelmRepository
-        name: oauth2-proxy
-        namespace: flux-system
-      interval: 12h
-      version: "10.4.3"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-oauth2-proxy
+    namespace: oauth2-proxy
   values:
     replicaCount: 1
     config:
