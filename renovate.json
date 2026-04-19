@@ -7,8 +7,11 @@
     "managerFilePatterns": ["/\\.ya?ml$/"]
   },
   "kubernetes": {
-    "managerFilePatterns": ["/\\.yaml$/"],
-    "ignorePaths": ["**/*-v*.*.*.yaml"],
+    "managerFilePatterns": ["/\\.ya?ml$/"],
+    "ignorePaths": [
+      "**/*-v*.*.*.yaml",
+      "infra/configs/base/cloudnative-pg/official-image-catalogs/**"
+    ],
   },
   "packageRules": [
     {
@@ -17,6 +20,10 @@
       "automerge": true,
       "automergeStrategy": "squash",
       "platformAutomerge": true
+    },
+    {
+      "matchPackageNames": ["adyanth/cloudflare-operator"],
+      "ignoreVersions": ["10", "10.0", "10.0.2"]
     }
   ]
 }
