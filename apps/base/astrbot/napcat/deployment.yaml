@@ -25,7 +25,7 @@ spec:
       # 初始化容器：首次生成随机 machine-id，后续复用
       initContainers:
         - name: init-machine-id
-          image: busybox:1.37.0
+          image: busybox:1.37.0@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
           command:
             - /bin/sh
             - -c
@@ -42,7 +42,7 @@ spec:
             - name: machine-id-data
               mountPath: /machine-id-data
         - name: setup-onebot-config
-          image: mikefarah/yq:4
+          image: mikefarah/yq:4@sha256:0cb4a78491b6e62ee8a9bf4fbeacbd15b5013d19bc420591b05383a696315e60
           command:
           - /bin/sh
           - -c
@@ -65,7 +65,7 @@ spec:
       
       containers:
         - name: napcat
-          image: mlikiowa/napcat-docker:v4.18.0
+          image: mlikiowa/napcat-docker:v4.18.0@sha256:29ef959c1e59318d280891b08523f8e2258bbab7717992969811e45f30f81ceb
           imagePullPolicy: IfNotPresent
           env:
             - name: NAPCAT_UID

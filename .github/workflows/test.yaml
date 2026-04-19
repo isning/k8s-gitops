@@ -17,10 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup yq
-        uses: fluxcd/pkg/actions/yq@main
+        uses: fluxcd/pkg/actions/yq@56073664a34f2e47d0a1b1347567b709e9a2bec5 # main
       - name: Setup kubeconform
-        uses: fluxcd/pkg/actions/kubeconform@main
+        uses: fluxcd/pkg/actions/kubeconform@56073664a34f2e47d0a1b1347567b709e9a2bec5 # main
       - name: Setup kustomize
-        uses: fluxcd/pkg/actions/kustomize@main
+        uses: fluxcd/pkg/actions/kustomize@56073664a34f2e47d0a1b1347567b709e9a2bec5 # main
       - name: Validate manifests
         run: ./scripts/validate.sh

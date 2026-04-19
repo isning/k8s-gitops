@@ -1538,7 +1538,7 @@ spec:
         - --webhook-cert-path=/tmp/k8s-webhook-server/serving-certs
         command:
         - /manager
-        image: adyanth/cloudflare-operator:0.13.1
+        image: adyanth/cloudflare-operator:0.13.1@sha256:6b168dc237d50e3d36cc5df86bf2be7981700a49d7a4ae02548f4762ec0d7aaa
         livenessProbe:
           httpGet:
             path: /healthz
