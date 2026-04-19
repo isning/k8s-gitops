@@ -12,4 +12,3 @@ spec:
   url: oci://ghcr.io/open-telemetry/opentelemetry-helm-charts/opentelemetry-collector
   ref:
     tag: "0.150.1"
-    digest: "sha256:3cafeed02edec3fd9e357766cb705fa257146ef60c8bf4a7ea1e48eae37caaae"

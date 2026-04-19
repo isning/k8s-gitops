@@ -24,6 +24,11 @@
     {
       "matchPackageNames": ["adyanth/cloudflare-operator"],
       "allowedVersions": "!/^(10|10\\.0|10\\.0\\.2)$/"
+    },
+    {
+        "matchManagers": ["flux"],
+        "matchDatasources": ["docker"],
+        "pinDigests": false
     }
   ]
 }

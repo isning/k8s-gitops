@@ -12,4 +12,3 @@ spec:
   url: oci://ghcr.io/isning/charts/redroid-operator
   ref:
     tag: "0.1.7"
-    digest: "sha256:9a69ff3b8f680bda5c9f0f4d5e2db7f3f89c2ff483e9ae6c921ac1cf4e6e00fb"
