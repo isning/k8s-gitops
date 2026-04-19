@@ -11,4 +11,5 @@ spec:
     operation: copy
   url: oci://ghcr.io/isning/charts-mirror/kiali-operator
   ref:
-    tag: "2.24.0@sha256:accaae542b6204cfaf2e122386771c1911454b54f2ec35db3306826b351268d2"
+    tag: "2.24.0"
+    digest: "sha256:accaae542b6204cfaf2e122386771c1911454b54f2ec35db3306826b351268d2"

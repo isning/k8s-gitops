@@ -11,4 +11,5 @@ spec:
     operation: copy
   url: oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner
   ref:
-    tag: "0.0.35@sha256:e55542fbcaabca60400efd544a5554dff27e570e1864633d4efe14406d7fda23"
+    tag: "0.0.35"
+    digest: "sha256:e55542fbcaabca60400efd544a5554dff27e570e1864633d4efe14406d7fda23"
