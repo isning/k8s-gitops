@@ -8,8 +8,7 @@
   },
   "packageRules": [
     {
-      "description": "Auto-merge minor updates",
-      "matchDatasources": ["helm"],
+      "description": "Automerge non-major updates",
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "automergeStrategy": "squash",
