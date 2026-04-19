@@ -16,7 +16,7 @@ spec:
         name: local-path-provisioner
         namespace: flux-system
       interval: 12h
-      version: "0.0.34"
+      version: "0.0.35"
   # https://github.com/rancher/local-path-provisioner/tree/master/deploy/chart/local-path-provisioner
   values:
     ## For creating the StorageClass automatically:
