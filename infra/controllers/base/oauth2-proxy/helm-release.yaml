@@ -15,7 +15,7 @@ spec:
         name: oauth2-proxy
         namespace: flux-system
       interval: 12h
-      version: "10.4.2"
+      version: "10.4.3"
   values:
     replicaCount: 1
     config:
