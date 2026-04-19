@@ -12,5 +12,5 @@ spec:
   # macvtap: {}
   ovs: {} # openvswitch cni plugin
   multus: {} # required by ovs-cni
-  # Manually installed and patched along with the cluster-network-addons-operator
-  #multusDynamicNetworks: {}
+  multusDynamicNetworks:
+    hostCRISocketPath: /run/k3s/containerd/containerd.sock
