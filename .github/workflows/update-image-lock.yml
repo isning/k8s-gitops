@@ -36,7 +36,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
 
       - name: Setup Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v8
+        uses: DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39 # v13
 
       - name: Cache uv tools (flux-local)
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
