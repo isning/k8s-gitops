@@ -10,4 +10,4 @@ spec:
     operation: copy
   url: oci://ghcr.io/the-ccsn/charts/logto
   ref:
-    tag: "0.2.12"
+    tag: "0.2.12@sha256:a94af59e24a0c1631daac45f9375d4f7e7caec9f41a88521917ee9fcd203f0b0"

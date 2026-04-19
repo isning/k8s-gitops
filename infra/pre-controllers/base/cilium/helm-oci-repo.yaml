@@ -11,4 +11,4 @@ spec:
     operation: copy
   url: oci://quay.io/cilium/charts/cilium
   ref:
-    tag: "1.19.3"
+    tag: "1.19.3@sha256:0683e1fc672e0c6587a8d8d43f6845430aaaed47e36dacbe77e3e621ea7a4c69"

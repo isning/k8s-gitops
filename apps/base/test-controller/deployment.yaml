@@ -15,7 +15,7 @@ spec:
       serviceAccountName: test-controller
       containers:
         - name: test-controller
-          image: ryan4yin/kunbernates-python-client:latest
+          image: ryan4yin/kunbernates-python-client:latest@sha256:e6a5dc667e736da85a304ac56a7f00f6eac4d762afe456c0faee5a4c440917df
           imagePullPolicy: Always
           command:
             - /bin/sh

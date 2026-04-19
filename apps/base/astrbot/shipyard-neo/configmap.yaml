@@ -45,7 +45,7 @@ data:
       # ── Standard Python sandbox ────────────────────────
       - id: python-default
         description: "Standard Python sandbox with filesystem and shell access"
-        image: "ghcr.io/astrbotdevs/shipyard-neo-ship:latest"
+        image: "ghcr.io/astrbotdevs/shipyard-neo-ship:latest@sha256:adc8660064ce1f04775171cb0fc8f661649c5b65e9476377ce4b4d04556cc459"
         runtime_type: ship
         runtime_port: 8123
         resources:
@@ -61,7 +61,7 @@ data:
       # ── Data Science sandbox (more resources) ──────────
       - id: python-data
         description: "Data science sandbox with extra CPU and memory"
-        image: "ghcr.io/astrbotdevs/shipyard-neo-ship:latest"
+        image: "ghcr.io/astrbotdevs/shipyard-neo-ship:latest@sha256:adc8660064ce1f04775171cb0fc8f661649c5b65e9476377ce4b4d04556cc459"
         runtime_type: ship
         runtime_port: 8123
         resources:
@@ -79,7 +79,7 @@ data:
         description: "Browser automation with Python backend"
         containers:
           - name: ship
-            image: "ghcr.io/astrbotdevs/shipyard-neo-ship:latest"
+            image: "ghcr.io/astrbotdevs/shipyard-neo-ship:latest@sha256:adc8660064ce1f04775171cb0fc8f661649c5b65e9476377ce4b4d04556cc459"
             runtime_type: ship
             runtime_port: 8123
             resources:
@@ -95,7 +95,7 @@ data:
               - shell
             env: {}
           - name: browser
-            image: "ghcr.io/astrbotdevs/shipyard-neo-gull:latest"
+            image: "ghcr.io/astrbotdevs/shipyard-neo-gull:latest@sha256:91547a323ef5bd0ba7602dc27ecf406eb1d382e5cc75edcdfa08ed1088f5d2a6"
             runtime_type: gull
             runtime_port: 8115
             resources:

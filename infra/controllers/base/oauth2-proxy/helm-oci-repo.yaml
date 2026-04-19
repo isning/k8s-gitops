@@ -11,4 +11,4 @@ spec:
     operation: copy
   url: oci://ghcr.io/oauth2-proxy/charts/oauth2-proxy
   ref:
-    tag: "10.4.3"
+    tag: "10.4.3@sha256:8628835e87c24230f59942298663eb6544b285ea0fbbd4370a1882143b065c0e"

@@ -19,7 +19,7 @@ spec:
       serviceAccountName: bay
       containers:
         - name: bay
-          image: ghcr.io/astrbotdevs/shipyard-neo-bay:0.3.1
+          image: ghcr.io/astrbotdevs/shipyard-neo-bay:0.3.1@sha256:84518bf66f59d7eeb9afb760f79bb149ea6dce87d19d0478e24ce296c725f380
           imagePullPolicy: Always
           ports:
             - name: http

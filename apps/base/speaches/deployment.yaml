@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: speaches
-          image: ghcr.io/speaches-ai/speaches:0.8.3-cpu
+          image: ghcr.io/speaches-ai/speaches:0.8.3-cpu@sha256:21e3df06d842fb7802ab470dd77c25f0e8c0d22950e8d8c6ae886e851af53ef8
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
