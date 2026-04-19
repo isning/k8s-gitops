@@ -11,7 +11,7 @@
     "ignorePaths": [
       "**/*-v*.*.*.yaml",
       "infra/configs/base/cloudnative-pg/official-image-catalogs/**"
-    ],
+    ]
   },
   "packageRules": [
     {
