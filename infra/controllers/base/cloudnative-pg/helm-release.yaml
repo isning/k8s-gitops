@@ -9,15 +9,10 @@ metadata:
 spec:
   releaseName: cnpg
   interval: 30m
-  chart:
-    spec:
-      chart: cloudnative-pg
-      sourceRef:
-        kind: HelmRepository
-        name: cnpg
-        namespace: flux-system
-      interval: 12h
-      version: "0.28.*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-cloudnative-pg
+    namespace: cnpg-system
   # https://github.com/cloudnative-pg/charts
   values:
     crds:

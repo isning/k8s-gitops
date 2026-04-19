@@ -8,15 +8,10 @@ metadata:
 spec:
   releaseName: local-path-provisioner
   interval: 30m
-  chart:
-    spec:
-      chart: local-path-provisioner
-      sourceRef:
-        kind: HelmRepository
-        name: local-path-provisioner
-        namespace: flux-system
-      interval: 12h
-      version: "0.0.35"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-local-path-provisioner
+    namespace: kube-system
   # https://github.com/rancher/local-path-provisioner/tree/master/deploy/chart/local-path-provisioner
   values:
     ## For creating the StorageClass automatically:

@@ -8,15 +8,10 @@ metadata:
 spec:
   releaseName: grafana-operator
   interval: 30m
-  chart:
-    spec:
-      chart: grafana-operator
-      sourceRef:
-        kind: HelmRepository
-        name: grafana-operator
-        namespace: flux-system
-      interval: 12h
-      version: "5.*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-grafana-operator
+    namespace: grafana-operator
   install:
     crds: Create
   upgrade:

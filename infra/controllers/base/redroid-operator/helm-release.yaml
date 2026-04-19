@@ -13,15 +13,10 @@ metadata:
   namespace: redroid-operator
 spec:
   interval: 1h
-  chart:
-    spec:
-      chart: redroid-operator
-      version: "*"          # track latest; pin to e.g. "0.1.0" for stability
-      sourceRef:
-        kind: HelmRepository
-        name: redroid-operator
-        namespace: flux-system
-      interval: 12h
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-redroid-operator
+    namespace: redroid-operator
   install:
     crds: Create
   upgrade:

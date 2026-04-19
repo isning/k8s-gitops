@@ -1,0 +1,56 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-istio-base
+  namespace: istio-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://gcr.dockerproxy.net/istio-release/charts/base
+  ref:
+    tag: "1.29.2"
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-cni
+  namespace: istio-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://gcr.dockerproxy.net/istio-release/charts/cni
+  ref:
+    tag: "1.29.2"
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-ztunnel
+  namespace: istio-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://gcr.dockerproxy.net/istio-release/charts/ztunnel
+  ref:
+    tag: "1.29.2"
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-istiod
+  namespace: istio-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://gcr.dockerproxy.net/istio-release/charts/istiod
+  ref:
+    tag: "1.29.2"

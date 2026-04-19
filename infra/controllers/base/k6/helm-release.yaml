@@ -11,15 +11,10 @@ spec:
     replace: true
   releaseName: k6-operator
   interval: 30m
-  chart:
-    spec:
-      chart: k6-operator
-      sourceRef:
-        kind: HelmRepository
-        name: k6-operator
-        namespace: flux-system
-      interval: 12h
-      version: "*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-k6-operator
+    namespace: k6
   # https://github.com/grafana/k6-operator/blob/main/charts/k6-operator/values.yaml
   values:
     namespace:

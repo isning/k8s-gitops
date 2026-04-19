@@ -9,15 +9,10 @@ metadata:
 spec:
   releaseName: cilium
   interval: 30m
-  chart:
-    spec:
-      chart: cilium
-      sourceRef:
-        kind: HelmRepository
-        name: cilium
-        namespace: flux-system
-      interval: 12h
-      version: "1.19.*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-cilium
+    namespace: kube-system
   # https://github.com/cilium/cilium/tree/v1.19.0/install/kubernetes/cilium
   values:
     enableIPv4Masquerade: true

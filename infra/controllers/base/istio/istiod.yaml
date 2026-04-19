@@ -8,15 +8,10 @@ metadata:
 spec:
   releaseName: istiod
   interval: 30m
-  chart:
-    spec:
-      chart: istiod
-      sourceRef:
-        kind: HelmRepository
-        name: istio
-        namespace: flux-system
-      interval: 12h
-      version: "*"
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-istiod
+    namespace: istio-system
   # https://github.com/istio/istio/blob/1.27.0/manifests/charts/istio-control/istio-discovery/values.yaml
   values:
     profile: ambient

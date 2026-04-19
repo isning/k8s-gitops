@@ -1,0 +1,14 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-local-path-provisioner
+  namespace: kube-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner
+  ref:
+    tag: "0.0.35"
