@@ -3,6 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: flux-cluster-admin-to-flux-web-admin
+  namespace: flux-system
 subjects:
   - kind: Group
     name: flux:cluster-admin
