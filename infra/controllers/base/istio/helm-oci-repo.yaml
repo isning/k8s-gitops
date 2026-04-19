@@ -11,7 +11,8 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/base
   ref:
-    tag: "1.29.2@sha256:94f3ec5ce77ed25df771dd8431622fe56d986dc0fcc3386a91c8faf7eb58d425"
+    tag: "1.29.2"
+    digest: "sha256:94f3ec5ce77ed25df771dd8431622fe56d986dc0fcc3386a91c8faf7eb58d425"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -25,7 +26,8 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/cni
   ref:
-    tag: "1.29.2@sha256:a9a6eb8f53124e18a49171d80e8eab57852bc778c3165e2434cc7fa21f43f662"
+    tag: "1.29.2"
+    digest: "sha256:a9a6eb8f53124e18a49171d80e8eab57852bc778c3165e2434cc7fa21f43f662"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -39,7 +41,8 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/ztunnel
   ref:
-    tag: "1.29.2@sha256:6046ea57e28e2d7c289abd9db5f9709bd3aac0c771d077aeb39634da3c7e5fea"
+    tag: "1.29.2"
+    digest: "sha256:6046ea57e28e2d7c289abd9db5f9709bd3aac0c771d077aeb39634da3c7e5fea"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -53,4 +56,5 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/istiod
   ref:
-    tag: "1.29.2@sha256:9b20c3cd533008fd3624b44a68cb428820c388293db95221886c69606cd2cd28"
+    tag: "1.29.2"
+    digest: "sha256:9b20c3cd533008fd3624b44a68cb428820c388293db95221886c69606cd2cd28"

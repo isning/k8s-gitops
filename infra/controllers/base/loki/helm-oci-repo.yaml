@@ -11,4 +11,5 @@ spec:
     operation: copy
   url: oci://ghcr.io/grafana/helm-charts/loki
   ref:
-    tag: "6.55.0@sha256:ab6e6711db093392b61c57de63a9e5dd82f185011a2f64144d5239ca63864ce7"
+    tag: "6.55.0"
+    digest: "sha256:ab6e6711db093392b61c57de63a9e5dd82f185011a2f64144d5239ca63864ce7"
