@@ -53,7 +53,7 @@ spec:
           mountPath: /tmp
       containers:
       - name: sing-box
-        image: ghcr.io/sagernet/sing-box:v1.13.10@sha256:9eccbbae748c124f5dd682ce5f7284c83f3e232678e37be715348fdaa467a77f
+        image: ghcr.io/sagernet/sing-box:v1.13.11@sha256:9bed1fcb406bd971d1b48c7f824e5128d63543ca278cdcd6b5737c19941e404d
         command: 
         - "sing-box"
         - "run"
