@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: astrbot
-          image: soulter/astrbot:v4.23.2@sha256:4c0de173532034c2d4675f177bd6a8b7f609420b735930847718673798859a63
+          image: soulter/astrbot:v4.23.3@sha256:aec1e0fdcc2fb9ccd72a8d1b5df168cc88001f383a57dbf64922b4d9af5df99a
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
