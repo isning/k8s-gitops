@@ -1,0 +1,39 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  releaseName: longhorn
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-longhorn
+    namespace: controllers
+  values:
+    image:
+      longhorn:
+        tag: v1.7.1
+    enablePSP: false
+    defaultSettings:
+      taintToleration: "node-role.kubernetes.io/control-plane:NoSchedule"
+      dataEngine: "v1"
+      upgradeChecker: "false"
+    persistence:
+      longhornStorageClass: "longhorn"
+    resources:
+      manager:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+      driver:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+    priorityClass:
+      systemPriorityClass: system-node-critical
+    telemetry:
+      enabled: false
+    openshift:
+      enabled: false
