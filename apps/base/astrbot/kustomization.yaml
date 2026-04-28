@@ -6,5 +6,6 @@ resources:
   - ./deployment.yaml
   - ./service.yaml
   - ./httproute.yaml
+  - ./vm-service-scrape.yaml
   - ./shipyard-neo
   - ./napcat

@@ -6,6 +6,9 @@ resources:
   - ../../base/generic-device-plugin/
   - ../../base/grafana-operator/
   - ../../base/victoria-metrics/
+  - ../../base/loki/
+  - ../../base/otel-collector/
+  - ../../base/longhorn/
   - ../../base/cert-manager/
   - ../../base/gateway-api/
   - ../../base/istio/

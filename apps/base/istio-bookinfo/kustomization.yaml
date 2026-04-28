@@ -7,3 +7,4 @@ resources:
   - ./bookinfo-gateway.yaml
   - ./httproute-trafficsplit.yaml
   - ./waypoint-default.yaml
+  - ./vm-service-scrape.yaml

@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: kubernetes-nodes
+spec:
+  selector:
+    {}
+  scheme: http
+  tlsConfig:
+    insecureSkipVerify: false
+  relabelConfigs:
+    - action: labelmap
+      regex: __meta_kubernetes_node_label_(.+)
+      replacement: kubernetes_node_$1
+    - source_labels:
+        - __meta_kubernetes_node_name
+      target_label: node

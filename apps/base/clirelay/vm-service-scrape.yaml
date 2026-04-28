@@ -1,0 +1,14 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: clirelay
+  labels:
+    app: clirelay
+spec:
+  selector:
+    matchLabels:
+      app: clirelay
+  endpoints:
+    - port: 8317
+      path: /metrics
+      interval: 20s

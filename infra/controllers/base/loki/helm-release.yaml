@@ -31,6 +31,10 @@ spec:
       replicas: 1
       extraVolumes: *extraVolumes
       extraVolumeMounts: *extraVolumeMounts
+      persistence:
+        enabled: true
+        size: 10Gi
+        storageClass: longhorn
       resources:
         limits:
           cpu: 2
@@ -205,48 +209,19 @@ spec:
             attributes_config:
               - action: index_label
                 attributes:
-                  # my custom attributes
-                  - cluster
-                  - env
-                  # common labels created from labels/metadata
+                  # common labels created from k8s attributes
                   - app
-                  - node_name
                   - namespace
                   - pod
                   - container
-                  # original meatdata attributes
-                  - k8s.pod.name
-                  - k8s.container.name
-                  - k8s.node.name
-                  - k8s.namespace.name
+                  - node_name
       # ============================================================================
-      # Storage Configuration
+      # Storage Configuration - using Longhorn PVC
       # ============================================================================
       storage:
-        # Loki requires a bucket for chunks and the ruler. GEL requires a third bucket for the admin API.
         type: filesystem
         filesystem:
           chunks_directory: /var/loki/chunks
-          rules_directory: /var/loki/rules
-          admin_api_directory: /var/loki/admin
-        # bucketNames: # Use a different bucket for each cluster
-        #   chunks: xxx-loki-chunks
-        s3:
-          # bucketnames: {{ $.Values.loki.storage.bucketNames.chunks }}
-          s3ForcePathStyle: true
-          region: us-east-1
-          insecure: false # Disable https on s3 connection.
-          http_config:
-            insecure_skip_verify: false # skip verifying the certificate chain and hostname.
-            ca_file: /data/ca-certs/ca.crt
-          endpoint: https://minio.isning.moe
-          # Encrypt Command:
-          #  sops --encrypt --age=${AGE_RECIPIENT}   --encrypted-regex 'Key' --in-place ./infra/controllers/overlays/k3s-test-1/helmrelease-loki.yaml
-          #
-          # Access Key
-          accessKeyId: ENC[AES256_GCM,data:HrJOr3O+xaYCKpAwJrkqpbG/+N0=,iv:QbOKinnwmLgYtEmWrFJfnDjFXiNX4epU9ip7kGexzRs=,tag:kmoFR2dGj3uWLp1nWi7C5A==,type:str]
-          # Secret Key
-          secretAccessKey: ENC[AES256_GCM,data:vvSaDBWP2bV1grXFYfeZH/GV4Cbi8+w8BQXQLGdmLPVazHId8gd5MA==,iv:iQxC4ekcqo2K3kOM54HFP7AH5VGuvlNhjzrbMZIpbq8=,tag:GruLo0gVQ1LXC5eYdlIa3A==,type:str]
 sops:
   age:
     - recipient: age15tr9ja4ll22ef3rw43v4mje47x8a03ruqap08f68hcu077tytq0q9e4h5y
