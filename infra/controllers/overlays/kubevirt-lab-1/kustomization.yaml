@@ -6,9 +6,10 @@ resources:
   - ../../base/generic-device-plugin/
   - ../../base/grafana-operator/
   - ../../base/victoria-metrics/
-  - ../../base/loki/
-  - ../../base/otel-collector/
-  - ../../base/longhorn/
+  # TODO: re-enable after S3 or MinIO is deployed
+  # - ../../base/loki/
+  # - ../../base/otel-collector/
+  # - ../../base/longhorn/
   - ../../base/cert-manager/
   - ../../base/gateway-api/
   - ../../base/istio/
