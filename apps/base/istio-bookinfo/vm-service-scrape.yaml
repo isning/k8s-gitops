@@ -1,0 +1,59 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: details
+  labels:
+    app: details
+spec:
+  selector:
+    matchLabels:
+      app: details
+  endpoints:
+    - port: 9080
+      path: /metrics
+      interval: 20s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: ratings
+  labels:
+    app: ratings
+spec:
+  selector:
+    matchLabels:
+      app: ratings
+  endpoints:
+    - port: 9080
+      path: /metrics
+      interval: 20s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: reviews
+  labels:
+    app: reviews
+spec:
+  selector:
+    matchLabels:
+      app: reviews
+  endpoints:
+    - port: 9080
+      path: /metrics
+      interval: 20s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: productpage
+  labels:
+    app: productpage
+spec:
+  selector:
+    matchLabels:
+      app: productpage
+  endpoints:
+    - port: 9080
+      path: /metrics
+      interval: 20s

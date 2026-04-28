@@ -10,6 +10,7 @@ resources:
   - ../../base/kiali/
   - ../../base/flux/
   - ../../base/cloudnative-pg/
+  - ../../base/victoria-metrics/
   - ./cloudflare-operator/
   - ./i-reroute/
 

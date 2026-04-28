@@ -1,0 +1,11 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: test-controller
+  labels:
+    app: test-controller
+spec:
+  selector:
+    matchLabels:
+      app: test-controller
+  endpoints: []

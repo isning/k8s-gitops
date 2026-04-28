@@ -1,0 +1,48 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertRule
+metadata:
+  name: application-logs
+  labels:
+    app: logging
+spec:
+  groups:
+    - name: application-logs-critical
+      rules:
+        - alert: ApplicationCriticalLogs
+          expr: |
+            sum by (app, namespace, container) (rate({level=~"error|critical|fatal"}[5m])) > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical logs from {{ $labels.app }}/{{ $labels.namespace }}"
+            description: "Container {{ $labels.container }} is producing critical level logs"
+        - alert: ApplicationHighErrorLogs
+          expr: |
+            sum by (app, namespace) (rate({level=~"error|err"}[5m])) > 10
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate from {{ $labels.app }}"
+            description: "Error rate > 10/s for {{ $labels.app }}/{{ $labels.namespace }}"
+    - name: application-logs-info
+      rules:
+        - alert: ApplicationPanicLogs
+          expr: |
+            sum by (app, namespace) (rate({level=~"panic"}[5m])) > 0
+          for: 30s
+          labels:
+            severity: critical
+          annotations:
+            summary: "Panic detected in {{ $labels.app }}"
+            description: "Application {{ $labels.app }}/{{ $labels.namespace }} is panicking"
+        - alert: ApplicationWarningLogs
+          expr: |
+            sum by (app, namespace) (rate({level=~"warn|warning"}[5m])) > 50
+          for: 10m
+          labels:
+            severity: info
+          annotations:
+            summary: "High warning rate from {{ $labels.app }}"
+            description: "Warning rate > 50/s for {{ $labels.app }}/{{ $labels.namespace }}"

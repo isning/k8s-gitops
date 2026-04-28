@@ -101,8 +101,6 @@ spec:
       processors:
         k8sattributes:
           passthrough: false
-          filter:
-            node_from_env_var: K8S_NODE_NAME
           extract:
             # Extract pod labels
             labels:
