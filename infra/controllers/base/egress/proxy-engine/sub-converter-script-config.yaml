@@ -96,6 +96,35 @@ data:
                 return 1.0
         return 1.0
 
+    def parse_group_selections(value):
+        selections = {}
+        for raw_line in value.splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith('#'):
+                continue
+            match = re.match(r'^([^=]+?)\s*=\s*\[(.*)\]\s*$', line)
+            if not match:
+                print(f"Warning: ignoring invalid selection line: {line}")
+                continue
+            group_name = match.group(1).strip()
+            items = []
+            for raw_item in match.group(2).split(','):
+                item = raw_item.strip().strip('"').strip("'")
+                if item:
+                    items.append(item)
+            if items:
+                selections[group_name] = items
+        return selections
+
+    def resolve_tag(name):
+        for node in all_nodes:
+            if node['tag'] == name or node.get('_original_tag', node['tag']) == name:
+                return node['tag']
+        for node in all_nodes:
+            if node['tag'].lower() == name.lower() or node.get('_original_tag', node['tag']).lower() == name.lower():
+                return node['tag']
+        return None
+
     print(f"Starting to process {len(sub_list)} subscriptions...")
 
     for sub_tag, url in sub_list:
@@ -163,13 +192,17 @@ data:
     # Groups that must have at least one node; missing nodes are a hard error.
     STRICT_GROUPS = {"UnitedStates"}
 
+    # Optional group overrides, format:
+    # HongKong = [ 'HongKong URLTest', '[YZT] 香港1', '[YZT] 香港2' ]
+    group_selections = parse_group_selections(os.environ.get('NODE_SELECTIONS', ''))
+
     # Build Outbounds
     custom_outbounds = []
 
     # 1. Add all proxy nodes
     custom_outbounds.extend(all_nodes)
 
-    # 2. Per-region urltest groups (proxy nodes only).
+    # 2. Per-region urltest + selector groups.
     for group_name, pattern in groups.items():
         nodes = filter_nodes(pattern)
         if not nodes:
@@ -179,10 +212,27 @@ data:
             else:
                 print(f"Warning: No nodes found for group '{group_name}'. Skipping.")
                 continue
+
+        urltest_tag = f"{group_name} URLTest"
         custom_outbounds.append({
             "type": "urltest",
-            "tag": group_name,
+            "tag": urltest_tag,
             "outbounds": nodes
+        })
+
+        selector_outbounds = [urltest_tag]
+        for item in group_selections.get(group_name, []):
+            resolved_tag = resolve_tag(item)
+            if resolved_tag is None:
+                print(f"Warning: group '{group_name}' references unknown outbound '{item}'.")
+                continue
+            if resolved_tag not in selector_outbounds:
+                selector_outbounds.append(resolved_tag)
+
+        custom_outbounds.append({
+            "type": "selector",
+            "tag": group_name,
+            "outbounds": selector_outbounds
         })
 
     # 3. Low-Rate group (Multiplier <= 0.5x).
