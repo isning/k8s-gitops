@@ -11,9 +11,10 @@ After first login, change the admin password immediately.
 
 ## OIDC
 
-OIDC is **not** managed by GitOps manifests in this folder.
-Configure OIDC manually in Harbor UI:
+OIDC baseline config is managed by `helm-release.yaml` via `valuesFrom -> core.configureUserSettings`.
 
-1. `Administration` -> `Configuration` -> `Authentication`
-2. Set `Auth Mode` to `OIDC`
-3. Fill Logto endpoint/client credentials and group mapping as needed
+Secret `harbor-oidc` (namespace `harbor`) provides a single key:
+
+- `configure-user-settings-json`
+
+The value is a JSON object containing Harbor OIDC settings (including `oidc_client_id` and `oidc_client_secret`).

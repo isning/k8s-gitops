@@ -1,0 +1,25 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: harbor-proxy-cache
+  namespace: harbor
+spec:
+  interval: 30m
+  approvePlan: auto
+  path: ./infra/configs/base/harbor/tf
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  retryInterval: 1m
+  runnerPodTemplate:
+    spec:
+      env:
+        - name: TF_VAR_harbor_username
+          value: admin
+        - name: TF_VAR_harbor_password
+          valueFrom:
+            secretKeyRef:
+              name: harbor-admin-auth
+              key: HARBOR_ADMIN_PASSWORD

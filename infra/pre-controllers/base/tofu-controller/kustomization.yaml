@@ -4,5 +4,3 @@ kind: Kustomization
 resources:
   - ./helm-repo.yaml
   - ./helm-release.yaml
-  - ./harbor-admin-secret.yaml
-  - ./harbor-oidc-secret.yaml
