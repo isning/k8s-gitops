@@ -17,6 +17,9 @@ spec:
       version: "1.*"
       interval: 12h
   values:
+    existingSecretAdminPassword: harbor-admin-auth
+    existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
+
     expose:
       type: clusterIP
       tls:
@@ -52,3 +55,9 @@ spec:
           size: 10Gi
         redis:
           size: 5Gi
+
+  valuesFrom:
+    - kind: Secret
+      name: harbor-oidc
+      valuesKey: configure-user-settings-json
+      targetPath: core.configureUserSettings

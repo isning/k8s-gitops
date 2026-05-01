@@ -38,22 +38,18 @@ rewrite path and testing Harbor project resolution instead.
 
 ## Initialize Proxy Cache Projects
 
-Use robot-account-only script auth:
+Proxy-cache registries/projects are managed by `tofu-controller` + Terraform:
 
-```bash
-HARBOR_ROBOT_NAME='robot$init' \
-HARBOR_ROBOT_SECRET='replace-me' \
-python3 scripts/harbor_init_proxy_cache.py \
-  --harbor-url https://harbor.isning.moe \
-  --config scripts/harbor_proxy_cache_config.example.json
-```
+- Controller install: `infra/pre-controllers/base/tofu-controller`
+- Terraform CR: `infra/configs/base/harbor/tofu-terraform.yaml`
+- Terraform code: `infra/configs/base/harbor/tf`
 
-Available config examples:
+Terraform runs in namespace `harbor` and reuses Harbor's existing admin password secret.
 
-- `scripts/harbor_proxy_cache_config.example.json`
-  - credentialed upstreams (recommended for stable native providers)
-- `scripts/harbor_proxy_cache_config.anonymous.example.json`
-  - anonymous-first, native-where-supported, fallback to `docker-registry` where needed
+- `TF_VAR_harbor_username` is set to `admin` in `Terraform` CR
+- `TF_VAR_harbor_password` is read from secret `harbor-admin-auth`, key `HARBOR_ADMIN_PASSWORD`
+
+If you need upstream registry credentials, add them as env vars in the `Terraform` CR runner pod.
 
 ## k3s
 

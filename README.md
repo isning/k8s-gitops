@@ -48,7 +48,7 @@ until dependencies are healthy):
 6. Validate service readiness before hard dependencies:
    - Harbor core/registry healthy and serving API.
    - Logto issuer URL reachable from cluster and admin workstation.
-7. Initialize Harbor proxy-cache projects (`scripts/harbor_init_proxy_cache.py`).
+7. Initialize Harbor proxy-cache projects (`tofu-controller` + Terraform at `infra/configs/base/harbor/tf`).
 8. Switch node mirror config to Harbor-first only after step 6-7 pass, and keep
    a break-glass upstream fallback during first rollout.
 9. Enable OIDC-dependent login paths (API server OIDC login flow and related client
