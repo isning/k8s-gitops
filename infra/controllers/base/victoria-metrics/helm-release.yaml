@@ -101,7 +101,7 @@ spec:
       # https://docs.victoriametrics.com/faq/#which-victoriametrics-type-is-recommended-for-use-in-production---single-node-or-cluster
       # vmsingle = vmcluster(vmselect + vmstorage + vminsert)
       enabled: true
-      rententionPeriod: "7d"
+      retentionPeriod: "7d"
       resources:
         limits:
           cpu: "1"
