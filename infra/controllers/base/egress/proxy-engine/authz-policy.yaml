@@ -1,0 +1,40 @@
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-engine-dashboard-ext-auth
+  namespace: prod
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: default-gateway
+  action: CUSTOM
+  provider:
+    name: oauth2-proxy
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - proxy-engine.isning.moe
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-engine-dashboard-deny-non-admin
+  namespace: prod
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: default-gateway
+  action: DENY
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - proxy-engine.isning.moe
+      when:
+        - key: request.auth.claims[roles]
+          notValues:
+            - proxy-engine:admin

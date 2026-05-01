@@ -64,6 +64,8 @@ spec:
         ports:
         - containerPort: 7890
           name: mixed-proxy
+        - containerPort: 9090
+          name: clash-api
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -72,15 +74,17 @@ spec:
           seccompProfile:
             type: RuntimeDefault
         livenessProbe:
-          tcpSocket:
-            port: 7890
+          httpGet:
+            path: /version
+            port: 9090
           initialDelaySeconds: 10
           periodSeconds: 30
           timeoutSeconds: 5
           failureThreshold: 3
         readinessProbe:
-          tcpSocket:
-            port: 7890
+          httpGet:
+            path: /version
+            port: 9090
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 3
