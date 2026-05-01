@@ -7,15 +7,10 @@ metadata:
 spec:
   releaseName: tofu-controller
   interval: 30m
-  chart:
-    spec:
-      chart: tofu-controller
-      sourceRef:
-        kind: HelmRepository
-        name: tofu-controller
-        namespace: flux-system
-      version: ">=0.16.2"
-      interval: 12h
+  chartRef:
+    kind: OCIRepository
+    name: tofu-controller
+    namespace: flux-system
   install:
     crds: Create
     remediation:
