@@ -29,13 +29,25 @@
 set -o errexit
 set -o pipefail
 
+strict_missing_schemas="${STRICT_MISSING_SCHEMAS:-false}"
+schema_report_file="/tmp/kubeconform-schema-report.log"
+rm -f "$schema_report_file"
+
 # mirror kustomize-controller build options
 kustomize_flags=("--load-restrictor=LoadRestrictionsNone")
 kustomize_config="kustomization.yaml"
 
 # skip Kubernetes Secrets due to SOPS fields failing validation
 kubeconform_flags=("-skip=Secret")
-kubeconform_config=("-strict" "-ignore-missing-schemas" "-schema-location" "default" "-schema-location" "/tmp/flux-crd-schemas" "-verbose")
+kubeconform_config=(
+  "-strict"
+  "-ignore-missing-schemas"
+  "-schema-location" "default"
+  "-schema-location" "/tmp/flux-crd-schemas"
+  "-schema-location" "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
+  "-summary"
+  "-verbose"
+)
 
 echo "INFO - Downloading Flux OpenAPI schemas"
 mkdir -p /tmp/flux-crd-schemas/master-standalone-strict
@@ -50,9 +62,21 @@ done
 echo "INFO - Validating clusters"
 find ./clusters -maxdepth 2 -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
   do
-    kubeconform "${kubeconform_flags[@]}" "${kubeconform_config[@]}" "${file}"
+    kubeconform "${kubeconform_flags[@]}" "${kubeconform_config[@]}" "${file}" | tee -a "$schema_report_file"
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
       exit 1
+    fi
+done
+
+echo "INFO - Validating CRD manifests"
+find . -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
+  do
+    if yq e 'select(.kind == "CustomResourceDefinition") | .kind' "$file" 2>/dev/null | grep -q '^CustomResourceDefinition$'; then
+      echo "INFO - Validating CRD file $file"
+      kubeconform "${kubeconform_flags[@]}" "${kubeconform_config[@]}" "$file" | tee -a "$schema_report_file"
+      if [[ ${PIPESTATUS[0]} != 0 ]]; then
+        exit 1
+      fi
     fi
 done
 
@@ -61,8 +85,24 @@ find . -type f -name $kustomize_config -print0 | while IFS= read -r -d $'\0' fil
   do
     echo "INFO - Validating kustomization ${file/%$kustomize_config}"
     kustomize build "${file/%$kustomize_config}" "${kustomize_flags[@]}" | \
-      kubeconform "${kubeconform_flags[@]}" "${kubeconform_config[@]}"
+      kubeconform "${kubeconform_flags[@]}" "${kubeconform_config[@]}" | tee -a "$schema_report_file"
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
       exit 1
     fi
 done
+
+echo "INFO - Reporting missing schemas"
+missing_schema_lines="$(grep -E 'could not find schema for|could not find schema' "$schema_report_file" || true)"
+if [[ -n "$missing_schema_lines" ]]; then
+  echo "WARN - Some resources are missing schemas in kubeconform sources:"
+  printf '%s\n' "$missing_schema_lines" | sed 's/^/  - /'
+
+  if [[ "$strict_missing_schemas" == "true" ]]; then
+    echo "ERROR - STRICT_MISSING_SCHEMAS=true and missing schemas were found."
+    exit 1
+  fi
+
+  echo "INFO - Set STRICT_MISSING_SCHEMAS=true to fail CI on missing schemas."
+else
+  echo "INFO - No missing schemas found."
+fi
