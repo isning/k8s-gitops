@@ -24,3 +24,6 @@ jobs:
         uses: fluxcd/pkg/actions/kustomize@56073664a34f2e47d0a1b1347567b709e9a2bec5 # main
       - name: Validate manifests
         run: ./scripts/validate.sh
+        env:
+          # Set to 'true' to fail CI when schema is missing.
+          STRICT_MISSING_SCHEMAS: "false"

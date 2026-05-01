@@ -9,6 +9,6 @@ spec:
     matchLabels:
       app: clirelay
   endpoints:
-    - port: 8317
+    - port: http
       path: /metrics
       interval: 20s

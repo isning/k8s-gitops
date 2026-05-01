@@ -9,6 +9,6 @@ spec:
     matchLabels:
       app: echo
   endpoints:
-    - port: 8080
+    - port: http
       path: /
       interval: 20s

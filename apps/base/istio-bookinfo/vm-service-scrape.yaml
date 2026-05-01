@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: details
   endpoints:
-    - port: 9080
+    - port: http
       path: /metrics
       interval: 20s
 ---
@@ -24,7 +24,7 @@ spec:
     matchLabels:
       app: ratings
   endpoints:
-    - port: 9080
+    - port: http
       path: /metrics
       interval: 20s
 ---
@@ -39,7 +39,7 @@ spec:
     matchLabels:
       app: reviews
   endpoints:
-    - port: 9080
+    - port: http
       path: /metrics
       interval: 20s
 ---
@@ -54,6 +54,6 @@ spec:
     matchLabels:
       app: productpage
   endpoints:
-    - port: 9080
+    - port: http
       path: /metrics
       interval: 20s
