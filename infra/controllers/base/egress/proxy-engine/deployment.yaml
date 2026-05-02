@@ -113,8 +113,8 @@ spec:
         configMap:
           name: sing-box-main-config
       - name: config-temp
-        emptyDir:
-          sizeLimit: 10Mi
+        persistentVolumeClaim:
+          claimName: nodes-cache
       - name: script-volume
         configMap:
           name: sub-converter-script-config
