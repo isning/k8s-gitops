@@ -1,0 +1,32 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertRule
+metadata:
+  name: proxy-engine
+  labels:
+    app: proxy-engine
+spec:
+  groups:
+    - name: proxy-engine-fetch-nodes
+      rules:
+        - alert: ProxyEngineFetchNodesInitFailing
+          expr: |
+            sum by (namespace, pod, container) (
+              increase(kube_pod_init_container_status_restarts_total{namespace="egress-system",container="fetch-nodes"}[15m])
+            ) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "fetch-nodes init container is failing"
+            description: "Init container {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.container }} restarted during the last 15m"
+        - alert: ProxyEngineFetchNodesFallbackUsed
+          expr: |
+            sum by (namespace, pod) (
+              rate({namespace="egress-system", pod=~"proxy-engine-.*"} |= "FETCH_NODES_FALLBACK" [10m])
+            ) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "fetch-nodes used last known good data"
+            description: "Proxy-engine used fallback nodes cache for {{ $labels.namespace }}/{{ $labels.pod }}"
