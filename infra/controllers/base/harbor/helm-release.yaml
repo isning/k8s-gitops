@@ -59,5 +59,4 @@ spec:
   valuesFrom:
     - kind: Secret
       name: harbor-oidc
-      valuesKey: configure-user-settings-json
-      targetPath: core.configureUserSettings
+      valuesKey: values.yaml
