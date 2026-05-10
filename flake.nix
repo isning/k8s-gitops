@@ -75,7 +75,8 @@
               esac
             done
 
-            for cluster in ${pkgs.lib.concatStringsSep " " (map pkgs.lib.escapeShellArg clusterNames)}; do
+            clusters=(${pkgs.lib.concatStringsSep " " (map pkgs.lib.escapeShellArg clusterNames)})
+            for cluster in "''${clusters[@]}"; do
               echo "Processing $cluster..."
               gen-image-lock --cluster "$cluster" "''${args[@]}" \
                 --commit-msg-file "msg_$cluster.txt" \
