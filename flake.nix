@@ -26,19 +26,16 @@
         gen-image-lock = pkgs.writeShellApplication {
           name = "gen-image-lock";
           runtimeInputs = with pkgs; [
-            bash
-            coreutils
-            findutils
-            fluxcd
             kustomize
             kubernetes-helm
             crane
-            jq
-            yq-go
             uv
             nix-prefetch-docker
+            git
           ];
-          text = builtins.readFile ./scripts/gen-image-lock.sh;
+          text = ''
+            exec uv run ${./scripts/gen-image-lock.py} "$@"
+          '';
         };
       }
       // builtins.listToAttrs (
@@ -64,20 +61,39 @@
         gen-image-lock-all = pkgs.writeShellApplication {
           name = "gen-image-lock-all";
           runtimeInputs = [ self.packages.${pkgs.stdenv.hostPlatform.system}.gen-image-lock ];
-          text =
-            if clusterNames == [ ] then
-              ''
-                echo "No clusters found under ./clusters"
-              ''
-            else
-              ''
-                set -euo pipefail
-                clusters=( ${pkgs.lib.concatStringsSep " " (map pkgs.lib.escapeShellArg clusterNames)} )
-                for cluster in "''${clusters[@]}"; do
-                  echo "Generating image lock for $cluster"
-                  gen-image-lock --cluster "$cluster" "$@"
-                done
-              '';
+          text = ''
+            set -euo pipefail
+            COMMIT_MSG_FILE=""
+            REPORT_FILE=""
+            args=()
+            
+            while [[ $# -gt 0 ]]; do
+              case "$1" in
+                --commit-msg-file) COMMIT_MSG_FILE="$2"; shift 2 ;;
+                --report-file) REPORT_FILE="$2"; shift 2 ;;
+                *) args+=("$1"); shift ;;
+              esac
+            done
+
+            for cluster in ${pkgs.lib.concatStringsSep " " (map pkgs.lib.escapeShellArg clusterNames)}; do
+              echo "Processing $cluster..."
+              gen-image-lock --cluster "$cluster" "''${args[@]}" \
+                --commit-msg-file "msg_$cluster.txt" \
+                --report-file "rep_$cluster.md"
+              
+              if [[ -n "$COMMIT_MSG_FILE" && -f "msg_$cluster.txt" ]]; then
+                cat "msg_$cluster.txt" >> "$COMMIT_MSG_FILE"
+                echo -e "\n\n" >> "$COMMIT_MSG_FILE"
+                rm "msg_$cluster.txt"
+              fi
+
+              if [[ -n "$REPORT_FILE" && -f "rep_$cluster.md" ]]; then
+                cat "rep_$cluster.md" >> "$REPORT_FILE"
+                echo -e "\n---\n" >> "$REPORT_FILE"
+                rm "rep_$cluster.md"
+              fi
+            done
+          '';
         };
       });
 
