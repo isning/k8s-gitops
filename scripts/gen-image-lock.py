@@ -1,9 +1,9 @@
 #!/usr/bin/env -S uv run
 # /// script
-# requires-python = ">=3.10"
+# requires-python = "~=3"
 # dependencies = [
 #     "pyyaml",
-#     "flux-local==8.2.0",
+#     "flux-local~=8.2.0",
 # ]
 # ///
 import argparse
