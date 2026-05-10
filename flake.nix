@@ -30,6 +30,7 @@
             kubernetes-helm
             crane
             uv
+            fluxcd
             nix-prefetch-docker
             git
           ];

@@ -20,6 +20,16 @@ import yaml
 def log(msg):
     print(msg, file=sys.stderr)
 
+
+def ensure_commands_exist(commands):
+    missing = [cmd for cmd in commands if shutil.which(cmd) is None]
+    if not missing:
+        return
+
+    log("[gen-image-lock] missing required command(s): " + ", ".join(missing))
+    log("[gen-image-lock] please install them and make sure they are available in PATH")
+    sys.exit(1)
+
 def run_cmd(cmd, input_data=None, retries=1, check=True):
     for attempt in range(1, retries + 1):
         try:
@@ -165,6 +175,7 @@ class ImageLockGenerator:
 
     def run(self):
         log(f"[gen-image-lock] cluster={self.args.cluster} root={self.flux_root}")
+        self.check_dependencies()
         cluster_meta = self.fetch_cluster_metadata()
         manifests = self.render_manifests()
         
@@ -187,6 +198,16 @@ class ImageLockGenerator:
         self.write_commit_msg()
         self.auto_commit()
         log("Execution finished successfully.")
+
+    def check_dependencies(self):
+        required_commands = [
+            "flux-local",
+            "flux",
+            "kustomize",
+            "crane",
+            "nix-prefetch-docker",
+        ]
+        ensure_commands_exist(required_commands)
 
     def fetch_cluster_metadata(self):
         log("[gen-image-lock] step 1: fetch cluster metadata (sources)")
