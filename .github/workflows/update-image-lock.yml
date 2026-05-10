@@ -1,8 +1,8 @@
 name: Update Image Lock
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       cluster:
@@ -19,8 +19,8 @@ on:
         default: "linux"
 
 permissions:
+  id-token: write
   contents: write
-  checks: write
   pull-requests: write
 
 jobs:
