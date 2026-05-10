@@ -27,11 +27,26 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Get GitHub App User ID
+        id: get-user-id
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: echo "user-id=$(gh api \"/users/${{ steps.app-token.outputs.app-slug }}[bot]\" --jq .id)" >> "$GITHUB_OUTPUT"
+
       - name: Checkout PR branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
+          token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
@@ -61,12 +76,12 @@ jobs:
           cluster="${{ github.event.inputs.cluster || 'all' }}"
           arch="${{ github.event.inputs.arch || 'amd64' }}"
           os="${{ github.event.inputs.os || 'linux' }}"
-          common_args="--arch $arch --os $os --commit-msg-file $COMMIT_MSG_FILE --report-file $REPORT_PATH"
+          common_args=(--arch "$arch" --os "$os" --commit-msg-file "$COMMIT_MSG_FILE" --report-file "$REPORT_PATH")
 
           if [[ "$cluster" == "all" ]]; then
-            nix run .#gen-image-lock-all -- $common_args
+            nix run .#gen-image-lock-all -- "${common_args[@]}"
           else
-            nix run .#gen-image-lock -- --cluster "$cluster" $common_args
+            nix run .#gen-image-lock -- --cluster "$cluster" "${common_args[@]}"
           fi
 
       - name: Save image digest/hash cache
@@ -80,18 +95,23 @@ jobs:
         id: msg_output
         run: |
           if [[ -f final_commit_msg.txt ]]; then
-            echo "COMMIT_MSG<<EOF" >> $GITHUB_OUTPUT
-            cat final_commit_msg.txt >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+            {
+              echo "COMMIT_MSG<<EOF"
+              cat final_commit_msg.txt
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
           else
-            echo "COMMIT_MSG=chore(lock): no image changes detected" >> $GITHUB_OUTPUT
+            echo "COMMIT_MSG=chore(lock): no image changes detected" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
+          token: ${{ steps.app-token.outputs.token }}
           commit-message: ${{ steps.msg_output.outputs.COMMIT_MSG }}
+          committer: ${{ steps.app-token.outputs.app-slug }}[bot] <${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com>
+          author: ${{ steps.app-token.outputs.app-slug }}[bot] <${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com>
           title: "chore(lock): refresh flux image lock"
           body-path: ${{ github.workspace }}/pr_report.md
           branch: ci/auto-update-lock/${{ github.run_id }}
@@ -103,9 +123,9 @@ jobs:
       - name: Force Merge PR
         if: steps.cpr.outputs.pull-request-operation == 'created'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          PR_NUMBER=${{ steps.cpr.outputs.pull-request-number }}
+          PR_NUMBER="${{ steps.cpr.outputs.pull-request-number }}"
           echo "Using bypass privileges to squash merge PR #$PR_NUMBER..."
 
-          gh pr merge $PR_NUMBER --squash --admin
+          gh pr merge "$PR_NUMBER" --squash --admin

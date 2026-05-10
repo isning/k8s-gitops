@@ -126,8 +126,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
     steps:
+      - name: Create GitHub App token
+        id: app-token
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Download diff artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -241,7 +247,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: mshick/add-pr-comment@8e4927817251f1ff60c001f04568532b38e0b4a0 # v3
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ steps.app-token.outputs.token }}
           message-id: flux-local/${{ github.event.pull_request.number }}/combined
           message-failure: Unable to post flux-local diff comment
           message: ${{ steps.build_comment.outputs.body }}
