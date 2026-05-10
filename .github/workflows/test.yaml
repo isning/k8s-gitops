@@ -46,11 +46,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@v2.8.6
+        uses: fluxcd/flux2/action@04acaec6161ac4fb1a82ffafa88901c03271d34f # v2.8.6
       - name: Setup kustomize
         uses: fluxcd/pkg/actions/kustomize@f1acb236137acb1283bf3b6be88110479dfd4f45 # main
       - name: flux-local test
-        uses: allenporter/flux-local/action/test@8.2.0
+        uses: allenporter/flux-local/action/test@4d666add25002f550dc0dbe8b2b2f25859169b34 # 8.2.0
         with:
           path: clusters/${{ matrix.cluster }}
           enable-helm: true
@@ -71,12 +71,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@v2.8.6
+        uses: fluxcd/flux2/action@04acaec6161ac4fb1a82ffafa88901c03271d34f # v2.8.6
       - name: Setup kustomize
         uses: fluxcd/pkg/actions/kustomize@f1acb236137acb1283bf3b6be88110479dfd4f45 # main
       - name: flux-local diff
         id: diff
-        uses: allenporter/flux-local/action/diff@8.2.0
+        uses: allenporter/flux-local/action/diff@4d666add25002f550dc0dbe8b2b2f25859169b34 # 8.2.0
         continue-on-error: true
         with:
           live-branch: main
@@ -109,7 +109,7 @@ jobs:
           PY
       - name: Upload diff artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: flux-local-diff-${{ matrix.cluster }}-${{ matrix.resource }}
           path: artifacts/diff-${{ matrix.cluster }}-${{ matrix.resource }}.json
@@ -129,7 +129,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Download diff artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: artifacts
           pattern: flux-local-diff-*
@@ -239,7 +239,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Comment combined diff on PR
         if: ${{ github.event_name == 'pull_request' }}
-        uses: mshick/add-pr-comment@v3
+        uses: mshick/add-pr-comment@8e4927817251f1ff60c001f04568532b38e0b4a0 # v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           message-id: flux-local/${{ github.event.pull_request.number }}/combined
