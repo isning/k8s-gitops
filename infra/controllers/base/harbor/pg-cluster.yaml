@@ -1,0 +1,22 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: harbor-pg-cluster
+spec:
+  instances: 1
+
+  bootstrap:
+    initdb:
+      database: registry
+      owner: app
+
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    # https://goharbor.io/docs/2.14.0/install-config/
+    major: 15
+
+  storage:
+    size: 10Gi
+    storageClass: local-path-nocow

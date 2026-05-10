@@ -6,3 +6,6 @@ resources:
   - ./helm-release.yaml
   - ./harbor-admin-secret.yaml
   - ./harbor-oidc-secret.yaml
+  - ./harbor-redis-auth-secret.yaml
+  - ./pg-cluster.yaml
+  - ./redis-release.yaml
