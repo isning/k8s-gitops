@@ -89,9 +89,8 @@ jobs:
 
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: ${{ steps.msg_output.outputs.COMMIT_MSG }}
           title: "chore(lock): refresh flux image lock"
           body-path: ${{ github.workspace }}/pr_report.md
@@ -101,7 +100,7 @@ jobs:
           add-paths: |
             clusters/**/images.lock.nix
 
-      - name: Force Merge PR 
+      - name: Force Merge PR
         if: steps.cpr.outputs.pull-request-operation == 'created'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
