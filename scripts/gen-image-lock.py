@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run
 # /// script
-# requires-python = "~=3"
+# requires-python = ">=3.13"
 # dependencies = [
 #     "pyyaml",
 #     "flux-local~=8.2.0",
