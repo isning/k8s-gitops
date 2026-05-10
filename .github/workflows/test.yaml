@@ -10,6 +10,9 @@ on:
     branches: [ '*' ]
     tags-ignore: [ '*' ]
 
+permissions:
+  contents: read
+
 jobs:
   manifests:
     runs-on: ubuntu-latest
@@ -27,3 +30,212 @@ jobs:
         env:
           # Set to 'true' to fail CI when schema is missing.
           STRICT_MISSING_SCHEMAS: "false"
+
+  flux-local-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cluster:
+          - kubevirt-lab-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@v2.8.6
+      - name: Setup kustomize
+        uses: fluxcd/pkg/actions/kustomize@f1acb236137acb1283bf3b6be88110479dfd4f45 # main
+      - name: flux-local test
+        uses: allenporter/flux-local/action/test@8.2.0
+        with:
+          path: clusters/${{ matrix.cluster }}
+          enable-helm: true
+
+  flux-local-diff:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        cluster:
+          - kubevirt-lab-1
+        resource:
+          - kustomization
+          - helmrelease
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@v2.8.6
+      - name: Setup kustomize
+        uses: fluxcd/pkg/actions/kustomize@f1acb236137acb1283bf3b6be88110479dfd4f45 # main
+      - name: flux-local diff
+        id: diff
+        uses: allenporter/flux-local/action/diff@8.2.0
+        continue-on-error: true
+        with:
+          live-branch: main
+          path: clusters/${{ matrix.cluster }}
+          resource: ${{ matrix.resource }}
+      - name: Write diff artifact payload
+        if: ${{ always() }}
+        env:
+          CLUSTER: ${{ matrix.cluster }}
+          RESOURCE: ${{ matrix.resource }}
+          DIFF_OUTPUT: ${{ steps.diff.outputs.diff }}
+          DIFF_OUTCOME: ${{ steps.diff.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
+        run: |
+          mkdir -p artifacts
+          python3 - <<'PY'
+          import json
+          import os
+
+          payload = {
+            "cluster": os.environ["CLUSTER"],
+            "resource": os.environ["RESOURCE"],
+            "outcome": os.environ["DIFF_OUTCOME"],
+            "diff": os.environ.get("DIFF_OUTPUT", ""),
+            "run_url": os.environ["RUN_URL"],
+          }
+
+          with open(os.path.join("artifacts", f"diff-{payload['cluster']}-{payload['resource']}.json"), "w", encoding="utf-8") as handle:
+            json.dump(payload, handle)
+          PY
+      - name: Upload diff artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: flux-local-diff-${{ matrix.cluster }}-${{ matrix.resource }}
+          path: artifacts/diff-${{ matrix.cluster }}-${{ matrix.resource }}.json
+          if-no-files-found: error
+      - name: Fail job if diff failed
+        if: ${{ steps.diff.outcome != 'success' }}
+        run: |
+          echo "flux-local diff failed for resource=${{ matrix.resource }}"
+          exit 1
+
+  aggregate-comment:
+    needs: flux-local-diff
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download diff artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: flux-local-diff-*
+          merge-multiple: true
+      - name: Build combined PR comment
+        id: build_comment
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
+        run: |
+          cat > build_comment.py <<'PYEOF'
+          import glob
+          import json
+          from collections import defaultdict
+
+          files = sorted(glob.glob("artifacts/**/*.json", recursive=True))
+          grouped = defaultdict(list)
+          total_resources = 0
+          total_changed = 0
+          total_no_change = 0
+          total_failed = 0
+
+          for file_path in files:
+            with open(file_path, "r", encoding="utf-8") as handle:
+              item = json.load(handle)
+            cluster = item.get("cluster", "unknown")
+            resource = item.get("resource", "unknown")
+            outcome = item.get("outcome", "failure")
+            diff = item.get("diff", "") or ""
+            has_diff = bool(diff.strip())
+
+            status = "failed"
+            if outcome == "success":
+              status = "changed" if has_diff else "no-change"
+
+            grouped[cluster].append({
+              "resource": resource,
+              "status": status,
+              "diff": diff,
+            })
+
+            total_resources += 1
+            if status == "changed":
+              total_changed += 1
+            elif status == "no-change":
+              total_no_change += 1
+            else:
+              total_failed += 1
+
+          print("## flux-local diff summary")
+          print()
+          print(f"Clusters: {len(grouped)} | Resources: {total_resources} | Changed: {total_changed} | No change: {total_no_change} | Failed: {total_failed}")
+          print()
+
+          if not grouped:
+            print("No matrix diff artifacts were found.")
+            print()
+          elif total_changed == 0 and total_failed == 0:
+            print("✅ No updates across all clusters/resources.")
+            print()
+          else:
+            for cluster in sorted(grouped):
+              entries = sorted(grouped[cluster], key=lambda entry: entry["resource"])
+              changed = sum(1 for entry in entries if entry["status"] == "changed")
+              no_change = sum(1 for entry in entries if entry["status"] == "no-change")
+              failed = sum(1 for entry in entries if entry["status"] == "failed")
+
+              if changed == 0 and failed == 0:
+                print(f"- Cluster `{cluster}`: ✅ no updates")
+                print()
+                continue
+
+              print(f"### Cluster: `{cluster}` ({len(entries)} resources: {changed} changed, {no_change} no-change, {failed} failed)")
+              print()
+
+              for entry in entries:
+                resource = entry["resource"]
+                status = entry["status"]
+                if status == "no-change":
+                  print(f"- Resource `{resource}`: ✅ no updates")
+                elif status == "failed":
+                  print(f"<details><summary>Resource `{resource}`: ❌ diff failed</summary>")
+                  print()
+                  print("Please inspect workflow logs for the `flux-local diff` step.")
+                  print()
+                  print("</details>")
+                else:
+                  print(f"<details><summary>Resource `{resource}`: ⚠️ updates detected</summary>")
+                  print()
+                  print("```diff")
+                  print(entry["diff"].rstrip())
+                  print("```")
+                  print()
+                  print("</details>")
+              print()
+          PYEOF
+          {
+            echo "body<<EOF"
+            python3 build_comment.py
+            echo
+            echo "[Open workflow logs](${RUN_URL})"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - name: Upload combined result to action summary
+        run: |
+          {
+            echo "${{ steps.build_comment.outputs.body }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Comment combined diff on PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: mshick/add-pr-comment@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          message-id: flux-local/${{ github.event.pull_request.number }}/combined
+          message-failure: Unable to post flux-local diff comment
+          message: ${{ steps.build_comment.outputs.body }}
