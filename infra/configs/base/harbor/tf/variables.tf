@@ -17,6 +17,20 @@ variable "harbor_password" {
   default     = ""
 }
 
+variable "robot_account_k8s_secret" {
+  description = "Robot account k8s secret"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "robot_account_k8s_secret_version" {
+  description = "Robot account k8s secret"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "dockerhub_access_id" {
   type    = string
   default = ""

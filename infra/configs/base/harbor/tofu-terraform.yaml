@@ -23,3 +23,8 @@ spec:
             secretKeyRef:
               name: harbor-admin-auth
               key: HARBOR_ADMIN_PASSWORD
+        - name: TF_VAR_robot_account_k8s_secret
+          valueFrom:
+            secretKeyRef:
+              name: harbor-k8s-robot-account-auth
+              key: password
