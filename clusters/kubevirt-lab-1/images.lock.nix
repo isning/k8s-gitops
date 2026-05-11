@@ -355,10 +355,10 @@
   }
   {
     imageName = "ghcr.io/flux-iac/tofu-controller";
-    imageDigest = "sha256:6ac5e98c25eff86c900df738eba92d7a083c6e5c6109b3b650ffce559e138250";
+    imageDigest = "sha256:e16d8295e66f73d66f6904a9129d8aedfa84612d1e8b5a8e122fda99d28af09c";
     finalImageName = "ghcr.io/flux-iac/tofu-controller";
-    finalImageTag = "v0.16.2";
-    hash = "sha256-yw6/C9TjxzGLsCu1rFKGS7bRaVcbtyQsC6ItHo4t5LI=";
+    finalImageTag = "v0.16.3";
+    hash = "sha256-9GoiCyMtdzdwDZNKMOnuaFyx/DQdKK+ZG4ZvNcUngxk=";
     os = "linux";
     arch = "amd64";
     sources = [
