@@ -31,7 +31,8 @@
             crane
             uv
             fluxcd
-            nix-prefetch-docker
+            skopeo
+            nix
             git
           ];
           text = ''
