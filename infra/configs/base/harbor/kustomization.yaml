@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./ingress-route.yaml
   - ./tofu-terraform.yaml
+  - ./harbor-k8s-robot-account-auth-secret.yaml
