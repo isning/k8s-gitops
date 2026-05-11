@@ -17,6 +17,10 @@ on:
         description: "Container OS"
         required: true
         default: "linux"
+      registry_mirror_map:
+        description: "JSON mapping of registry to mirror (e.g. {\"docker.io\":\"dockerproxy.net\"})"
+        required: false
+        default: ""
 
 jobs:
   update:
@@ -55,13 +59,13 @@ jobs:
           path: ~/.cache/uv
           key: ${{ runner.os }}-uv
 
-      - name: Restore image digest/hash cache
+      - name: Restore image digest/archive-hash cache
         uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.cache/nixos-image-lock
-          key: nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          key: ${{ runner.os }}-nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-
+            ${{ runner.os }}-nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-
 
       - name: Generate lock
         run: |
@@ -71,7 +75,12 @@ jobs:
           cluster="${{ github.event.inputs.cluster || 'all' }}"
           arch="${{ github.event.inputs.arch || 'amd64' }}"
           os="${{ github.event.inputs.os || 'linux' }}"
+          registry_mirror_map='${{ github.event.inputs.registry_mirror_map || '' }}'
           common_args=(--arch "$arch" --os "$os" --commit-msg-file "$COMMIT_MSG_FILE" --report-file "$REPORT_PATH")
+
+          if [[ -n "$registry_mirror_map" ]]; then
+            common_args+=(--registry-mirror-map "$registry_mirror_map")
+          fi
 
           if [[ "$cluster" == "all" ]]; then
             nix run .#gen-image-lock-all -- "${common_args[@]}"
@@ -79,7 +88,7 @@ jobs:
             nix run .#gen-image-lock -- --cluster "$cluster" "${common_args[@]}"
           fi
 
-      - name: Save image digest/hash cache
+      - name: Save image digest/archive-hash cache
         if: always() && !cancelled()
         uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:

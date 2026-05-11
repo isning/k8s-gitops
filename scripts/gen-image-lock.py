@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -50,12 +51,22 @@ def run_cmd(cmd, input_data=None, retries=1, check=True):
                 return None
             time.sleep(attempt * 2)
 
-def extract_prefetch_hash(output):
-    try:
-        data = json.loads(output)
-        return data.get("sha256") or data.get("hash") or ""
-    except json.JSONDecodeError:
-        return ""
+def split_image_name(image_name):
+    parts = image_name.split("/")
+    first = parts[0] if parts else ""
+    has_explicit_registry = "." in first or ":" in first or first == "localhost"
+    if has_explicit_registry:
+        registry = first
+        repo = "/".join(parts[1:])
+    else:
+        registry = "docker.io"
+        repo = image_name
+    return registry, repo
+
+def map_image_source(image_name, registry_mirrors):
+    registry, repo = split_image_name(image_name)
+    mapped_registry = registry_mirrors.get(registry, registry)
+    return f"{mapped_registry}/{repo}"
 
 def parse_nix_blocks(content):
     """Extract complete block text for exact metadata diffing"""
@@ -74,14 +85,14 @@ def parse_nix_blocks(content):
             
         name_match = re.search(r'imageName\s*=\s*"([^"]*)"', block_str)
         tag_match = re.search(r'finalImageTag\s*=\s*"([^"]*)"', block_str)
-        hash_match = re.search(r'hash\s*=\s*"([^"]*)"', block_str)
+        hash_match = re.search(r'archiveHash\s*=\s*"([^"]*)"', block_str)
         
         if name_match and tag_match and hash_match:
             name = name_match.group(1)
             tag = tag_match.group(1) or "latest"
             uid = f"{name}:{tag}"
             blocks[uid] = {
-                "hash": hash_match.group(1),
+                "archiveHash": hash_match.group(1),
                 "block": block_str.strip()
             }
     return blocks
@@ -135,10 +146,10 @@ def format_image_diff(uid, old_hash, new_hash, old_meta, new_meta, action, intro
     
     if action == "Added":
         lines.append(f"• Added image '{uid}'{intro}:")
-        lines.append(f"    hash: '{new_hash}'")
+        lines.append(f"    archiveHash: '{new_hash}'")
     elif action == "Updated":
         lines.append(f"• Updated image '{uid}':")
-        lines.append(f"    hash:")
+        lines.append(f"    archiveHash:")
         lines.append(f"      - '{old_hash}'")
         lines.append(f"      + '{new_hash}'")
     elif action == "MetaUpdated":
@@ -168,6 +179,7 @@ class ImageLockGenerator:
         self.changes_detected = False
         self.final_nix = ""
         self.summary_output = ""
+        self.registry_mirrors = json.loads(args.registry_mirror_map) if args.registry_mirror_map else {}
         
         if not self.flux_root.is_dir():
             log(f"Cluster path does not exist: {self.flux_root}")
@@ -192,7 +204,7 @@ class ImageLockGenerator:
         self.total_images = len(self.image_map)
         log(f"[gen-image-lock] render complete: {self.total_images} images found")
         
-        self.resolve_digests_and_prefetch()
+        self.resolve_digests_and_archive_hash()
         self.generate_diff()
         self.generate_report()
         self.write_commit_msg()
@@ -205,7 +217,8 @@ class ImageLockGenerator:
             "flux",
             "kustomize",
             "crane",
-            "nix-prefetch-docker",
+            "skopeo",
+            "nix",
         ]
         ensure_commands_exist(required_commands)
 
@@ -364,11 +377,11 @@ class ImageLockGenerator:
                 lines.append(f"      {{ kind = \"{item['kind']}\"; namespace = \"{item['namespace']}\"; name = \"{item['name']}\"; }}")
         return "[\n" + "\n".join(lines) + "\n    ]"
 
-    def resolve_digests_and_prefetch(self):
+    def resolve_digests_and_archive_hash(self):
         cache_dir = Path.home() / f".cache/nixos-image-lock/{self.args.arch}-{self.args.os}"
         cache_dir.mkdir(parents=True, exist_ok=True)
-        prefetch_version = run_cmd(["nix-prefetch-docker", "--version"], check=False) or "unknown"
-        tool_sig = re.sub(r'[^a-zA-Z0-9.\-_]', '_', prefetch_version)[:80]
+        skopeo_version = run_cmd(["skopeo", "--version"], check=False) or "unknown"
+        tool_sig = re.sub(r'[^a-zA-Z0-9.\-_]', '_', skopeo_version)[:80]
 
         def process_image(img_ref, data, index):
             log(f"[gen-image-lock] [{index}/{self.total_images}] resolve digest: {img_ref}")
@@ -386,20 +399,25 @@ class ImageLockGenerator:
             safe_digest = digest.replace(":", "-")
             safe_name = re.sub(r'[/:]', '_', image_name)
             cache_file = cache_dir / f"{safe_name}-{safe_digest}-{tool_sig}.txt"
+            source_image = map_image_source(image_name, self.registry_mirrors)
             
             hash_val = cache_file.read_text('utf-8').strip() if cache_file.exists() else ""
             if not hash_val:
-                log(f"[gen-image-lock] [{index}/{self.total_images}] digest ok, prefetching...")
-                prefetch_out = run_cmd([
-                    "nix-prefetch-docker", "--json", "--quiet",
-                    "--image-name", image_name, "--image-tag", tag,
-                    "--arch", self.args.arch, "--os", self.args.os, "--image-digest", digest
-                ], retries=4)
-                hash_val = extract_prefetch_hash(prefetch_out)
+                log(f"[gen-image-lock] [{index}/{self.total_images}] digest ok, exporting multi-arch archive...")
+                with tempfile.TemporaryDirectory(prefix="image-lock-") as tmpdir:
+                    out_tar = Path(tmpdir) / "image.oci.tar"
+
+                    run_cmd([
+                        "skopeo", "copy", "--insecure-policy", "--multi-arch", "all",
+                        f"docker://{source_image}@{digest}",
+                        f"oci-archive:{out_tar}:{image_name}:{tag}",
+                    ], retries=4)
+                    hash_val = run_cmd(["nix", "hash", "file", "--sri", str(out_tar)], retries=2).strip()
+
                 if not hash_val:
-                    raise Exception(f"Failed to parse hash for: {img_ref}")
+                    raise Exception(f"Failed to calculate archive hash for: {img_ref}")
                 cache_file.write_text(hash_val, encoding='utf-8')
-                log(f"[gen-image-lock] [{index}/{self.total_images}] prefetch ok: {hash_val}")
+                log(f"[gen-image-lock] [{index}/{self.total_images}] archive hash ok: {hash_val}")
             else:
                 log(f"[gen-image-lock] [{index}/{self.total_images}] cache hit ok")
 
@@ -409,7 +427,7 @@ class ImageLockGenerator:
                 f"    imageDigest = \"{digest}\";\n"
                 f"    finalImageName = \"{image_name}\";\n"
                 f"    finalImageTag = \"{tag}\";\n"
-                f"    hash = \"{hash_val}\";\n"
+                f"    archiveHash = \"{hash_val}\";\n"
                 f"    os = \"{self.args.os}\";\n"
                 f"    arch = \"{self.args.arch}\";\n"
                 f"    sources = {self.format_list(data['sources'])};\n"
@@ -427,7 +445,7 @@ class ImageLockGenerator:
                 try:
                     img_ref, uid, hash_val, block, intro_str = future.result()
                     self.results_nix_blocks.append((img_ref, block))
-                    self.new_hashes[uid] = {"hash": hash_val, "block": block.strip()}
+                    self.new_hashes[uid] = {"archiveHash": hash_val, "block": block.strip()}
                     self.intro_map[uid] = intro_str
                 except Exception as e:
                     log(f"Job failed: {e}")
@@ -457,16 +475,16 @@ class ImageLockGenerator:
                         old_data = old_hashes[uid]
                         old_meta = parse_metadata_from_block(old_data['block'])
                         
-                        if old_data['hash'] != new_data['hash']:
-                            diff_lines = format_image_diff(uid, old_data['hash'], new_data['hash'], old_meta, new_meta, "Updated", self.intro_map)
+                        if old_data['archiveHash'] != new_data['archiveHash']:
+                            diff_lines = format_image_diff(uid, old_data['archiveHash'], new_data['archiveHash'], old_meta, new_meta, "Updated", self.intro_map)
                             summary_lines.extend(diff_lines)
                             stats["updated"] += 1
                         elif old_data['block'] != new_data['block']:
-                            diff_lines = format_image_diff(uid, old_data['hash'], new_data['hash'], old_meta, new_meta, "MetaUpdated", self.intro_map)
+                            diff_lines = format_image_diff(uid, old_data['archiveHash'], new_data['archiveHash'], old_meta, new_meta, "MetaUpdated", self.intro_map)
                             summary_lines.extend(diff_lines)
                             stats["meta_updated"] += 1
                     else:
-                        diff_lines = format_image_diff(uid, None, new_data['hash'], {}, new_meta, "Added", self.intro_map)
+                        diff_lines = format_image_diff(uid, None, new_data['archiveHash'], {}, new_meta, "Added", self.intro_map)
                         summary_lines.extend(diff_lines)
                         stats["added"] += 1
                         
@@ -483,7 +501,7 @@ class ImageLockGenerator:
                     if stats["added"]: summary_lines.append(f"{stats['added']} image(s) added in total.")
                     if stats["removed"]: summary_lines.append(f"{stats['removed']} image(s) removed in total.")
                 else:
-                    summary_lines.append("• Lock file structure modified, but core image hashes remain unchanged.")
+                    summary_lines.append("• Lock file structure modified, but core image archive hashes remain unchanged.")
                     
         self.summary_output = "\n".join(summary_lines).strip()
 
@@ -540,6 +558,7 @@ def main():
     parser.add_argument("--auto-commit", action="store_true", help="Enable auto commit")
     parser.add_argument("--report-file", default="", help="Path to generate markdown report")
     parser.add_argument("--commit-msg-file", default="", help="Path to save the generated commit message")
+    parser.add_argument("--registry-mirror-map", default="", help="JSON object mapping source registry to mirror registry")
     
     parser.add_argument("--namespaces", default="", help="Space separated namespaces to filter")
     
