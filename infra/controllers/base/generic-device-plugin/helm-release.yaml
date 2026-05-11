@@ -1,0 +1,68 @@
+# https://fluxcd.io/flux/components/helm/helmreleases/
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: generic-device-plugin
+  namespace: kube-system
+spec:
+  releaseName: generic-device-plugin
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-generic-device-plugin
+    namespace: kube-system
+  # https://github.com/cloudnative-pg/charts
+  values:
+    crds:
+      create: true
+    resources:
+      limits:
+        cpu: 50m
+        memory: 20Mi
+      requests:
+        cpu: 50m
+        memory: 10Mi
+    deployPodMonitor: true
+
+# args:
+# - --domain
+# - isning.moe
+# - --device
+# - |
+#   name: serial
+#   groups:
+#     - paths:
+#         - path: /dev/ttyUSB*
+#     - paths:
+#         - path: /dev/ttyACM*
+#     - paths:
+#         - path: /dev/tty.usb*
+#     - paths:
+#         - path: /dev/cu.*
+#     - paths:
+#         - path: /dev/cuaU*
+#     - paths:
+#         - path: /dev/rfcomm*
+# - --device
+# - |
+#   name: gpu
+#   groups:
+#     - count: 10
+#       paths:
+#         - path: /dev/dri/renderD128
+# - --device
+# - |
+#   name: fuse
+#   groups:
+#     - count: 10
+#       paths:
+#         - path: /dev/fuse
+# - --device
+# - |
+#   name: audio
+#   groups:
+#     - count: 10
+#       paths:
+#         - path: /dev/snd
