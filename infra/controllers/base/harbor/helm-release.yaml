@@ -38,8 +38,7 @@ spec:
         host: harbor-pg-cluster-rw
         port: 5432
         username: app
-        password:
-          existingSecret: harbor-pg-cluster-app 
+        existingSecret: harbor-pg-cluster-app
         coreDatabase: registry
     redis:
       type: external
