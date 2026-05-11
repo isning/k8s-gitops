@@ -20,11 +20,7 @@ spec:
     remediation:
       retries: -1
   values:
-    image:
-      tag: v0.16.2
     runner:
-      image:
-        tag: v0.16.2
       serviceAccount:
         allowedNamespaces:
           - flux-system
