@@ -6,4 +6,3 @@ resources:
   - ./loki-metrics.yaml
   - ./kubernetes-alerts.yaml
   - ./node-metrics.yaml
-  - ./application-logs-alerts.yaml

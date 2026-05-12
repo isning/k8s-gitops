@@ -20,14 +20,3 @@ spec:
           annotations:
             summary: "fetch-nodes init container is failing"
             description: "Init container {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.container }} restarted during the last 15m"
-        - alert: ProxyEngineFetchNodesFallbackUsed
-          expr: |
-            sum by (namespace, pod) (
-              rate({namespace="egress-system", pod=~"proxy-engine-.*"} |= "FETCH_NODES_FALLBACK" [10m])
-            ) > 0
-          for: 5m
-          labels:
-            severity: warning
-          annotations:
-            summary: "fetch-nodes used last known good data"
-            description: "Proxy-engine used fallback nodes cache for {{ $labels.namespace }}/{{ $labels.pod }}"
