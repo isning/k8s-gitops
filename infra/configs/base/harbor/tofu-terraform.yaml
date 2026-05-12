@@ -10,8 +10,7 @@ spec:
   path: ./infra/configs/base/harbor/tf
   sourceRef:
     kind: GitRepository
-    name: flux-system
-    namespace: flux-system
+    name: harbor-config
   retryInterval: 1m
   runnerPodTemplate:
     spec:
