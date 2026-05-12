@@ -25,6 +25,14 @@ on:
         description: "Retry attempts per mirror source"
         required: false
         default: "3"
+      ignore_cache:
+        description: "Ignore cache and force rebuild archive hashes"
+        required: false
+        default: "false"
+      clean_cache:
+        description: "Clean local image hash cache before running"
+        required: false
+        default: "false"
 
 jobs:
   update:
@@ -64,12 +72,19 @@ jobs:
           key: ${{ runner.os }}-uv
 
       - name: Restore image digest/archive-hash cache
+        if: ${{ github.event.inputs.ignore_cache != 'true' && github.event.inputs.clean_cache != 'true' }}
         uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.cache/nixos-image-lock
           key: ${{ runner.os }}-nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             ${{ runner.os }}-nixos-image-lock-${{ github.event.inputs.arch || 'amd64' }}-${{ github.event.inputs.os || 'linux' }}-v1-
+
+      - name: Clean image digest/archive-hash cache
+        if: ${{ github.event.inputs.clean_cache == 'true' }}
+        run: |
+          rm -rf ~/.cache/nixos-image-lock
+          mkdir -p ~/.cache/nixos-image-lock
 
       - name: Generate lock
         run: |
@@ -81,12 +96,20 @@ jobs:
           os="${{ github.event.inputs.os || 'linux' }}"
           registry_mirror_map='${{ github.event.inputs.registry_mirror_map || '' }}'
           mirror_retries='${{ github.event.inputs.mirror_retries || '3' }}'
+          ignore_cache='${{ github.event.inputs.ignore_cache || 'false' }}'
+          clean_cache='${{ github.event.inputs.clean_cache || 'false' }}'
           common_args=(--arch "$arch" --os "$os" --verbose --commit-msg-file "$COMMIT_MSG_FILE" --report-file "$REPORT_PATH")
 
           if [[ -n "$registry_mirror_map" ]]; then
             common_args+=(--registry-mirror-map "$registry_mirror_map")
           fi
           common_args+=(--mirror-retries "$mirror_retries")
+          if [[ "$ignore_cache" == "true" ]]; then
+            common_args+=(--ignore-cache)
+          fi
+          if [[ "$clean_cache" == "true" ]]; then
+            echo "[ci] clean_cache enabled: local cache directory was reset"
+          fi
 
           if [[ "$cluster" == "all" ]]; then
             nix run .#gen-image-lock-all -- "${common_args[@]}"
@@ -95,7 +118,7 @@ jobs:
           fi
 
       - name: Save image digest/archive-hash cache
-        if: always() && !cancelled()
+        if: always() && !cancelled() && github.event.inputs.ignore_cache != 'true'
         uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.cache/nixos-image-lock

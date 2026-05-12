@@ -211,6 +211,7 @@ class ImageLockGenerator:
         self.cache_hits = 0
         self.cache_misses = 0
         self.cache_writes = 0
+        self.cache_skips = 0
         self.nix_build_count = 0
         self.nix_build_paths = []
         self.registry_mirrors = json.loads(args.registry_mirror_map) if args.registry_mirror_map else {}
@@ -261,7 +262,7 @@ class ImageLockGenerator:
         ]
         ensure_commands_exist(required_commands)
 
-    def build_archive_via_nix(self, source_images, image_name, tag, digest):
+    def prefetch_archive_hash_via_nix(self, source_images, image_name, tag, digest):
         source_images_json = json.dumps(source_images)
         expr = (
             "let\n"
@@ -273,11 +274,11 @@ class ImageLockGenerator:
             f"  finalImageName = {nix_escape_string(image_name)};\n"
             f"  finalImageTag = {nix_escape_string(tag)};\n"
             f"  imageDigest = {nix_escape_string(digest)};\n"
-            "  archiveHash = null;\n"
+            "  archiveHash = \"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\";\n"
             f"  mirrorRetries = {self.mirror_retries};\n"
             "}"
         )
-        out_path = run_cmd([
+        result = subprocess.run([
             "nix",
             "build",
             "--impure",
@@ -285,10 +286,27 @@ class ImageLockGenerator:
             "--print-out-paths",
             "--expr",
             expr,
-        ], retries=2).strip()
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         self.nix_build_count += 1
-        self.nix_build_paths.append(out_path)
-        return out_path
+
+        output = (result.stdout or "") + "\n" + (result.stderr or "")
+        got_match = re.search(r"got:\s*(sha256-[A-Za-z0-9+/=]+)", output)
+        if got_match:
+            archive_hash = got_match.group(1)
+            self.nix_build_paths.append(f"prefetch:{image_name}:{tag}@{digest} -> {archive_hash}")
+            return archive_hash
+
+        if result.returncode == 0:
+            out_path = (result.stdout or "").strip()
+            if out_path:
+                hash_val = run_cmd(["nix", "hash", "file", "--sri", out_path], retries=2).strip()
+                if hash_val:
+                    self.nix_build_paths.append(f"build:{out_path} -> {hash_val}")
+                    return hash_val
+
+        log(f"Command failed: {' '.join(result.args)}")
+        log(f"Error output: {result.stderr}")
+        raise Exception("Failed to prefetch archive hash via FOD placeholder")
 
     def fetch_cluster_metadata(self):
         log("[gen-image-lock] step 1: fetch cluster metadata (sources)")
@@ -448,10 +466,7 @@ class ImageLockGenerator:
     def resolve_digests_and_archive_hash(self):
         cache_dir = Path.home() / f".cache/nixos-image-lock/{self.args.arch}-{self.args.os}"
         cache_dir.mkdir(parents=True, exist_ok=True)
-        nix_version = run_cmd(["nix", "--version"], check=False) or "unknown"
-        tool_sig = re.sub(r'[^a-zA-Z0-9.\-_]', '_', nix_version)[:80]
         self.vlog(f"[gen-image-lock] cache dir: {cache_dir}")
-        self.vlog(f"[gen-image-lock] cache tool signature: {tool_sig}")
 
         def process_image(img_ref, data, index):
             log(f"[gen-image-lock] [{index}/{self.total_images}] resolve digest: {img_ref}")
@@ -472,19 +487,21 @@ class ImageLockGenerator:
             cache_file = cache_dir / (
                 f"{safe_name}-{safe_tag}-{safe_digest}-"
                 f"{hashlib.sha256(json.dumps(source_images := map_image_sources(image_name, self.registry_mirrors), sort_keys=True).encode('utf-8')).hexdigest()[:16]}-"
-                f"{ARCHIVE_HASH_FORMAT_VERSION}-{tool_sig}.txt"
+                f"{ARCHIVE_HASH_FORMAT_VERSION}.txt"
             )
 
             
             hash_val = cache_file.read_text('utf-8').strip() if cache_file.exists() else ""
+            if self.args.ignore_cache:
+                self.cache_skips += 1
+                hash_val = ""
+                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] cache bypass enabled")
             if not hash_val:
                 self.cache_misses += 1
                 self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] cache miss: {cache_file.name}")
                 self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] digest={digest} sources={len(source_images)}")
-                log(f"[gen-image-lock] [{index}/{self.total_images}] building archive via nix lib...")
-                out_tar = self.build_archive_via_nix(source_images, image_name, tag, digest)
-                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] nix output: {out_tar}")
-                hash_val = run_cmd(["nix", "hash", "file", "--sri", out_tar], retries=2).strip()
+                log(f"[gen-image-lock] [{index}/{self.total_images}] prefetching archive hash via nix lib...")
+                hash_val = self.prefetch_archive_hash_via_nix(source_images, image_name, tag, digest)
                 if not hash_val:
                     raise Exception(f"Failed to calculate archive hash for: {img_ref}")
                 tmp_cache_file = cache_file.with_suffix(cache_file.suffix + f".{os.getpid()}.tmp")
@@ -598,6 +615,7 @@ class ImageLockGenerator:
             f"- **Cache Hits:** {self.cache_hits}",
             f"- **Cache Misses:** {self.cache_misses}",
             f"- **Cache Writes:** {self.cache_writes}",
+            f"- **Cache Bypassed:** {self.cache_skips}",
             f"- **Nix Builds:** {self.nix_build_count}",
             ""
         ]
@@ -656,6 +674,7 @@ def main():
     parser.add_argument("--registry-mirror-map", default="", help="JSON object mapping source registry to mirror registry")
     parser.add_argument("--mirror-retries", type=int, default=3, help="Retry attempts per mirror source")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging for cache/build details")
+    parser.add_argument("--ignore-cache", action="store_true", help="Ignore local cache and force rebuild archive hashes")
     
     parser.add_argument("--namespaces", default="", help="Space separated namespaces to filter")
     
