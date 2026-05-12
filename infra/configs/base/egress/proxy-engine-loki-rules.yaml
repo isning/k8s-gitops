@@ -1,0 +1,14 @@
+groups:
+  - name: proxy-engine-fetch-nodes
+    rules:
+      - alert: ProxyEngineFetchNodesFallbackUsed
+        expr: |
+          sum by (namespace, pod) (
+            count_over_time({namespace="egress-system", pod=~"proxy-engine-.*"} |= "FETCH_NODES_FALLBACK" [10m])
+          ) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "fetch-nodes used last known good data"
+          description: "Proxy-engine used fallback nodes cache for {{ $labels.namespace }}/{{ $labels.pod }}"
