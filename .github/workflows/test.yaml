@@ -17,8 +17,50 @@ permissions:
   contents: read
 
 jobs:
-  manifests:
+  changes:
     if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') }}
+    runs-on: ubuntu-latest
+    outputs:
+      archive_related: ${{ steps.filter.outputs.archive_related }}
+      gitops_related: ${{ steps.filter.outputs.gitops_related }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Detect archive-related changes
+        id: filter
+        uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c # v4
+        with:
+          filters: |
+            archive_related:
+              - '.github/workflows/**'
+              - 'lib/mkMultiArchImageArchive.nix'
+              - 'scripts/test-mk-multiarch-archive.sh'
+            gitops_related:
+              - '.github/workflows/**'
+              - 'infra/**'
+              - 'apps/**'
+              - 'vms/**'
+              - 'clusters/**'
+
+  archive-hash-regression:
+    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.archive_related == 'true' }}
+    needs:
+      - changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39 # v13
+      - name: Run archive hash regression test
+        run: bash ./scripts/test-mk-multiarch-archive.sh
+
+  manifests:
+    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.gitops_related == 'true' }}
+    needs:
+      - changes
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,7 +78,9 @@ jobs:
           STRICT_MISSING_SCHEMAS: "false"
 
   flux-local-test:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') }}
+    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.gitops_related == 'true' }}
+    needs:
+      - changes
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -56,7 +100,9 @@ jobs:
           enable-helm: true
 
   flux-local-diff:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') }}
+    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.gitops_related == 'true' }}
+    needs:
+      - changes
     runs-on: ubuntu-latest
     permissions:
       contents: read
