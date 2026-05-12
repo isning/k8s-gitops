@@ -7,7 +7,9 @@
 # ]
 # ///
 import argparse
+import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -17,6 +19,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import yaml
+
+ARCHIVE_HASH_FORMAT_VERSION = "v2"
 
 def log(msg):
     print(msg, file=sys.stderr)
@@ -50,6 +54,10 @@ def run_cmd(cmd, input_data=None, retries=1, check=True):
                     sys.exit(1)
                 return None
             time.sleep(attempt * 2)
+
+
+def nix_escape_string(value):
+    return '"' + value.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
 def split_image_name(image_name):
     parts = image_name.split("/")
@@ -200,8 +208,18 @@ class ImageLockGenerator:
         self.changes_detected = False
         self.final_nix = ""
         self.summary_output = ""
+        self.cache_hits = 0
+        self.cache_misses = 0
+        self.cache_writes = 0
+        self.nix_build_count = 0
+        self.nix_build_paths = []
         self.registry_mirrors = json.loads(args.registry_mirror_map) if args.registry_mirror_map else {}
         self.mirror_retries = max(args.mirror_retries, 1)
+        self.repo_root = Path(args.root).resolve()
+
+    def vlog(self, msg):
+        if self.args.verbose:
+            log(msg)
         
         if not self.flux_root.is_dir():
             log(f"Cluster path does not exist: {self.flux_root}")
@@ -239,10 +257,37 @@ class ImageLockGenerator:
             "flux",
             "kustomize",
             "crane",
-            "skopeo",
             "nix",
         ]
         ensure_commands_exist(required_commands)
+
+    def build_archive_via_nix(self, source_images, image_name, tag, digest):
+        source_images_json = json.dumps(source_images)
+        expr = (
+            "let\n"
+            f"  flake = builtins.getFlake {nix_escape_string(str(self.repo_root))};\n"
+            "  pkgs = import flake.inputs.nixpkgs { system = builtins.currentSystem; };\n"
+            "in flake.lib.mkMultiArchImageArchive {\n"
+            "  inherit pkgs;\n"
+            f"  sourceImages = builtins.fromJSON ''{source_images_json}'';\n"
+            f"  finalImageName = {nix_escape_string(image_name)};\n"
+            f"  finalImageTag = {nix_escape_string(tag)};\n"
+            f"  imageDigest = {nix_escape_string(digest)};\n"
+            "  archiveHash = null;\n"
+            f"  mirrorRetries = {self.mirror_retries};\n"
+            "}"
+        )
+        out_path = run_cmd([
+            "nix",
+            "build",
+            "--no-link",
+            "--print-out-paths",
+            "--expr",
+            expr,
+        ], retries=2).strip()
+        self.nix_build_count += 1
+        self.nix_build_paths.append(out_path)
+        return out_path
 
     def fetch_cluster_metadata(self):
         log("[gen-image-lock] step 1: fetch cluster metadata (sources)")
@@ -402,8 +447,10 @@ class ImageLockGenerator:
     def resolve_digests_and_archive_hash(self):
         cache_dir = Path.home() / f".cache/nixos-image-lock/{self.args.arch}-{self.args.os}"
         cache_dir.mkdir(parents=True, exist_ok=True)
-        skopeo_version = run_cmd(["skopeo", "--version"], check=False) or "unknown"
-        tool_sig = re.sub(r'[^a-zA-Z0-9.\-_]', '_', skopeo_version)[:80]
+        nix_version = run_cmd(["nix", "--version"], check=False) or "unknown"
+        tool_sig = re.sub(r'[^a-zA-Z0-9.\-_]', '_', nix_version)[:80]
+        self.vlog(f"[gen-image-lock] cache dir: {cache_dir}")
+        self.vlog(f"[gen-image-lock] cache tool signature: {tool_sig}")
 
         def process_image(img_ref, data, index):
             log(f"[gen-image-lock] [{index}/{self.total_images}] resolve digest: {img_ref}")
@@ -420,40 +467,34 @@ class ImageLockGenerator:
             
             safe_digest = digest.replace(":", "-")
             safe_name = re.sub(r'[/:]', '_', image_name)
-            cache_file = cache_dir / f"{safe_name}-{safe_digest}-{tool_sig}.txt"
-            source_images = map_image_sources(image_name, self.registry_mirrors)
+            safe_tag = re.sub(r'[^a-zA-Z0-9._-]', '_', tag)
+            cache_file = cache_dir / (
+                f"{safe_name}-{safe_tag}-{safe_digest}-"
+                f"{hashlib.sha256(json.dumps(source_images := map_image_sources(image_name, self.registry_mirrors), sort_keys=True).encode('utf-8')).hexdigest()[:16]}-"
+                f"{ARCHIVE_HASH_FORMAT_VERSION}-{tool_sig}.txt"
+            )
+
             
             hash_val = cache_file.read_text('utf-8').strip() if cache_file.exists() else ""
             if not hash_val:
-                log(f"[gen-image-lock] [{index}/{self.total_images}] digest ok, exporting multi-arch archive...")
-                with tempfile.TemporaryDirectory(prefix="image-lock-") as tmpdir:
-                    out_tar = Path(tmpdir) / "image.oci.tar"
-
-                    last_error = None
-                    for source_image in source_images:
-                        for _ in range(self.mirror_retries):
-                            try:
-                                run_cmd([
-                                    "skopeo", "--tmpdir", tmpdir, "copy", "--insecure-policy", "--multi-arch", "all",
-                                    f"docker://{source_image}@{digest}",
-                                    f"oci-archive:{out_tar}:{image_name}:{tag}",
-                                ], retries=1)
-                                last_error = None
-                                break
-                            except SystemExit:
-                                last_error = source_image
-                        if last_error is None:
-                            break
-                    if last_error is not None:
-                        raise Exception(f"Failed to fetch {img_ref} from all mirror sources")
-                    hash_val = run_cmd(["nix", "hash", "file", "--sri", str(out_tar)], retries=2).strip()
-
+                self.cache_misses += 1
+                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] cache miss: {cache_file.name}")
+                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] digest={digest} sources={len(source_images)}")
+                log(f"[gen-image-lock] [{index}/{self.total_images}] building archive via nix lib...")
+                out_tar = self.build_archive_via_nix(source_images, image_name, tag, digest)
+                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] nix output: {out_tar}")
+                hash_val = run_cmd(["nix", "hash", "file", "--sri", out_tar], retries=2).strip()
                 if not hash_val:
                     raise Exception(f"Failed to calculate archive hash for: {img_ref}")
-                cache_file.write_text(hash_val, encoding='utf-8')
+                tmp_cache_file = cache_file.with_suffix(cache_file.suffix + f".{os.getpid()}.tmp")
+                tmp_cache_file.write_text(hash_val, encoding='utf-8')
+                tmp_cache_file.replace(cache_file)
+                self.cache_writes += 1
                 log(f"[gen-image-lock] [{index}/{self.total_images}] archive hash ok: {hash_val}")
             else:
-                log(f"[gen-image-lock] [{index}/{self.total_images}] cache hit ok")
+                self.cache_hits += 1
+                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] cache hit: {cache_file.name}")
+                self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] archive hash cached: {hash_val}")
 
             block = (
                 f"  {{\n"
@@ -481,12 +522,17 @@ class ImageLockGenerator:
                     self.results_nix_blocks.append((img_ref, block))
                     self.new_hashes[uid] = {"archiveHash": hash_val, "block": block.strip()}
                     self.intro_map[uid] = intro_str
-                except Exception as e:
+                except BaseException as e:
                     log(f"Job failed: {e}")
                     sys.exit(1)
 
         self.results_nix_blocks.sort(key=lambda x: x[0])
         self.final_nix = "[\n" + "\n".join([block for _, block in self.results_nix_blocks]) + "\n]\n"
+        self.vlog(
+            "[gen-image-lock] cache summary: "
+            f"hits={self.cache_hits} misses={self.cache_misses} writes={self.cache_writes} "
+            f"nix-builds={self.nix_build_count}"
+        )
 
     def generate_diff(self):
         old_content = self.out_lock_file.read_text('utf-8') if self.out_lock_file.exists() else ""
@@ -546,8 +592,22 @@ class ImageLockGenerator:
         report_content = [
             "## 🚀 Flux Image Lock Report",
             f"- **Cluster:** `{self.args.cluster}`",
-            f"- **Images Processed:** {self.total_images}\n"
+            f"- **Images Processed:** {self.total_images}",
+            f"- **Verbose Mode:** {self.args.verbose}",
+            f"- **Cache Hits:** {self.cache_hits}",
+            f"- **Cache Misses:** {self.cache_misses}",
+            f"- **Cache Writes:** {self.cache_writes}",
+            f"- **Nix Builds:** {self.nix_build_count}",
+            ""
         ]
+
+        if self.nix_build_paths:
+            report_content.extend([
+                "### 🧱 Nix Build Outputs",
+                "```text",
+                "\n".join(self.nix_build_paths),
+                "```",
+            ])
         
         if self.changes_detected:
             report_content.extend(["### 🔄 Image lock file updates\n", f"```text\n{self.summary_output}\n```"])
@@ -594,6 +654,7 @@ def main():
     parser.add_argument("--commit-msg-file", default="", help="Path to save the generated commit message")
     parser.add_argument("--registry-mirror-map", default="", help="JSON object mapping source registry to mirror registry")
     parser.add_argument("--mirror-retries", type=int, default=3, help="Retry attempts per mirror source")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging for cache/build details")
     
     parser.add_argument("--namespaces", default="", help="Space separated namespaces to filter")
     

@@ -81,7 +81,7 @@ jobs:
           os="${{ github.event.inputs.os || 'linux' }}"
           registry_mirror_map='${{ github.event.inputs.registry_mirror_map || '' }}'
           mirror_retries='${{ github.event.inputs.mirror_retries || '3' }}'
-          common_args=(--arch "$arch" --os "$os" --commit-msg-file "$COMMIT_MSG_FILE" --report-file "$REPORT_PATH")
+          common_args=(--arch "$arch" --os "$os" --verbose --commit-msg-file "$COMMIT_MSG_FILE" --report-file "$REPORT_PATH")
 
           if [[ -n "$registry_mirror_map" ]]; then
             common_args+=(--registry-mirror-map "$registry_mirror_map")
