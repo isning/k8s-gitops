@@ -15,6 +15,9 @@ SOURCES=(
 build_archive_with_hash() {
   local source_image="$1"
   local archive_hash="$2"
+  local image_name="${3:-${IMAGE_NAME}}"
+  local image_tag="${4:-${IMAGE_TAG}}"
+  local image_digest="${5:-${IMAGE_DIGEST}}"
 
   nix build --impure --no-link --print-out-paths --expr "
     let
@@ -24,27 +27,54 @@ build_archive_with_hash() {
     flake.lib.mkMultiArchImageArchive {
       inherit pkgs;
       sourceImages = [ \"${source_image}\" ];
-      finalImageName = \"${IMAGE_NAME}\";
-      finalImageTag = \"${IMAGE_TAG}\";
-      imageDigest = \"${IMAGE_DIGEST}\";
+      finalImageName = \"${image_name}\";
+      finalImageTag = \"${image_tag}\";
+      imageDigest = \"${image_digest}\";
       archiveHash = \"${archive_hash}\";
       mirrorRetries = 2;
     }
   "
 }
 
-run_skopeo() {
+run_ctr() {
   nix shell --impure --expr "
     let
       flake = builtins.getFlake (toString ${ROOT_DIR});
       pkgs = import flake.inputs.nixpkgs { system = builtins.currentSystem; };
     in
-    [ pkgs.skopeo ]
-  " -c skopeo "$@"
+    [ pkgs.containerd ]
+  " -c sudo ctr "$@"
+}
+
+detect_containerd_socket() {
+  if [[ -n "${CONTAINERD_ADDRESS:-}" ]]; then
+    if [[ ! -S "${CONTAINERD_ADDRESS}" ]]; then
+      echo "CONTAINERD_ADDRESS does not point to a valid socket: ${CONTAINERD_ADDRESS}" >&2
+      return 1
+    fi
+    printf '%s\n' "${CONTAINERD_ADDRESS}"
+    return
+  fi
+
+  if [[ -S "/run/k3s/containerd/containerd.sock" ]]; then
+    printf '%s\n' "/run/k3s/containerd/containerd.sock"
+    return
+  fi
+
+  if [[ -S "/run/containerd/containerd.sock" ]]; then
+    printf '%s\n' "/run/containerd/containerd.sock"
+    return
+  fi
+
+  echo "containerd socket not found; set CONTAINERD_ADDRESS explicitly" >&2
+  return 1
 }
 
 build_with_fake_hash() {
   local source_image="$1"
+  local image_name="${2:-${IMAGE_NAME}}"
+  local image_tag="${3:-${IMAGE_TAG}}"
+  local image_digest="${4:-${IMAGE_DIGEST}}"
   nix build --impure --no-link --print-out-paths --expr "
     let
       flake = builtins.getFlake (toString ${ROOT_DIR});
@@ -53,9 +83,9 @@ build_with_fake_hash() {
     flake.lib.mkMultiArchImageArchive {
       inherit pkgs;
       sourceImages = [ \"${source_image}\" ];
-      finalImageName = \"${IMAGE_NAME}\";
-      finalImageTag = \"${IMAGE_TAG}\";
-      imageDigest = \"${IMAGE_DIGEST}\";
+      finalImageName = \"${image_name}\";
+      finalImageTag = \"${image_tag}\";
+      imageDigest = \"${image_digest}\";
       archiveHash = pkgs.lib.fakeHash;
       mirrorRetries = 2;
     }
@@ -66,26 +96,23 @@ extract_got_hash() {
   sed -n 's/.*got:[[:space:]]*\(sha256-[A-Za-z0-9+/=]*\).*/\1/p' | tail -n 1
 }
 
-verify_archive_contents() {
-  local archive_hash="$1"
-  local source_image="$2"
-
-  local out_path
-  out_path="$(build_archive_with_hash "${source_image}" "${archive_hash}")"
-
+verify_archive_contents_from_path() {
+  local out_path="$1"
+  local expected_digest="$2"
   local tmpdir
   tmpdir="$(mktemp -d)"
-  trap 'rm -rf "${tmpdir}"' RETURN
+  trap 'rm -rf "${tmpdir:-}"' RETURN
 
   tar -xf "${out_path}" -C "${tmpdir}"
 
-  python3 - "$tmpdir" <<'PY'
+  python3 - "$tmpdir" "$expected_digest" <<'PY'
 import hashlib
 import json
 import pathlib
 import sys
 
 tmpdir = pathlib.Path(sys.argv[1])
+expected_digest = sys.argv[2]
 
 
 def sha256_hex(path: pathlib.Path) -> str:
@@ -164,11 +191,17 @@ def verify_oci_archive(root: pathlib.Path) -> None:
                     raise SystemExit(
                         f"blob size mismatch: {child_digest} expected {child_size} got {actual_child_size}"
                     )
+
                 child_hash = sha256_hex(child_blob)
                 if child_hash != child_hex:
                     raise SystemExit(
                         f"blob digest mismatch: {child_digest} got sha256:{child_hash}"
                     )
+
+    if expected_digest and not any(d.get("digest") == expected_digest for d in manifests):
+        raise SystemExit(
+            f"expected digest not found in OCI index descriptors: {expected_digest}"
+        )
 
 
 def verify_docker_archive(root: pathlib.Path) -> None:
@@ -194,52 +227,55 @@ def verify_docker_archive(root: pathlib.Path) -> None:
                 raise SystemExit(f"missing layer file: {layer_path}")
 
 
+def verify_expected_digest_presence(root: pathlib.Path) -> None:
+    if not expected_digest:
+        return
+    expected_hash = expected_digest.split(":", 1)[1]
+    blobs_dir = root / "blobs" / "sha256"
+    if blobs_dir.exists() and (blobs_dir / expected_hash).exists():
+        return
+    raise SystemExit(f"expected digest blob not found in archive: {expected_digest}")
+
+
 if (tmpdir / "index.json").exists() and (tmpdir / "oci-layout").exists():
     verify_oci_archive(tmpdir)
 elif (tmpdir / "manifest.json").exists():
     verify_docker_archive(tmpdir)
 else:
     raise SystemExit("unknown archive layout: neither OCI nor Docker archive detected")
+
+verify_expected_digest_presence(tmpdir)
 PY
+
+  rm -rf "${tmpdir}"
+  trap - RETURN
+}
+
+verify_archive_contents() {
+  local archive_hash="$1"
+  local source_image="$2"
+  local out_path
+  out_path="$(build_archive_with_hash "${source_image}" "${archive_hash}")"
+  verify_archive_contents_from_path "${out_path}" "${IMAGE_DIGEST}"
+}
+
+verify_archive_import_from_path() {
+  local out_path="$1"
+  local socket
+  socket="$(detect_containerd_socket)"
+
+  if ! run_ctr --address "${socket}" -n k8s.io images import "${out_path}" >/dev/null 2>&1; then
+    echo "ctr import verification failed for ${out_path} via ${socket}" >&2
+    exit 1
+  fi
 }
 
 verify_archive_import() {
   local archive_hash="$1"
   local source_image="$2"
-
   local out_path
   out_path="$(build_archive_with_hash "${source_image}" "${archive_hash}")"
-
-  local tmpdir
-  tmpdir="$(mktemp -d)"
-  trap 'rm -rf "${tmpdir}"' RETURN
-
-  local imported=0
-  local transport
-  for transport in oci-archive docker-archive; do
-    local import_dir="${tmpdir}/imported-${transport}"
-    rm -rf "${import_dir}"
-    mkdir -p "${import_dir}"
-
-    if run_skopeo copy --insecure-policy --multi-arch all --preserve-digests \
-      "${transport}:${out_path}:${IMAGE_NAME}:${IMAGE_TAG}" \
-      "dir:${import_dir}" >/dev/null 2>&1; then
-      imported=1
-      break
-    fi
-
-    if run_skopeo copy --insecure-policy --multi-arch all --preserve-digests \
-      "${transport}:${out_path}" \
-      "dir:${import_dir}" >/dev/null 2>&1; then
-      imported=1
-      break
-    fi
-  done
-
-  if [[ "${imported}" -ne 1 ]]; then
-    echo "archive import verification failed for ${out_path}" >&2
-    exit 1
-  fi
+  verify_archive_import_from_path "${out_path}"
 }
 
 verify_reproducible_build() {
