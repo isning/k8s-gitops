@@ -25,6 +25,7 @@ jobs:
     outputs:
       archive_related: ${{ steps.filter.outputs.archive_related }}
       gitops_related: ${{ steps.filter.outputs.gitops_related }}
+      terraform_related: ${{ steps.filter.outputs.terraform_related }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -43,6 +44,42 @@ jobs:
               - 'apps/**'
               - 'vms/**'
               - 'clusters/**'
+            terraform_related:
+              - '.github/workflows/**'
+              - '**/*.tf'
+              - '**/*.tfvars'
+              - '**/*.tfvars.json'
+
+  terraform-validate:
+    if:  ${{ needs.changes.outputs.terraform_related == 'true' }}
+    needs:
+      - changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@fc711fa910b93cba0f3fbecaafc9f42fd0c411cb # v2
+      - name: Validate Terraform/OpenTofu configs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Discovering Terraform/OpenTofu directories..."
+          mapfile -t tf_dirs < <(find . -type f -name '*.tf' -print0 | xargs -0 -r -n1 dirname | sort -u) || true
+          echo "Detected ${#tf_dirs[@]} Terraform directory(ies)."
+
+          if [[ ${#tf_dirs[@]} -eq 0 ]]; then
+            echo "No Terraform/OpenTofu directories found."
+            exit 0
+          fi
+
+          for dir in "${tf_dirs[@]}"; do
+            echo "::group::Validate $dir"
+            tofu -chdir="$dir" init -backend=false -input=false -no-color
+            tofu -chdir="$dir" validate -no-color
+            echo "::endgroup::"
+          done
 
   archive-hash-regression:
     if:  ${{ needs.changes.outputs.archive_related == 'true' }}
