@@ -21,10 +21,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:3220dcc839f55be732a29548043a1ddf635a0dd6c8781b0f2a0bcdc19029c7d3";
+    imageDigest = "sha256:a8373525af6a362dd256fd70ddd2492c6ac273eb745942dd0a22d318869269ee";
     finalImageName = "bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-K1QO/QmaNOyiLyfD418FttM3fMVWxbqvdNjknFc00so=";
+    archiveHash = "sha256-heknmw6EARu4HnChcHFucxniyOiVC2gXMkdMSyK3UCs=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -65,7 +65,7 @@
     imageDigest = "sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e";
     finalImageName = "busybox";
     finalImageTag = "latest";
-    archiveHash = "sha256-/YvjuYm9ideVu9goto0cz6QqKuPugPAkS4fIxucwV5o=";
+    archiveHash = "sha256-HL5PXQyy1fAU9YX9KFCuvbkzhc9dM+f+CaA3ktawCYc=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -933,10 +933,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis-exporter";
-    imageDigest = "sha256:7af1930ffdff174db1e71c6b81e3fd8101233ba3e91c0fa8a617b095b89132ab";
+    imageDigest = "sha256:839260c04bc3858980157da2f69219681bdcd8874fdb0a58c40b396050b5100d";
     finalImageName = "registry-1.docker.io/bitnami/redis-exporter";
     finalImageTag = "latest";
-    archiveHash = "sha256-ixIWvfkujLDn+D001iupOb/HkGl9bAtGSnGlgy9I3aw=";
+    archiveHash = "sha256-n/72aFuorsPn4D1Hue/BzqjyWHOZld5zJLwmGJTZeQY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -954,10 +954,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis";
-    imageDigest = "sha256:b90e0708affe88f438e0577f5fcbc8036b97382c97bbb656726756f0b8d89480";
+    imageDigest = "sha256:1347d526ecec0c6537e99eac09e7c3405c21664f6044ff60e78b0898da37abd2";
     finalImageName = "registry-1.docker.io/bitnami/redis";
     finalImageTag = "latest";
-    archiveHash = "sha256-y6EkL9aOCF8fDfGP+UnBUV0jCHpoGAjwQS8ysU+NVpw=";
+    archiveHash = "sha256-OrWrug3NdVUGBLorBu4qL313oEo3YTspfZpMSW6o978=";
     os = "linux";
     arch = "amd64";
     sources = [
