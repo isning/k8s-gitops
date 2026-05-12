@@ -46,10 +46,11 @@ Proxy-cache registries/projects are managed by `tofu-controller` + Terraform:
 
 Terraform runs in namespace `harbor` and reuses Harbor's existing admin password secret.
 
-- `TF_VAR_harbor_username` is set to `admin` in `Terraform` CR
-- `TF_VAR_harbor_password` is read from secret `harbor-admin-auth`, key `HARBOR_ADMIN_PASSWORD`
+- `harbor_username` is set to `admin` via `spec.vars` in `Terraform` CR
+- `harbor_password` is read from secret `harbor-admin-auth` via `spec.varsFrom`
+- `robot_account_k8s_secret` is read from secret `harbor-k8s-robot-account-auth` via `spec.varsFrom`
 
-If you need upstream registry credentials, add them as env vars in the `Terraform` CR runner pod.
+If you need upstream registry credentials, add them via `spec.varsFrom` (recommended) or `spec.vars` in the `Terraform` CR.
 
 ## k3s
 
