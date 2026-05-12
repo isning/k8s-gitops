@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/local-path-provisioner/
+  - ../../base/cilium/
+  - ../../base/secrets/
+  - ./cilium
+  - ../../base/flux/
+
+patches:
+  - path: helmrelease-cilium-patch.yaml
+    target:
+      group: helm.toolkit.fluxcd.io
+      kind: HelmRelease
+      name: cilium
+      namespace: kube-system

@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - redis/redis-deployment.yaml
+  - content-server/nginx-configmap.yaml
+  - content-server/content-server-deployment.yaml
+  - tunasync-manager/manager-configmap.yaml
+  - tunasync-manager/manager-deployment.yaml
+  - tunasync-worker/worker-configmap.yaml
+  - tunasync-worker/worker-apt-configmap.yaml
+  - tunasync-worker/worker-heavy-configmap.yaml
+  - tunasync-worker/worker-deployment.yaml
+  - tunasync-worker/worker-apt-deployment.yaml
+  - tunasync-worker/worker-heavy-deployment.yaml
+  - web-portal/web-portal-deployment.yaml
+  - rubygems-proxy/nginx-configmap.yaml
+  - rubygems-proxy/rubygems-proxy-deployment.yaml
+  - httproute.yaml
+  - metrics-scrape.yaml
+  - dashboard.yaml
+  - alerts.yaml
+  - security/cilium-gateway-cidr-deny.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: opentuna
+    includeTemplates: true

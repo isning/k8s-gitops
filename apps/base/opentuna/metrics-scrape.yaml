@@ -1,0 +1,47 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: opentuna-content-server
+  namespace: opentuna
+  labels:
+    app: opentuna-content-server
+spec:
+  selector:
+    matchLabels:
+      app: opentuna-content-server
+  endpoints:
+    - port: http
+      path: /health
+      interval: 20s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: opentuna-manager
+  namespace: opentuna
+  labels:
+    app: tunasync-manager
+spec:
+  selector:
+    matchLabels:
+      app: tunasync-manager
+  endpoints:
+    - port: http
+      path: /ping
+      interval: 20s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: opentuna-rubygems-proxy
+  namespace: opentuna
+  labels:
+    app: opentuna-rubygems-proxy
+spec:
+  selector:
+    matchLabels:
+      app: opentuna-rubygems-proxy
+  endpoints:
+    - port: http
+      path: /health
+      interval: 20s

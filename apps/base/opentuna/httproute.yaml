@@ -1,0 +1,62 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: opentuna
+  namespace: opentuna
+  labels:
+    app: opentuna
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: default-gateway
+      namespace: prod
+  hostnames:
+    - "opentuna.local"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /jobs
+      backendRefs:
+        - name: tunasync-manager
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /rubygems
+      backendRefs:
+        - name: opentuna-rubygems-proxy
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /debian
+        - path:
+            type: PathPrefix
+            value: /debian-security
+        - path:
+            type: PathPrefix
+            value: /ubuntu
+      backendRefs:
+        - name: opentuna-content-server
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /help
+        - path:
+            type: PathPrefix
+            value: /news
+        - path:
+            type: PathPrefix
+            value: /status
+        - path:
+            type: PathPrefix
+            value: /static
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: opentuna-web-portal
+          port: 80

@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentuna-cache-nginx-conf
+  namespace: opentuna
+data:
+  nginx.conf: |
+    proxy_cache_path /var/cache/nginx/opentuna levels=1:2 keys_zone=opentuna_cache:128m max_size=20g inactive=24h use_temp_path=off;
+
+    upstream opentuna_origin {
+      server opentuna-content-server:80;
+    }
+
+    log_format cache_json escape=json
+      '{"time":"$time_iso8601",'
+      '"request_id":"$request_id",'
+      '"remote_addr":"$remote_addr",'
+      '"uri":"$uri",'
+      '"status":$status,'
+      '"request_time":$request_time,'
+      '"cache":"$upstream_cache_status"}';
+
+    server {
+      listen 8080;
+      server_name _;
+
+      access_log /var/log/nginx/access.log cache_json;
+      error_log /var/log/nginx/error.log warn;
+
+      location /health {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+      }
+
+      location / {
+        proxy_cache opentuna_cache;
+        proxy_cache_revalidate on;
+        proxy_cache_lock on;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
+        proxy_cache_valid 200 30m;
+        proxy_cache_valid 404 1m;
+
+        add_header X-Cache-Status $upstream_cache_status always;
+        add_header X-Request-Id $request_id always;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Request-Id $request_id;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_pass http://opentuna_origin;
+      }
+    }

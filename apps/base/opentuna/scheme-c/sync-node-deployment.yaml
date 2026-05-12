@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentuna-sync-node
+  namespace: opentuna
+  labels:
+    app: opentuna-sync-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentuna-sync-node
+  template:
+    metadata:
+      labels:
+        app: opentuna-sync-node
+    spec:
+      nodeSelector:
+        opentuna.isning.moe/node-role: mirror
+      tolerations:
+        - key: opentuna.isning.moe/mirror
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+      containers:
+        - name: sync-simulator
+          image: alpine:3.20
+          command:
+            - /bin/sh
+            - -lc
+            - |
+              set -eu
+              mkdir -p /mnt/efs/hot
+              while true; do
+                ts=$(date +%s)
+                echo "sync update ${ts}" > "/mnt/efs/hot/update-${ts}.txt"
+                sleep 15
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/efs
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: opentuna-efs-pvc

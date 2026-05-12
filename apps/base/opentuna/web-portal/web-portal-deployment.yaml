@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentuna-web-portal
+  namespace: opentuna
+  labels:
+    app: opentuna-web-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentuna-web-portal
+  template:
+    metadata:
+      labels:
+        app: opentuna-web-portal
+    spec:
+      containers:
+        - name: web-portal
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: web-content
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: web-content
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentuna-web-portal
+  namespace: opentuna
+  labels:
+    app: opentuna-web-portal
+spec:
+  selector:
+    app: opentuna-web-portal
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: ClusterIP

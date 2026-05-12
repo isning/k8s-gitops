@@ -74,6 +74,13 @@ spec:
 
     hubble:
       enabled: true
+      metrics:
+        enableOpenMetrics: true
+        enabled:
+          - drop:labelsContext=source_ip,source_namespace,destination_namespace,protocol
+          - flow:labelsContext=source_ip,source_namespace,destination_namespace,protocol,traffic_direction
+        serviceMonitor:
+          enabled: true
       relay:
         enabled: true
       ui:

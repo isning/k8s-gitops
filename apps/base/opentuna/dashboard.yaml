@@ -1,0 +1,159 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: opentuna-overview
+  namespace: opentuna
+  labels:
+    dashboards: grafana
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  json: >
+    {
+      "title": "OpenTuna Overview",
+      "uid": "opentuna-overview",
+      "tags": ["opentuna", "mirror", "ban"],
+      "timezone": "browser",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "30s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Gateway Requests (all)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "sum(rate(istio_requests_total{request_host=~\"opentuna\\\\.local(:443)?\"}[5m]))",
+              "legendFormat": "rps",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Gateway 5xx Ratio",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "sum(rate(istio_requests_total{request_host=~\"opentuna\\\\.local(:443)?\",response_code=~\"5..\"}[5m])) / clamp_min(sum(rate(istio_requests_total{request_host=~\"opentuna\\\\.local(:443)?\"}[5m])), 1)",
+              "legendFormat": "5xx_ratio",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Gateway P95 Latency (ms)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{request_host=~\"opentuna\\\\.local(:443)?\"}[5m])) by (le))",
+              "legendFormat": "p95",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Ban Hits (Cilium policy denied)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "targets": [
+            {
+              "expr": "sum(rate(cilium_drop_count_total{destination_namespace=\"opentuna\",reason=~\"Policy denied|Policy denied by denylist\"}[5m]))",
+              "legendFormat": "deny_hits/s",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Content Server Pod Ready",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16},
+          "targets": [
+            {
+              "expr": "sum(kube_pod_status_ready{namespace=\"opentuna\",condition=\"true\",pod=~\"opentuna-content-server.*\"})",
+              "legendFormat": "ready_pods",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Worker Pod Ready",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
+          "targets": [
+            {
+              "expr": "sum(kube_pod_status_ready{namespace=\"opentuna\",condition=\"true\",pod=~\"tunasync-worker-fs-.*\"})",
+              "legendFormat": "ready_workers",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "Rubygems Proxy Requests",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16},
+          "targets": [
+            {
+              "expr": "sum(rate(istio_requests_total{request_host=~\"opentuna\\\\.local(:443)?\",request_path=~\"/rubygems.*\"}[5m]))",
+              "legendFormat": "rubygems_rps",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "title": "Top Source IPs by Deny Hits",
+          "type": "table",
+          "gridPos": {"h": 10, "w": 12, "x": 0, "y": 24},
+          "targets": [
+            {
+              "expr": "topk(20, sum(rate(cilium_drop_count_total{destination_namespace=\"opentuna\",reason=~\"Policy denied|Policy denied by denylist\"}[5m])) by (source_ip))",
+              "legendFormat": "{{source_ip}}",
+              "refId": "A",
+              "format": "table",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "title": "Top Source IPs by Requests",
+          "type": "table",
+          "gridPos": {"h": 10, "w": 12, "x": 12, "y": 24},
+          "targets": [
+            {
+              "expr": "topk(20, sum(rate(cilium_forward_count_total{destination_namespace=\"opentuna\",traffic_direction=\"ingress\"}[5m])) by (source_ip))",
+              "legendFormat": "{{source_ip}}",
+              "refId": "A",
+              "format": "table",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "title": "Top Denied Tuples (IP + Reason)",
+          "type": "table",
+          "gridPos": {"h": 10, "w": 24, "x": 0, "y": 34},
+          "targets": [
+            {
+              "expr": "topk(20, sum(rate(cilium_drop_count_total{destination_namespace=\"opentuna\",reason=~\"Policy denied|Policy denied by denylist\"}[5m])) by (source_ip, reason))",
+              "legendFormat": "{{source_ip}} {{reason}}",
+              "refId": "A",
+              "format": "table",
+              "instant": true
+            }
+          ]
+        }
+      ]
+    }

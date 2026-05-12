@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunasync-worker-apt-config
+  namespace: opentuna
+data:
+  worker.conf: |
+    debug: false
+    manager_addr: "http://tunasync-manager:80"
+    http:
+      addr: "0.0.0.0:8080"
+      pprof: false
+    mirrors:
+      - name: "debian"
+        provider: "rsync"
+        upstream: "rsync://mirrors.tuna.tsinghua.edu.cn/debian/"
+        rsync_threads: 4
+        mirror_dir: "/mnt/efs/debian"
+      - name: "debian-security"
+        provider: "rsync"
+        upstream: "rsync://mirrors.tuna.tsinghua.edu.cn/debian-security/"
+        rsync_threads: 4
+        mirror_dir: "/mnt/efs/debian-security"
+      - name: "ubuntu"
+        provider: "rsync"
+        upstream: "rsync://archive.ubuntu.com/ubuntu/"
+        rsync_threads: 4
+        mirror_dir: "/mnt/efs/ubuntu"

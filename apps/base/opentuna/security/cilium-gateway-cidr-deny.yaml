@@ -1,0 +1,14 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: opentuna-cidr-deny
+  namespace: opentuna
+spec:
+  description: "Deny blocked CIDRs only for opentuna workloads. Keep CIDRs here as single source-of-truth."
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: opentuna
+  ingressDeny:
+    - fromCIDRSet:
+        - cidr: 198.51.100.0/24
+        - cidr: 203.0.113.0/24

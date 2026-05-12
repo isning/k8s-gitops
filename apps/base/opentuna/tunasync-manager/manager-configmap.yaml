@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunasync-manager-config
+  namespace: opentuna
+data:
+  manager.conf: |
+    debug: false
+    http:
+      addr: "0.0.0.0:80"
+      pprof: false
+    scheduler:
+      type: "redis"
+      redis_schedulertype: "simple"
+      redis_url: "redis://opentuna-redis:6379"
+    database:
+      type: "redis"
+      redis_url: "redis://opentuna-redis:6379"
+    mirrors:
+      - name: "debian"
+        provider: "rsync"
+        upstream: "rsync://mirrors.tuna.tsinghua.edu.cn/debian/"
+        rsync_threads: 4
+      - name: "ubuntu"
+        provider: "rsync"
+        upstream: "rsync://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
+        rsync_threads: 4

@@ -1,0 +1,100 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: opentuna-alerts
+  namespace: opentuna
+  labels:
+    app.kubernetes.io/part-of: opentuna
+spec:
+  groups:
+    - name: opentuna.availability
+      rules:
+        - alert: OpenTunaGatewayHigh5xxRatio
+          expr: |
+            (
+              sum(rate(istio_requests_total{request_host=~"opentuna\\.local(:443)?",response_code=~"5.."}[5m]))
+              /
+              clamp_min(sum(rate(istio_requests_total{request_host=~"opentuna\\.local(:443)?"}[5m])), 1)
+            ) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            service: opentuna
+          annotations:
+            summary: "OpenTuna 5xx ratio is high"
+            description: "Gateway 5xx ratio for opentuna host is over 5% for 10m."
+
+        - alert: OpenTunaGatewayHighLatencyP95
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum(rate(istio_request_duration_milliseconds_bucket{request_host=~"opentuna\\.local(:443)?"}[5m])) by (le)
+            ) > 1500
+          for: 10m
+          labels:
+            severity: warning
+            service: opentuna
+          annotations:
+            summary: "OpenTuna gateway latency p95 is high"
+            description: "P95 request latency is over 1500ms for 10m."
+
+        - alert: OpenTunaManagerUnavailable
+          expr: |
+            sum(kube_pod_status_ready{namespace="opentuna",condition="true",pod=~"tunasync-manager.*"}) < 1
+          for: 5m
+          labels:
+            severity: critical
+            service: opentuna
+          annotations:
+            summary: "OpenTuna manager is unavailable"
+            description: "No ready tunasync-manager pod for 5m."
+
+        - alert: OpenTunaContentServerReplicaLow
+          expr: |
+            sum(kube_pod_status_ready{namespace="opentuna",condition="true",pod=~"opentuna-content-server.*"}) < 1
+          for: 5m
+          labels:
+            severity: critical
+            service: opentuna
+          annotations:
+            summary: "OpenTuna content server has no ready pod"
+            description: "No ready content-server pod for 5m."
+
+    - name: opentuna.security
+      rules:
+        - alert: OpenTunaCIDRDenyHitSpike
+          expr: |
+            sum(rate(cilium_drop_count_total{destination_namespace="opentuna",reason=~"Policy denied|Policy denied by denylist"}[5m])) > 20
+          for: 10m
+          labels:
+            severity: info
+            service: opentuna
+          annotations:
+            summary: "OpenTuna CIDR deny hits spiked"
+            description: "Cilium policy deny hits are above threshold for 10m."
+
+        - alert: OpenTunaSingleSourceIPHighDenyRate
+          expr: |
+            max(
+              sum(rate(cilium_drop_count_total{destination_namespace="opentuna",reason=~"Policy denied|Policy denied by denylist"}[5m])) by (source_ip)
+            ) > 5
+          for: 10m
+          labels:
+            severity: warning
+            service: opentuna
+          annotations:
+            summary: "OpenTuna single source IP deny rate is high"
+            description: "One source IP is continuously hitting deny policy (>5 req/s) for 10m."
+
+        - alert: OpenTunaSingleSourceIPRequestSpike
+          expr: |
+            max(
+              sum(rate(cilium_forward_count_total{destination_namespace="opentuna",traffic_direction="ingress"}[5m])) by (source_ip)
+            ) > 50
+          for: 10m
+          labels:
+            severity: warning
+            service: opentuna
+          annotations:
+            summary: "OpenTuna single source IP request spike"
+            description: "One source IP is sending over 50 req/s to opentuna namespace for 10m."

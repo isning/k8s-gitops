@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunasync-worker-heavy-config
+  namespace: opentuna
+data:
+  worker.conf: |
+    debug: false
+    manager_addr: "http://tunasync-manager:80"
+    http:
+      addr: "0.0.0.0:8080"
+      pprof: false
+    mirrors:
+      - name: "pypi"
+        provider: "command"
+        upstream: "https://mirrors.tuna.tsinghua.edu.cn/pypi/web"
+        mirror_dir: "/mnt/efs/pypi"
+      - name: "opensuse"
+        provider: "rsync"
+        upstream: "rsync://mirrors.bfsu.edu.cn/opensuse/"
+        rsync_threads: 2
+        mirror_dir: "/mnt/efs/opensuse"

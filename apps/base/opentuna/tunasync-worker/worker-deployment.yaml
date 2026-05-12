@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tunasync-worker-fs-rsync-general
+  namespace: opentuna
+  labels:
+    app: tunasync-worker-fs-rsync-general
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tunasync-worker-fs-rsync-general
+  template:
+    metadata:
+      labels:
+        app: tunasync-worker-fs-rsync-general
+    spec:
+      nodeSelector:
+        opentuna.isning.moe/node-role: mirror
+      tolerations:
+        - key: opentuna.isning.moe/mirror
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+      containers:
+        - name: tunasync-worker
+          image: tuna/tunasync:latest
+          command: ["/usr/bin/tunasync", "worker", "-c", "/etc/tunasync/worker.conf"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/tunasync
+            - name: efs-storage
+              mountPath: /mnt/efs
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+      volumes:
+        - name: config
+          configMap:
+            name: tunasync-worker-rsync-general-config
+        - name: efs-storage
+          persistentVolumeClaim:
+            claimName: opentuna-efs-pvc

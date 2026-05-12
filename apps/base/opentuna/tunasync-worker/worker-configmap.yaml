@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunasync-worker-rsync-general-config
+  namespace: opentuna
+data:
+  worker.conf: |
+    debug: false
+    manager_addr: "http://tunasync-manager:80"
+    http:
+      addr: "0.0.0.0:8080"
+      pprof: false
+    mirrors:
+      - name: "centos"
+        provider: "rsync"
+        upstream: "rsync://mirrors.tuna.tsinghua.edu.cn/centos/"
+        rsync_threads: 4
+        mirror_dir: "/mnt/efs/centos"
+      - name: "epel"
+        provider: "rsync"
+        upstream: "rsync://mirrors.tuna.tsinghua.edu.cn/epel/"
+        rsync_threads: 4
+        mirror_dir: "/mnt/efs/epel"

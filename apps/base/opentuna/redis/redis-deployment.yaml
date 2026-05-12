@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: opentuna-redis-data
+  namespace: opentuna
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentuna-redis
+  namespace: opentuna
+  labels:
+    app: opentuna-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentuna-redis
+  template:
+    metadata:
+      labels:
+        app: opentuna-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6-alpine
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: opentuna-redis-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentuna-redis
+  namespace: opentuna
+spec:
+  selector:
+    app: opentuna-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: ClusterIP

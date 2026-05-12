@@ -1,0 +1,6 @@
+kind: will-be-ignored
+metadata:
+  name: will-be-ignored
+spec:
+  newTunnel:
+    name: kubevirt-lab-1-tunnel
