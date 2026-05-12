@@ -24,3 +24,12 @@ spec:
       varsKeys:
         - password:robot_account_k8s_secret
   retryInterval: 1m
+  runnerPodTemplate:
+    spec:
+      env:
+        - name: HTTP_PROXY
+          value: http://proxy-svc.egress-system.svc.cluster.local:7890
+        - name: HTTPS_PROXY
+          value: http://proxy-svc.egress-system.svc.cluster.local:7890
+        - name: NO_PROXY
+          value: 127.0.0.1,localhost,.svc,.cluster.local
