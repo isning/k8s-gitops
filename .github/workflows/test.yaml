@@ -122,7 +122,9 @@ jobs:
 
   aggregate-comment:
     needs: flux-local-diff
-    if: ${{ always() }}
+    if: |
+      always() && 
+      needs.flux-local-diff.result != 'skipped'
     runs-on: ubuntu-latest
     permissions:
       contents: read
