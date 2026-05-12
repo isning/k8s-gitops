@@ -186,9 +186,11 @@ jobs:
             else:
               total_failed += 1
 
+          short_sha = "${{ github.sha }}"[:7]
           print("## flux-local diff summary")
           print()
-          print(f"Clusters: {len(grouped)} | Resources: {total_resources} | Changed: {total_changed} | No change: {total_no_change} | Failed: {total_failed}")
+          print(f"Commit: `{short_sha}` | Clusters: {len(grouped)} | Resources: {total_resources}")
+          print(f"Changed: {total_changed} | No change: {total_no_change} | Failed: {total_failed}")
           print()
 
           if not grouped:
