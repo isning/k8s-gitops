@@ -280,6 +280,7 @@ class ImageLockGenerator:
         out_path = run_cmd([
             "nix",
             "build",
+            "--impure",
             "--no-link",
             "--print-out-paths",
             "--expr",
