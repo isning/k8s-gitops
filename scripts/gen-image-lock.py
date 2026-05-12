@@ -68,6 +68,27 @@ def map_image_source(image_name, registry_mirrors):
     mapped_registry = registry_mirrors.get(registry, registry)
     return f"{mapped_registry}/{repo}"
 
+def normalize_mirror_value(mirror_value):
+    if isinstance(mirror_value, list):
+        return [it for it in mirror_value if isinstance(it, str) and it]
+    if isinstance(mirror_value, str) and mirror_value:
+        return [mirror_value]
+    return []
+
+def map_image_sources(image_name, registry_mirrors):
+    registry, repo = split_image_name(image_name)
+    mirror_value = registry_mirrors.get(registry, [])
+    mirror_registries = normalize_mirror_value(mirror_value)
+    sources = [f"{mirror_registry}/{repo}" for mirror_registry in mirror_registries]
+    sources.append(image_name)
+    unique_sources = []
+    seen = set()
+    for source in sources:
+        if source not in seen:
+            seen.add(source)
+            unique_sources.append(source)
+    return unique_sources
+
 def parse_nix_blocks(content):
     """Extract complete block text for exact metadata diffing"""
     blocks = {}
@@ -180,6 +201,7 @@ class ImageLockGenerator:
         self.final_nix = ""
         self.summary_output = ""
         self.registry_mirrors = json.loads(args.registry_mirror_map) if args.registry_mirror_map else {}
+        self.mirror_retries = max(args.mirror_retries, 1)
         
         if not self.flux_root.is_dir():
             log(f"Cluster path does not exist: {self.flux_root}")
@@ -399,7 +421,7 @@ class ImageLockGenerator:
             safe_digest = digest.replace(":", "-")
             safe_name = re.sub(r'[/:]', '_', image_name)
             cache_file = cache_dir / f"{safe_name}-{safe_digest}-{tool_sig}.txt"
-            source_image = map_image_source(image_name, self.registry_mirrors)
+            source_images = map_image_sources(image_name, self.registry_mirrors)
             
             hash_val = cache_file.read_text('utf-8').strip() if cache_file.exists() else ""
             if not hash_val:
@@ -407,11 +429,23 @@ class ImageLockGenerator:
                 with tempfile.TemporaryDirectory(prefix="image-lock-") as tmpdir:
                     out_tar = Path(tmpdir) / "image.oci.tar"
 
-                    run_cmd([
-                        "skopeo", "copy", "--insecure-policy", "--multi-arch", "all",
-                        f"docker://{source_image}@{digest}",
-                        f"oci-archive:{out_tar}:{image_name}:{tag}",
-                    ], retries=4)
+                    last_error = None
+                    for source_image in source_images:
+                        for _ in range(self.mirror_retries):
+                            try:
+                                run_cmd([
+                                    "skopeo", "--tmpdir", tmpdir, "copy", "--insecure-policy", "--multi-arch", "all",
+                                    f"docker://{source_image}@{digest}",
+                                    f"oci-archive:{out_tar}:{image_name}:{tag}",
+                                ], retries=1)
+                                last_error = None
+                                break
+                            except SystemExit:
+                                last_error = source_image
+                        if last_error is None:
+                            break
+                    if last_error is not None:
+                        raise Exception(f"Failed to fetch {img_ref} from all mirror sources")
                     hash_val = run_cmd(["nix", "hash", "file", "--sri", str(out_tar)], retries=2).strip()
 
                 if not hash_val:
@@ -559,6 +593,7 @@ def main():
     parser.add_argument("--report-file", default="", help="Path to generate markdown report")
     parser.add_argument("--commit-msg-file", default="", help="Path to save the generated commit message")
     parser.add_argument("--registry-mirror-map", default="", help="JSON object mapping source registry to mirror registry")
+    parser.add_argument("--mirror-retries", type=int, default=3, help="Retry attempts per mirror source")
     
     parser.add_argument("--namespaces", default="", help="Space separated namespaces to filter")
     

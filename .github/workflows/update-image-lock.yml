@@ -18,9 +18,13 @@ on:
         required: true
         default: "linux"
       registry_mirror_map:
-        description: "JSON mapping of registry to mirror (e.g. {\"docker.io\":\"dockerproxy.net\"})"
+        description: "JSON mapping of registry to mirror(s) (e.g. {\"docker.io\":[\"dockerproxy.net\",\"mirror.gcr.io\"]})"
         required: false
         default: ""
+      mirror_retries:
+        description: "Retry attempts per mirror source"
+        required: false
+        default: "3"
 
 jobs:
   update:
@@ -76,11 +80,13 @@ jobs:
           arch="${{ github.event.inputs.arch || 'amd64' }}"
           os="${{ github.event.inputs.os || 'linux' }}"
           registry_mirror_map='${{ github.event.inputs.registry_mirror_map || '' }}'
+          mirror_retries='${{ github.event.inputs.mirror_retries || '3' }}'
           common_args=(--arch "$arch" --os "$os" --commit-msg-file "$COMMIT_MSG_FILE" --report-file "$REPORT_PATH")
 
           if [[ -n "$registry_mirror_map" ]]; then
             common_args+=(--registry-mirror-map "$registry_mirror_map")
           fi
+          common_args+=(--mirror-retries "$mirror_retries")
 
           if [[ "$cluster" == "all" ]]; then
             nix run .#gen-image-lock-all -- "${common_args[@]}"
