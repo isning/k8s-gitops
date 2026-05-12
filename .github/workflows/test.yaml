@@ -5,11 +5,14 @@ name: test
 on:
   workflow_dispatch:
   pull_request:
-    
+    branches: 
+      - 'main'
   merge_group:
+    branches: 
+      - 'main'
   push:
     branches: 
-      - '*'
+      - 'main'
       - '!ci/auto-update-lock/**'
     tags-ignore: [ '*' ]
 
@@ -18,7 +21,6 @@ permissions:
 
 jobs:
   changes:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') }}
     runs-on: ubuntu-latest
     outputs:
       archive_related: ${{ steps.filter.outputs.archive_related }}
@@ -43,7 +45,7 @@ jobs:
               - 'clusters/**'
 
   archive-hash-regression:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.archive_related == 'true' }}
+    if:  ${{ needs.changes.outputs.archive_related == 'true' }}
     needs:
       - changes
     runs-on: ubuntu-latest
@@ -54,11 +56,22 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
       - name: Setup Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39 # v13
+      - name: Install and start containerd
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y containerd
+          sudo systemctl enable --now containerd
+          sudo systemctl is-active --quiet containerd
+      - name: Verify containerd health
+        run: |
+          sudo ctr version
       - name: Run archive hash regression test
+        env:
+          CONTAINERD_ADDRESS: /run/containerd/containerd.sock
         run: bash ./scripts/test-mk-multiarch-archive.sh
 
   manifests:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.gitops_related == 'true' }}
+    if:  ${{ needs.changes.outputs.gitops_related == 'true' }}
     needs:
       - changes
     runs-on: ubuntu-latest
@@ -78,7 +91,7 @@ jobs:
           STRICT_MISSING_SCHEMAS: "false"
 
   flux-local-test:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.gitops_related == 'true' }}
+    if:  ${{ needs.changes.outputs.gitops_related == 'true' }}
     needs:
       - changes
     runs-on: ubuntu-latest
@@ -100,7 +113,7 @@ jobs:
           enable-helm: true
 
   flux-local-diff:
-    if:  ${{ !startsWith(github.head_ref, 'ci/auto-update-lock/') && needs.changes.outputs.gitops_related == 'true' }}
+    if:  ${{ needs.changes.outputs.gitops_related == 'true' }}
     needs:
       - changes
     runs-on: ubuntu-latest
