@@ -4,7 +4,7 @@
   finalImageName,
   finalImageTag ? "latest",
   imageDigest,
-  archiveHash ? null,
+  archiveHash,
   mirrorRetries ? 3,
 }:
 let
@@ -14,16 +14,14 @@ let
   safeDigest = lib.replaceStrings [ ":" ] [ "-" ] imageDigest;
 in
 pkgs.runCommand "${safeName}-${safeTag}-${safeDigest}.tar"
-  ({
+  {
+    outputHashMode = "flat";
+    outputHashAlgo = null;
+    outputHash = archiveHash;
     nativeBuildInputs = [
       pkgs.skopeo
     ];
   }
-  // lib.optionalAttrs (archiveHash != null) {
-    outputHashMode = "flat";
-    outputHashAlgo = null;
-    outputHash = archiveHash;
-  })
   ''
     success=0
     for sourceImage in ${lib.concatStringsSep " " (map lib.escapeShellArg sourceImages)}; do
