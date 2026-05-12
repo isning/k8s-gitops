@@ -11,6 +11,7 @@ resources:
   - ../../base/flux/
   - ../../base/cloudnative-pg/
   - ../../base/victoria-metrics/
+  - ../../base/egress/
   - ./cloudflare-operator/
   - ./i-reroute/
 
