@@ -22,6 +22,10 @@
           [ ];
       mkName = cluster: "gen-image-lock-${cluster}";
     in {
+      lib = {
+        mkMultiArchImageArchive = import ./lib/mkMultiArchImageArchive.nix;
+      };
+
       packages = forAllSystems (pkgs: {
         gen-image-lock = pkgs.writeShellApplication {
           name = "gen-image-lock";
@@ -34,6 +38,7 @@
             skopeo
             nix
             git
+            bash
           ];
           text = ''
             exec uv run ${./scripts/gen-image-lock.py} "$@"
