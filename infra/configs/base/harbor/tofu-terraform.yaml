@@ -11,19 +11,16 @@ spec:
   sourceRef:
     kind: GitRepository
     name: harbor-config
+  vars:
+    - name: harbor_username
+      value: admin
+  varsFrom:
+    - kind: Secret
+      name: harbor-admin-auth
+      varsKeys:
+        - HARBOR_ADMIN_PASSWORD:harbor_password
+    - kind: Secret
+      name: harbor-k8s-robot-account-auth
+      varsKeys:
+        - password:robot_account_k8s_secret
   retryInterval: 1m
-  runnerPodTemplate:
-    spec:
-      env:
-        - name: TF_VAR_harbor_username
-          value: admin
-        - name: TF_VAR_harbor_password
-          valueFrom:
-            secretKeyRef:
-              name: harbor-admin-auth
-              key: HARBOR_ADMIN_PASSWORD
-        - name: TF_VAR_robot_account_k8s_secret
-          valueFrom:
-            secretKeyRef:
-              name: harbor-k8s-robot-account-auth
-              key: password
