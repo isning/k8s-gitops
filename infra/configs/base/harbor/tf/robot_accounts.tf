@@ -30,11 +30,6 @@ resource "harbor_robot_account" "k8s" {
       }
 
       access {
-        action   = "read"
-        resource = "helm-chart"
-      }
-
-      access {
         action   = "list"
         resource = "tag"
       }
