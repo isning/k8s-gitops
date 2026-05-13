@@ -26,9 +26,15 @@
       "allowedVersions": "!/^(10|10\\.0|10\\.0\\.2)$/"
     },
     {
-        "matchManagers": ["flux"],
-        "matchDatasources": ["docker"],
-        "pinDigests": false
+      "matchManagers": ["flux"],
+      "matchDatasources": ["docker"],
+      "pinDigests": false
+    },
+    {
+      "description": "Bump tofu runner tags",
+      "matchPackageNames": ["ghcr.io/isning/k8s-gitops/tf-runner"],
+      "allowedVersions": "/^v\\d+\\.\\d+\\.\\d+-custom-\\d{12}$/",
+      "versioning": "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-custom-(?<build>\\d{12})$"
     }
   ]
 }
