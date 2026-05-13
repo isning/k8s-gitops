@@ -11,7 +11,7 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/base
   ref:
-    tag: "1.30.0-rc.0"
+    tag: "1.29.1"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -25,7 +25,7 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/cni
   ref:
-    tag: "1.30.0-rc.0"
+    tag: "1.29.1"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -39,7 +39,7 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/ztunnel
   ref:
-    tag: "1.30.0-rc.0"
+    tag: "1.29.1"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -53,4 +53,4 @@ spec:
     operation: copy
   url: oci://gcr.dockerproxy.net/istio-release/charts/istiod
   ref:
-    tag: "1.30.0-rc.0"
+    tag: "1.29.1"
