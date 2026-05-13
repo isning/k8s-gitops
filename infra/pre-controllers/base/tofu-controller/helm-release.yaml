@@ -21,6 +21,9 @@ spec:
       retries: -1
   values:
     runner:
+      image:
+        repository: ghcr.io/isning/k8s-gitops/tf-runner
+        tag: v0.16.3-custom-202605131500
       serviceAccount:
         allowedNamespaces:
           - flux-system
