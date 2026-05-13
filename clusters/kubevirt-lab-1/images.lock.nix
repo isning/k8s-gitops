@@ -21,10 +21,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:a8373525af6a362dd256fd70ddd2492c6ac273eb745942dd0a22d318869269ee";
+    imageDigest = "sha256:e2b97dde9666986c61c56d49aae85a714b89b69392baa531438e74ec34096fb4";
     finalImageName = "bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-c0Dgh+9qmS+PDP0jxQTti9TqDzTtC5IAr90iFjGZGgk=";
+    archiveHash = "sha256-bbVcSSHFMn3yp859lDqkljtnngyAkzCFKtKkXHPOEI8=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -334,10 +334,10 @@
   }
   {
     imageName = "ghcr.io/controlplaneio-fluxcd/flux-operator";
-    imageDigest = "sha256:2db19fa35b0ea2d9976a0a1429cccbc36bb37625457b5a7e3ce57f2221e6fd73";
+    imageDigest = "sha256:9a689c27cd1f0c8b78d06a711e27aa7e64f217beb0c56510d7ef8a3bffa50322";
     finalImageName = "ghcr.io/controlplaneio-fluxcd/flux-operator";
-    finalImageTag = "v0.48.0";
-    archiveHash = "sha256-ItrycsQCx3KXCwYRxLT8JM+So1tLUB2vgd7ju9W1934=";
+    finalImageTag = "v0.49.0";
+    archiveHash = "sha256-kyLE/j2c9aIi3vEHTNy3HlRK1U9hDgpXfPBdygGo54Q=";
     os = "linux";
     arch = "amd64";
     sources = [
