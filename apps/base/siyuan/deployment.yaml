@@ -24,6 +24,11 @@ spec:
           env:
             - name: TZ
               value: "Asia/Shanghai"
+            - name: SIYUAN_ACCESS_AUTH_CODE
+              valueFrom:
+                secretKeyRef:
+                  name: siyuan-secret
+                  key: SIYUAN_ACCESS_AUTH_CODE
           resources:
             requests:
               cpu: 10m
