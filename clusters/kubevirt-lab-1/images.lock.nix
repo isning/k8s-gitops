@@ -208,69 +208,6 @@
     ];
   }
   {
-    imageName = "docker.io/istio/install-cni";
-    imageDigest = "sha256:88fb8849f6b2aa7343e36385b9adb3f4d9166a1f26432becee035997a0ac31cf";
-    finalImageName = "docker.io/istio/install-cni";
-    finalImageTag = "1.29.1-distroless";
-    archiveHash = "sha256-ahPKbDao7nW9DA6qAoYJ6hUZ1t+2DHjPzjO6ILb5cQU=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "istio-system"; name = "istio-cni"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "istio-system"; name = "istio-cni"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-      ]
-    ];
-    targets = [
-      { kind = "DaemonSet"; namespace = "istio-system"; name = "istio-cni-node"; }
-    ];
-  }
-  {
-    imageName = "docker.io/istio/pilot";
-    imageDigest = "sha256:80d6fcb2116aef065a8001ce055f55a6feac498c2aace222e637c7339c68cd56";
-    finalImageName = "docker.io/istio/pilot";
-    finalImageTag = "1.29.1-distroless";
-    archiveHash = "sha256-h+r9lrJOvB7GJRkVYf5i4hAmIKMuPqUAMp/jRnedKkE=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "istio-system"; name = "istiod"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "istio-system"; name = "istiod"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-      ]
-    ];
-    targets = [
-      { kind = "Deployment"; namespace = "istio-system"; name = "istiod"; }
-    ];
-  }
-  {
-    imageName = "docker.io/istio/ztunnel";
-    imageDigest = "sha256:5bf7a3561bd631b8add353468e738e2e4755f2ed8a10948eaffbe312f3d23f27";
-    finalImageName = "docker.io/istio/ztunnel";
-    finalImageTag = "1.29.1";
-    archiveHash = "sha256-zwKQHZAvAMjPIMHa+MmHbL2uEPuojXFgLOlmC+Kodh0=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "istio-system"; name = "ztunnel"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "istio-system"; name = "ztunnel"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-      ]
-    ];
-    targets = [
-      { kind = "DaemonSet"; namespace = "istio-system"; name = "ztunnel"; }
-    ];
-  }
-  {
     imageName = "docker.io/rancher/local-path-provisioner";
     imageDigest = "sha256:1eba82e9c386038b4af6d69cca7519fac738c28c42735ed48ce70c882ad0d80f";
     finalImageName = "docker.io/rancher/local-path-provisioner";
@@ -971,6 +908,69 @@
     ];
     targets = [
       { kind = "StatefulSet"; namespace = "harbor"; name = "harbor-redis-master"; }
+    ];
+  }
+  {
+    imageName = "registry.istio.io/release/install-cni";
+    imageDigest = "sha256:c37347421fe4d99b34d193b79437e7186fda762b2ae8231f28e2b9add287b9b5";
+    finalImageName = "registry.istio.io/release/install-cni";
+    finalImageTag = "1.30.0-rc.0-distroless";
+    archiveHash = "sha256-YHw4kFUcra/OgFPZCl0b4AYK9P9+P4yk8VQ+XI04uPY=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "istio-system"; name = "istio-cni"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "istio-system"; name = "istio-cni"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "DaemonSet"; namespace = "istio-system"; name = "istio-cni-node"; }
+    ];
+  }
+  {
+    imageName = "registry.istio.io/release/pilot";
+    imageDigest = "sha256:db64101f2e1828323950dc1bf12ed35bcf77121fc3cbb505bef31a5fb7dfe605";
+    finalImageName = "registry.istio.io/release/pilot";
+    finalImageTag = "1.30.0-rc.0-distroless";
+    archiveHash = "sha256-jkLTtqhOt8OcIbqJeFk/Ogdx7PtnVWPd6G9fky3TUm8=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "istio-system"; name = "istiod"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "istio-system"; name = "istiod"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "istio-system"; name = "istiod"; }
+    ];
+  }
+  {
+    imageName = "registry.istio.io/release/ztunnel";
+    imageDigest = "sha256:d2e1bdab8c85c335c173828a3fd34898a46fbb9139b409f646b4e8e4d328ad7e";
+    finalImageName = "registry.istio.io/release/ztunnel";
+    finalImageTag = "1.30.0-rc.0";
+    archiveHash = "sha256-si/XGIUvSOAPwTd0GCezeiKxBDT2GnCNWrHuNNts5ws=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "istio-system"; name = "ztunnel"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "istio-system"; name = "ztunnel"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "DaemonSet"; namespace = "istio-system"; name = "ztunnel"; }
     ];
   }
   {
