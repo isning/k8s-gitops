@@ -2,10 +2,10 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
-  name: harbor-config
+  name: k8s-gitops
   namespace: harbor
 spec:
-  interval: 5m
+  interval: 1m
   url: https://github.com/isning/k8s-gitops
   ref:
     branch: main
