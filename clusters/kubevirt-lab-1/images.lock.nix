@@ -209,10 +209,10 @@
   }
   {
     imageName = "docker.io/istio/install-cni";
-    imageDigest = "sha256:ffd908373e71733ac5ac5a55872191f57a41ddb6e9862f6e85fff768ed65ba2d";
+    imageDigest = "sha256:88fb8849f6b2aa7343e36385b9adb3f4d9166a1f26432becee035997a0ac31cf";
     finalImageName = "docker.io/istio/install-cni";
-    finalImageTag = "1.29.2-distroless";
-    archiveHash = "sha256-i1XheycMeXdJrVq/xwnJFlhTf5pW8Op5PbDtwXo7s5A=";
+    finalImageTag = "1.29.1-distroless";
+    archiveHash = "sha256-ahPKbDao7nW9DA6qAoYJ6hUZ1t+2DHjPzjO6ILb5cQU=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -230,10 +230,10 @@
   }
   {
     imageName = "docker.io/istio/pilot";
-    imageDigest = "sha256:1378e20bee98ae325d8f3c3324b7f5f1dcc46a6d3ddeb701d2cafc8468f8e486";
+    imageDigest = "sha256:80d6fcb2116aef065a8001ce055f55a6feac498c2aace222e637c7339c68cd56";
     finalImageName = "docker.io/istio/pilot";
-    finalImageTag = "1.29.2-distroless";
-    archiveHash = "sha256-v1AZYfvEsTYHAyFR2q3JM4lu/CKD8aOsPmh0KY9B4sw=";
+    finalImageTag = "1.29.1-distroless";
+    archiveHash = "sha256-h+r9lrJOvB7GJRkVYf5i4hAmIKMuPqUAMp/jRnedKkE=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -251,10 +251,10 @@
   }
   {
     imageName = "docker.io/istio/ztunnel";
-    imageDigest = "sha256:3db3cd9e5426f8ac1bd7e8aaa9ad3edfe0b5045d19016d2e4378701354fc6640";
+    imageDigest = "sha256:5bf7a3561bd631b8add353468e738e2e4755f2ed8a10948eaffbe312f3d23f27";
     finalImageName = "docker.io/istio/ztunnel";
-    finalImageTag = "1.29.2";
-    archiveHash = "sha256-oqmQ8kE/ZRcd1n0QE27DVgah42KWUe5GL441cOiPOfs=";
+    finalImageTag = "1.29.1";
+    archiveHash = "sha256-zwKQHZAvAMjPIMHa+MmHbL2uEPuojXFgLOlmC+Kodh0=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -622,10 +622,10 @@
   }
   {
     imageName = "quay.io/cilium/cilium";
-    imageDigest = "sha256:2e61680593cddca8b6c055f6d4c849d87a26a1c91c7e3b8b56c7fb76ab7b7b10";
+    imageDigest = "sha256:2eb67991eaa9368ba199c2fac2c573cb0ffdeb79184533344f42fc9a7ff6af3c";
     finalImageName = "quay.io/cilium/cilium";
-    finalImageTag = "v1.19.3";
-    archiveHash = "sha256-AZG9/gl65G7VaXNPcLRI2VVFJ7/Rl8C01ZKmS1ucI1c=";
+    finalImageTag = "v1.19.4";
+    archiveHash = "sha256-ryD/JBP9kzMo9MwtOynQBLsslXq+2aE4JvIZgZEztJY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -643,10 +643,10 @@
   }
   {
     imageName = "quay.io/cilium/hubble-relay";
-    imageDigest = "sha256:5ee21d57b6ef2aa6db67e603a735fdceb162454b352b7335b651456e308f681b";
+    imageDigest = "sha256:59af8c0d561e560c2a042e7600a3496bc0367df8fbf868aa68d5834c8ec1a431";
     finalImageName = "quay.io/cilium/hubble-relay";
-    finalImageTag = "v1.19.3";
-    archiveHash = "sha256-YYplDyt4S5aF6HNCEpAZUMxKmALjdIJALPBkfMumb+8=";
+    finalImageTag = "v1.19.4";
+    archiveHash = "sha256-A2JpV1AWc7sJFOReySU8+q0YKR7gZ3kBG5H+oeCQrFk=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -664,10 +664,10 @@
   }
   {
     imageName = "quay.io/cilium/hubble-ui-backend";
-    imageDigest = "sha256:db1454e45dc39ca41fbf7cad31eec95d99e5b9949c39daaad0fa81ef29d56953";
+    imageDigest = "sha256:fac0c300ae119274edca11fd89b1ad23c788792d8bc4ea2ba631c709e8d3c688";
     finalImageName = "quay.io/cilium/hubble-ui-backend";
-    finalImageTag = "v0.13.3";
-    archiveHash = "sha256-26n2H7gLS5s0SMQwhRcEynW9i6MA/PzjdfFt9KvvzDY=";
+    finalImageTag = "v0.13.5";
+    archiveHash = "sha256-kxiZjZ0IRaHo6dD/KG0QVcQYMFPdSELhUnB3Z5z12V0=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -685,10 +685,10 @@
   }
   {
     imageName = "quay.io/cilium/hubble-ui";
-    imageDigest = "sha256:661d5de7050182d495c6497ff0b007a7a1e379648e60830dd68c4d78ae21761d";
+    imageDigest = "sha256:f7d514fc54d784ed6df9d58cf0e97648b143f92b766dd1780ed3fc845bd4c516";
     finalImageName = "quay.io/cilium/hubble-ui";
-    finalImageTag = "v0.13.3";
-    archiveHash = "sha256-2r1rNWqyJc5SbOmxb7ILApKA9IxTeyj905ujod/e3n4=";
+    finalImageTag = "v0.13.5";
+    archiveHash = "sha256-YL/QAcolkztR+e12y6NDv4c7ybuFDnnR6vqf4mmdEIg=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -706,10 +706,10 @@
   }
   {
     imageName = "quay.io/cilium/operator-generic";
-    imageDigest = "sha256:205b09b0ed6accbf9fe688d312a9f0fcfc6a316fc081c23fbffb472af5dd62cd";
+    imageDigest = "sha256:1aa2b62735e7d8ab49ee840ae59c346932024c88901579121395c1271b435f71";
     finalImageName = "quay.io/cilium/operator-generic";
-    finalImageTag = "v1.19.3";
-    archiveHash = "sha256-a9WwIHUML+rjZG2ds/Tib9Jn+nV/yFmiTEF0n+d7ZX8=";
+    finalImageTag = "v1.19.4";
+    archiveHash = "sha256-v8gGpP3VvpRtqqlz1f6YKRI0yMPdTXxwIRYzOAwkjWA=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1037,10 +1037,10 @@
   }
   {
     imageName = "soulter/astrbot";
-    imageDigest = "sha256:b105ba78503525b678ef3f0f2801ef90338750970a264f2e6c72f83928082f4d";
+    imageDigest = "sha256:d59f094f4561281fcc9d627a107fc389f277923494ae8894d15fcbe81472ad5b";
     finalImageName = "soulter/astrbot";
-    finalImageTag = "v4.24.2";
-    archiveHash = "sha256-N6ngpiaXEmJM2N0GFED54NQ84sbLgzPF5vkgUjILxSk=";
+    finalImageTag = "v4.24.5";
+    archiveHash = "sha256-IAohg8OPaj7uiA5DhtfpGRZtzpHst/LJTYRO2g65S20=";
     os = "linux";
     arch = "amd64";
     sources = [
