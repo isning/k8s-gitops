@@ -37,7 +37,7 @@ locals {
       access_secret = ""
     }
     istio-registry-upstream = {
-      provider_name = "docker-registry"
+      provider_name = "huawei-SWR" // Workaround for health check
       endpoint_url  = "https://registry.istio.io"
       access_id     = ""
       access_secret = ""
