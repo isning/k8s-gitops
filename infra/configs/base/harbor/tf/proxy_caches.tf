@@ -36,6 +36,12 @@ locals {
       access_id     = ""
       access_secret = ""
     }
+    istio-registry-upstream = {
+      provider_name = "docker-registry"
+      endpoint_url  = "https://registry.istio.io"
+      access_id     = ""
+      access_secret = ""
+    }
   }
 
   projects = {
@@ -56,6 +62,9 @@ locals {
     }
     mcr = {
       registry = "mcr-upstream"
+    }
+    istio = {
+      registry = "istio-registry-upstream"
     }
   }
 }
