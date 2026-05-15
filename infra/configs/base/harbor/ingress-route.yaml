@@ -4,9 +4,6 @@ kind: HTTPRoute
 metadata:
   name: harbor
   namespace: harbor
-  labels:
-    app.kubernetes.io/name: harbor
-    app.kubernetes.io/component: ingress
 spec:
   parentRefs:
     - name: default-gateway
@@ -16,23 +13,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /api/
-        - path:
-            type: PathPrefix
-            value: /service/
-        - path:
-            type: PathPrefix
-            value: /v2/
-        - path:
-            type: PathPrefix
-            value: /c/
-      backendRefs:
-        - name: harbor-core
-          port: 80
-    - matches:
-        - path:
-            type: PathPrefix
             value: /
       backendRefs:
-        - name: harbor-portal
+        - name: harbor
           port: 80
