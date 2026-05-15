@@ -30,6 +30,8 @@ spec:
           kind: Gateway
           name: default-gateway
           namespace: prod
+      tls:
+        enabled: false
     externalURL: https://harbor.isning.moe
 
     # Route Harbor's outbound requests through the cluster egress proxy.
