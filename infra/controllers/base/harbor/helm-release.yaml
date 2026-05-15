@@ -59,8 +59,3 @@ spec:
     core:
       overridesJsonSecret: harbor-oidc
       extraEnvVarsCM: harbor-env
-
-  valuesFrom:
-    - kind: Secret
-      name: harbor-oidc
-      valuesKey: values.yaml
