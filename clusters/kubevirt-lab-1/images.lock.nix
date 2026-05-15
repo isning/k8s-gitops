@@ -186,27 +186,6 @@
     ];
   }
   {
-    imageName = "docker.io/goharbor/nginx-photon";
-    imageDigest = "sha256:4fcfe831b1d99e3193a586e59ba4984ca2587a9b2998ccd433f8e9425beaabdc";
-    finalImageName = "docker.io/goharbor/nginx-photon";
-    finalImageTag = "v2.15.0";
-    archiveHash = "sha256-uxgY6DEfEnNF9Qz2mOFUiCEOHuNUc6HHU89Ig1uhNJA=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "harbor"; name = "harbor"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "harbor"; name = "harbor"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-      ]
-    ];
-    targets = [
-      { kind = "Deployment"; namespace = "harbor"; name = "harbor-nginx"; }
-    ];
-  }
-  {
     imageName = "docker.io/goharbor/registry-photon";
     imageDigest = "sha256:beb49fd16cf0906c04a2bf51a22f7210289e7cc2ae43a733e2a0364380aceae6";
     finalImageName = "docker.io/goharbor/registry-photon";
@@ -375,10 +354,10 @@
   }
   {
     imageName = "ghcr.io/kittors/clirelay";
-    imageDigest = "sha256:5f65e386c93d0059b71f54dfefaea8016ec5206df9e8dee0d311db13b21a9081";
+    imageDigest = "sha256:cd71a43c7feee1831511fc5bd3e6cf1a417bdb856b2464799def509fa479367d";
     finalImageName = "ghcr.io/kittors/clirelay";
     finalImageTag = "main";
-    archiveHash = "sha256-k45mnOfb+f1qoxRteIVqxAwfbvYNA1FU/ozNST9x7nc=";
+    archiveHash = "sha256-2IXUqmYaoEZEzUkvh85u6o3CEbPpMFgvle4diBhx9FM=";
     os = "linux";
     arch = "amd64";
     sources = [
