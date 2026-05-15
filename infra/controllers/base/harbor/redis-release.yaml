@@ -32,7 +32,7 @@ spec:
     auth:
       enabled: true
       existingSecret: harbor-redis-auth
-      existingSecretPasswordKey: redis-password
+      existingSecretPasswordKey: REDIS_PASSWORD
 
     master:
       resources:
