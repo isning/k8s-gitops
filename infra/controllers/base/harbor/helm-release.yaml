@@ -51,11 +51,6 @@ spec:
         registry:
           size: 100Gi
         jobservice:
-          jobLog:
-            size: 5Gi
-        database:
-          size: 10Gi
-        redis:
           size: 5Gi
     
     core:
