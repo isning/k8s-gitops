@@ -24,6 +24,7 @@ spec:
       httpsProxy: http://proxy-svc.egress-system.svc.cluster.local:7890
       noProxy: 127.0.0.1,localhost,.svc,.cluster.local,harbor.harbor.svc,core,jobservice,registry,portal
 
+    postgresql.enabled: false
     externalDatabase:
       host: harbor-pg-cluster-rw
       port: 5432
@@ -31,11 +32,12 @@ spec:
       existingSecret: harbor-pg-cluster-app
       existingSecretPasswordKey: password
       coreDatabase: registry
+    redis.enabled: false
     externalRedis:
       host: harbor-redis-master
       port: 6379
       username: default
-      # Use an existing secret to connect to redis. The key must be REDIS_PASSWORD.
+      # Use an existing secret to connect to redis. The key must be redis-password.
       existingSecret: harbor-redis-auth
 
     # Disable scanners to reduce footprint; can be enabled later.
