@@ -1,4 +1,4 @@
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
   name: direct-to-encapsulated-https-api.github.com
@@ -18,7 +18,7 @@ spec:
           name: api.github.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
   name: direct-to-encapsulated-https-ghcr.io
@@ -38,7 +38,7 @@ spec:
           name: ghcr.io.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
   name: direct-to-encapsulated-https-github.githubassets.com
@@ -58,7 +58,7 @@ spec:
           name: github.githubassets.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
   name: direct-to-encapsulated-https-raw.githubusercontent.com
@@ -78,7 +78,7 @@ spec:
           name: raw.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
   name: direct-to-encapsulated-https-objects.githubusercontent.com
