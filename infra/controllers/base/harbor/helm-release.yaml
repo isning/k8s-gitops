@@ -21,9 +21,15 @@ spec:
     existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
 
     expose:
-      type: clusterIP
-      tls:
-        enabled: false
+      type: route
+      route:
+        hosts:
+        - harbor.isning.moe
+        parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: default-gateway
+          namespace: prod
     externalURL: https://harbor.isning.moe
 
     # Route Harbor's outbound requests through the cluster egress proxy.
