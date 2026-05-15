@@ -20,6 +20,26 @@
     ];
   }
   {
+    imageName = "b3log/siyuan";
+    imageDigest = "sha256:1a316554bfbf0c951ddabc7d3cb0292620152b44c087b6979d5d9b6bae065b1b";
+    finalImageName = "b3log/siyuan";
+    finalImageTag = "v3.6.5";
+    archiveHash = "sha256-XXpGj91bih0Nzr3E9dCR66KbtQUfc7NK12D9aIcqALM=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "prod"; name = "siyuan"; }
+    ];
+  }
+  {
     imageName = "bitnami/kubectl";
     imageDigest = "sha256:e2b97dde9666986c61c56d49aae85a714b89b69392baa531438e74ec34096fb4";
     finalImageName = "bitnami/kubectl";
@@ -355,10 +375,10 @@
   }
   {
     imageName = "ghcr.io/kittors/clirelay";
-    imageDigest = "sha256:8e885b164fc6735f8083c142644b71d98da7a77eeb2217bf25fd6967a4d83ddf";
+    imageDigest = "sha256:5f65e386c93d0059b71f54dfefaea8016ec5206df9e8dee0d311db13b21a9081";
     finalImageName = "ghcr.io/kittors/clirelay";
-    finalImageTag = "main-de96948";
-    archiveHash = "sha256-S1dSp4Pz/OpqncAAdNXqAQsMAg7EkyZ7wo9HsnvuWm0=";
+    finalImageTag = "main";
+    archiveHash = "sha256-k45mnOfb+f1qoxRteIVqxAwfbvYNA1FU/ozNST9x7nc=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -477,10 +497,10 @@
   }
   {
     imageName = "mlikiowa/napcat-docker";
-    imageDigest = "sha256:bbb5da74f749ea8c11d2bd4b3623bf3b419a95c44a61bb09efe35ba628dafa73";
+    imageDigest = "sha256:d8098fdabedfe5cbc570b994aebb685c3096a2bebbf4ea43ffb21655a4758e63";
     finalImageName = "mlikiowa/napcat-docker";
-    finalImageTag = "v4.18.1";
-    archiveHash = "sha256-pE0SzUgnArQSmKdaUHgdhPSVN9MmN1LF8aBUafvCcgQ=";
+    finalImageTag = "v4.18.2";
+    archiveHash = "sha256-3cWLkFN39w71u3PK1XHUaCQIbFhWQxQB3cAiCZmii9M=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -517,10 +537,10 @@
   }
   {
     imageName = "postgres";
-    imageDigest = "sha256:09e4f20b14ddb3dfe3a0c825b206032aaf8f28300ba2070c0b60fc1c10c6abc7";
+    imageDigest = "sha256:2a6577fca547b9021b9281c58bc71ec1617e05b8d128c8875bd5fa32c267c554";
     finalImageName = "postgres";
     finalImageTag = "15-alpine";
-    archiveHash = "sha256-iT5acJcWpa60dBUuOyi+QLAAyz8cZZ8J16JFU5iu+Po=";
+    archiveHash = "sha256-ayQFr4AMotRUbCkcZkV6oY0sdwuVegLPcLDTOvbmpBI=";
     os = "linux";
     arch = "amd64";
     sources = [
