@@ -55,9 +55,6 @@ auto-update:
 # Persist credentials in mounted PVC.
 auth-dir: "/root/.cli-proxy-api"
 
-api-keys:
-  - __CLIRELAY_API_KEY_CLIENT_ASTRBOT__
-
 # Enable debug logging
 debug: false
 
@@ -161,10 +158,18 @@ routing:
 #   - key: "sk-user-pro"
 #     name: "Pro User"
 #     allowed-channel-groups: ["pro"]
+api-key-entries:
+  - key: "__CLIRELAY_API_KEY_CLIENT_ISNING__"
+    name: "ISNing General Usage Key"
+  - key: __CLIRELAY_API_KEY_CLIENT_ASTRBOT__
+    name: "AstrBot"
+  - key: "__CLIRELAY_API_KEY_CLIENT_SIYUAN__"
+    name: "SiYuan"
 #   - key: "sk-team-a"
 #     name: "Team A"
 #     allowed-channel-groups: ["team-a", "pro"]
 #     allowed-channels: ["Team A Codex"]
+
 
 # When true, enable authentication for the WebSocket API (/v1/ws).
 ws-auth: false
@@ -178,6 +183,37 @@ nonstream-keepalive-interval: 0
 #   bootstrap-retries: 1    # Default: 0 (disabled). Retries before first byte is sent.
 
 openai-compatibility:
+  - name: PackyCode
+    base-url: https://www.packyapi.com/v1
+    api-key-entries:
+      - api-key: __CLIRELAY_API_KEY_PACKYCODE__
+    models:
+      - name: claude-opus-4-7
+        alias: ""
+      - name: claude-opus-4-6
+        alias: ""
+      - name: claude-sonnet-4-6
+        alias: ""
+      - name: claude-haiku-4-5-20251001
+        alias: ""
+      - name: deepseek-v4-flash
+        alias: ""
+      - name: deepseek-v4-pro
+        alias: ""
+      - name: qwen3-max
+        alias: ""
+      - name: qwen3.5-flash
+        alias: ""
+      - name: qwen3.6-max-preview
+        alias: ""
+      - name: qwen3.6-plus
+        alias: ""
+      - name: qwen3.5-plus
+        alias: ""
+      - name: qwen3-vl-flash
+        alias: ""
+    headers:
+      User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36
   - name: NVIDIA
     base-url: https://integrate.api.nvidia.com/v1/
     api-key-entries:
@@ -622,6 +658,14 @@ openai-compatibility:
         alias: gemini-3.1-flash-live-preview
       - name: models/lyria-realtime-exp
         alias: lyria-realtime-exp
+
+identity-fingerprint:
+  codex:
+    user-agent: codex_cli_rs/0.120.0 (Mac OS 26.0.1; arm64) Apple_Terminal/464
+    version: 0.120.0
+    originator: codex_cli_rs
+    websocket-beta: responses_websockets=2026-02-04
+    session-mode: per-request
 
 # Global OAuth model name aliases (per channel)
 # These aliases rename model IDs for both model listing and request routing.
