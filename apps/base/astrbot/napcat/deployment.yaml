@@ -65,7 +65,7 @@ spec:
       
       containers:
         - name: napcat
-          image: mlikiowa/napcat-docker:v4.18.1@sha256:bbb5da74f749ea8c11d2bd4b3623bf3b419a95c44a61bb09efe35ba628dafa73
+          image: mlikiowa/napcat-docker:v4.18.2@sha256:d8098fdabedfe5cbc570b994aebb685c3096a2bebbf4ea43ffb21655a4758e63
           imagePullPolicy: IfNotPresent
           env:
             - name: NAPCAT_UID
