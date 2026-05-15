@@ -18,7 +18,7 @@ spec:
   resolution: DNS
 ---
 ########### HTTPS traffic to github.com ###########
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
   name: direct-to-encapsulated-https-github.com
