@@ -7,15 +7,23 @@ metadata:
 spec:
   releaseName: harbor
   interval: 30m
-  chartRef:
-    kind: OCIRepository
-    name: helm-chart-harbor
-    namespace: flux-system
+  chart:
+    spec:
+      chart: harbor
+      sourceRef:
+        kind: HelmRepository
+        name: harbor
+        namespace: flux-system
+      version: "1.*"
+      interval: 12h
   values:
-    existingSecret: harbor-admin-auth
+    existingSecretAdminPassword: harbor-admin-auth
     existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
 
-    exposureType: none
+    expose:
+      type: clusterIP
+      tls:
+        enabled: false
     externalURL: https://harbor.isning.moe
 
     # Route Harbor's outbound requests through the cluster egress proxy.
@@ -24,19 +32,21 @@ spec:
       httpsProxy: http://proxy-svc.egress-system.svc.cluster.local:7890
       noProxy: 127.0.0.1,localhost,.svc,.cluster.local,harbor.harbor.svc,core,jobservice,registry,portal
 
-    externalDatabase:
-      host: harbor-pg-cluster-rw
-      port: 5432
-      user: app
-      existingSecret: harbor-pg-cluster-app
-      existingSecretPasswordKey: password
-      coreDatabase: registry
-    externalRedis:
-      host: harbor-redis-master
-      port: 6379
-      username: default
-      # Use an existing secret to connect to redis. The key must be REDIS_PASSWORD.
-      existingSecret: harbor-redis-auth
+    database:
+      type: external
+      external:
+        host: harbor-pg-cluster-rw
+        port: 5432
+        username: app
+        existingSecret: harbor-pg-cluster-app
+        coreDatabase: registry
+    redis:
+      type: external
+      external:
+        addr: harbor-redis-master:6379
+        username: default
+        # Use an existing secret to connect to redis. The key must be REDIS_PASSWORD.
+        existingSecret: harbor-redis-auth
 
     # Disable scanners to reduce footprint; can be enabled later.
     trivy:
@@ -55,10 +65,6 @@ spec:
           size: 10Gi
         redis:
           size: 5Gi
-    
-    core:
-      overridesJsonSecret: harbor-oidc
-      extraEnvVarsCM: harbor-env
 
   valuesFrom:
     - kind: Secret
