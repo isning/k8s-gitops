@@ -396,10 +396,10 @@
   }
   {
     imageName = "ghcr.io/sagernet/sing-box";
-    imageDigest = "sha256:9bed1fcb406bd971d1b48c7f824e5128d63543ca278cdcd6b5737c19941e404d";
+    imageDigest = "sha256:da0e2331395c9025a85fa58892772b4cdbe5f2e530e93defeec3968175d06c6d";
     finalImageName = "ghcr.io/sagernet/sing-box";
-    finalImageTag = "v1.13.11";
-    archiveHash = "sha256-cGpvdyKsj0BhTMAXlYFCVWfegB5l9aTkMZ3ZlBXaoU4=";
+    finalImageTag = "v1.13.12";
+    archiveHash = "sha256-ADuYPHGPIlR6Krx0VT0TYSsuicKWKYDIv14IWvixPYk=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1036,10 +1036,10 @@
   }
   {
     imageName = "soulter/astrbot";
-    imageDigest = "sha256:d59f094f4561281fcc9d627a107fc389f277923494ae8894d15fcbe81472ad5b";
+    imageDigest = "sha256:90e938a7833e073c6fa80e1115690378fb9815321c46bcb7912c7d2829fad835";
     finalImageName = "soulter/astrbot";
-    finalImageTag = "v4.24.5";
-    archiveHash = "sha256-IAohg8OPaj7uiA5DhtfpGRZtzpHst/LJTYRO2g65S20=";
+    finalImageTag = "v4.25.0";
+    archiveHash = "sha256-hUMKKnpM9ME+FobhC/f3P6qndkzkBKLl74NJen9bSds=";
     os = "linux";
     arch = "amd64";
     sources = [
