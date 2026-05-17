@@ -6,5 +6,9 @@ terraform {
       source  = "goharbor/harbor"
       version = "~> 3.10"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5"
+    }
   }
 }
