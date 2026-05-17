@@ -68,10 +68,6 @@ spec:
           secretKeyRef:
             name: vaultwarden-oidc
             key: SSO_CLIENT_SECRET
-      - name: SSO_ENABLED
-        value: "true"
-      - name: SSO_ENABLED
-        value: "true"
 
     backup:
       enabled: true
