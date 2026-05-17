@@ -332,6 +332,65 @@
     ];
   }
   {
+    imageName = "ghcr.io/headlamp-k8s/headlamp-plugin-cert-manager";
+    imageDigest = "sha256:d7d0321a90c0347e2e4f9f7e362ecaa10a36592cc5ac8fd1514df11c476b43fe";
+    finalImageName = "ghcr.io/headlamp-k8s/headlamp-plugin-cert-manager";
+    finalImageTag = "v0.1.0";
+    archiveHash = "sha256-K8fgubGpDrmeagg3nqTUnP9PN0SW77TLN2CcRTyc+m8=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [];
+  }
+  {
+    imageName = "ghcr.io/headlamp-k8s/headlamp-plugin-flux";
+    imageDigest = "sha256:055377b9011dcc73235e8969c488ecd92af5cb70aa5d5df0f66c1cea667fdccb";
+    finalImageName = "ghcr.io/headlamp-k8s/headlamp-plugin-flux";
+    finalImageTag = "v0.6.0";
+    archiveHash = "sha256-4ADArqRNWx9gzmhBa9rpEYTJZJ14rY6N78bAi6wqZ8Y=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [];
+  }
+  {
+    imageName = "ghcr.io/headlamp-k8s/headlamp";
+    imageDigest = "sha256:c9754bae1d799220da0547e51ceee234f6e66ebadc138518ca73e33ecd331e59";
+    finalImageName = "ghcr.io/headlamp-k8s/headlamp";
+    finalImageTag = "v0.42.0";
+    archiveHash = "sha256-NX0uuwxxZMwBHuJCWDhVvxgV8CO69j5y6ODttDP0vPg=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "prod"; name = "headlamp"; }
+    ];
+  }
+  {
     imageName = "ghcr.io/isning/redroid-operator";
     imageDigest = "sha256:f5e367011b405a3b5c594a6821d8806b4990d09cdc91eae9e4983a106dc9142e";
     finalImageName = "ghcr.io/isning/redroid-operator";
@@ -374,10 +433,10 @@
   }
   {
     imageName = "ghcr.io/logto-io/logto";
-    imageDigest = "sha256:aa4c428b70d9dd8eac23b6eeb3826a02d5fe0283b5dd774589b9b9760e0c6e9f";
+    imageDigest = "sha256:9dc15595766961d0d81d1026fc38294eacf3ce32d6dab2e9dbeb6d9b10e7a031";
     finalImageName = "ghcr.io/logto-io/logto";
-    finalImageTag = "1.38.0";
-    archiveHash = "sha256-FkmfdtZebd3vqj4mvBRIfcheQnX2w1iF71xag1Wi8AU=";
+    finalImageTag = "1.39.0";
+    archiveHash = "sha256-9nCGTsOFAYarcXbjAP88GYu+LzUM9S6xCmKOJ0KuyiY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -516,10 +575,10 @@
   }
   {
     imageName = "postgres";
-    imageDigest = "sha256:2a6577fca547b9021b9281c58bc71ec1617e05b8d128c8875bd5fa32c267c554";
+    imageDigest = "sha256:df7bca0066e6f60cc3dd32faa70caddec20e2c22b58932f79498e5704b23854a";
     finalImageName = "postgres";
     finalImageTag = "15-alpine";
-    archiveHash = "sha256-ayQFr4AMotRUbCkcZkV6oY0sdwuVegLPcLDTOvbmpBI=";
+    archiveHash = "sha256-kFJJTWPAw4k+xerrB8pUMFn9rxn6o9UaYdxEejGNzmw=";
     os = "linux";
     arch = "amd64";
     sources = [
