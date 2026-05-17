@@ -20,11 +20,37 @@ spec:
     resources:
       limits:
         cpu: 100m
-        memory: 200Mi
+        memory: 512Mi
       requests:
-        cpu: 100m
-        memory: 100Mi
+        cpu: 10m
+        memory: 10Mi
     monitoring:
       # -- Specifies whether the monitoring should be enabled. Requires Prometheus Operator CRDs.
       podMonitorEnabled: false
+
+---
+# This is required for S3 backup support
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cnpg-plugin-barman-cloud
+  namespace: cnpg-system
+spec:
+  releaseName: cnpg
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-cloudnative-pg-plugin-barman-cloud
+    namespace: cnpg-system
+  # https://github.com/cloudnative-pg/charts
+  values:
+    crds:
+      create: true
+    resources:
+      limits:
+        cpu: 100m
+        memory: 200Mi
+      requests:
+        cpu: 10m
+        memory: 10Mi
 
