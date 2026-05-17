@@ -67,3 +67,17 @@ spec:
       protocol: CONNECT
       targetHost: objects.githubusercontent.com
       targetPort: 443
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: encapsulate-https-release-assets.githubusercontent.com
+  namespace: egress-system
+spec:
+  host: release-assets.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
+  exportTo: ["."]
+  trafficPolicy:
+    tunnel:
+      protocol: CONNECT
+      targetHost: release-assets.githubusercontent.com
+      targetPort: 443

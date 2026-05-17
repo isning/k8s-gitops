@@ -97,3 +97,23 @@ spec:
           group: networking.istio.io
           name: objects.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
           port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: TLSRoute
+metadata:
+  name: direct-to-encapsulated-https-release-assets.githubusercontent.com
+  namespace: egress-system
+spec:
+  parentRefs:
+    - kind: ServiceEntry
+      group: networking.istio.io
+      name: github-others
+      port: 443
+  hostnames:
+    - release-assets.githubusercontent.com
+  rules:
+    - backendRefs:
+        - kind: Hostname
+          group: networking.istio.io
+          name: release-assets.githubusercontent.com.encapsulated-https.egress-gateway.mesh.internal
+          port: 443
