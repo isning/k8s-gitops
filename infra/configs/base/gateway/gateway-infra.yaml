@@ -62,8 +62,8 @@ spec:
           - staging
 ---
 # Move HTTP listener out of gateway to avoid auto attaching HTTPRoute to it to ensure the redirect HTTPRoute is selected
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: http-listener-set
   namespace: kube-system
@@ -96,8 +96,8 @@ metadata:
   namespace: kube-system
 spec:
   parentRefs:
-    - group: gateway.networking.x-k8s.io
-      kind: XListenerSet
+    - group: gateway.networking.k8s.io
+      kind: ListenerSet
       name: http-listener-set
       sectionName: http-raw
   hostnames:
