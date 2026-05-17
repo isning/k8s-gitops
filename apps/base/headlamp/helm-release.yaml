@@ -1,0 +1,72 @@
+# https://fluxcd.io/flux/components/helm/helmreleases/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: headlamp
+  namespace: prod
+spec:
+  releaseName: headlamp
+  interval: 30m
+  chart:
+    spec:
+      chart: headlamp
+      sourceRef:
+        kind: HelmRepository
+        name: helm-repo-headlamp
+      version: "0.42.0"
+      interval: 12h
+  values:
+    httpRoute:
+      enabled: true
+      # Optional: annotations on the HTTPRoute resource
+      annotations: {}
+      # Optional: additional labels for the HTTPRoute
+      labels: {}
+      parentRefs:
+        - name: default-gateway
+      hostnames:
+        - headlamp.isning.moe
+      # Optional: custom routing rules. If omitted, chart defaults to path prefix '/'
+      # rules:
+      #   - matches:
+      #       - path:
+      #           type: Prefix
+      #           value: "/"
+
+    config:
+      # baseURL: https://headlamp.isning.moe
+      oidc:
+        clientID: "xktx7x81fvdwvx3a0ly62"
+        issuerURL: "https://logto.isning.moe/oidc"
+        scopes: "openid email profile offline_access roles"
+        usePKCE: true
+        useCookie: false
+        meUserInfoURL: "https://logto.isning.moe/oidc/me"
+
+    # Resource requests and limits for Headlamp pod
+    resources:
+      requests:
+        cpu: "10m"
+        memory: "32Mi"
+      limits:
+        cpu: "200m"
+        memory: "512Mi"
+    # Plugin volumes and mounts (mount plugin images into /headlamp/plugins/...)
+    volumes:
+      - name: plugin-flux
+        image:
+          reference: ghcr.io/headlamp-k8s/headlamp-plugin-flux:v0.6.0
+          pullPolicy: IfNotPresent
+      - name: plugin-cert-manager
+        image:
+          reference: ghcr.io/headlamp-k8s/headlamp-plugin-cert-manager:v0.1.0
+          pullPolicy: IfNotPresent
+    volumeMounts:
+      - name: plugin-flux
+        mountPath: /headlamp/plugins/flux
+        subPath: plugins/flux/
+      - name: plugin-cert-manager
+        mountPath: /headlamp/plugins/cert-manager
+        subPath: plugins/cert-manager/
+  # Note: OIDC credentials are provided via the external Secret `headlamp-oidc` in namespace `prod`.
