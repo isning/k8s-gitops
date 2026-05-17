@@ -7,3 +7,4 @@ resources:
   - ./destinationrule.yaml
   - ./routes.yaml
   - ./serviceentries.yaml
+  - ./io
