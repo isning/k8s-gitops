@@ -1,0 +1,96 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vaultwarden
+spec:
+  releaseName: vaultwarden
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-vaultwarden
+    namespace: prod
+  values:
+    # HTTPS required for Passkey support
+    domain: 'https://vault.isning.moe'
+
+    vaultwarden:
+      signupsAllowed: true
+      invitationsAllowed: true
+      sendsAllowed: true
+      passwordIterations: 600000
+
+    admin:
+      existingSecret: vaultwarden-admin
+      existingSecretTokenKey: admin-token
+
+    smtp:
+      enabled: true
+      host: smtp.office365.com
+      port: 587
+      from: noreply@isning.moe
+      fromName: Vaultwarden
+      security: starttls
+      username: noreply@isning.moe
+      existingSecret: vaultwarden-smtp
+      existingSecretPasswordKey: password
+
+    database:
+      mode: sqlite
+
+    extraEnv:
+      - name: PUSH_ENABLED
+        value: "true"
+      - name: PUSH_INSTALLATION_ID
+        valueFrom:
+          secretKeyRef:
+            name: vaultwarden-push
+            key: PUSH_INSTALLATION_ID
+      - name: PUSH_INSTALLATION_KEY
+        valueFrom:
+          secretKeyRef:
+            name: vaultwarden-push
+            key: PUSH_INSTALLATION_KEY
+      - name: SSO_ENABLED
+        value: "true"
+      - name: SSO_SIGNUPS_MATCH_EMAIL # On SSO Signup if a user with a matching email already exists make the association (default true)
+        value: "true"
+      - name: SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION # Allow unknown email verification status (default false). Allowing this with SSO_SIGNUPS_MATCH_EMAIL open potential account takeover.
+        value: "false"
+      - name: SSO_AUTHORITY
+        value: "https://logto.isning.moe/oidc"
+      - name: SSO_SCOPES
+        value: "openid email profile offline_access"
+      - name: SSO_CLIENT_ID
+        value: "4ggb667if8rr9gcgk51vq"
+      - name: SSO_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: vaultwarden-oidc
+            key: SSO_CLIENT_SECRET
+      - name: SSO_ENABLED
+        value: "true"
+      - name: SSO_ENABLED
+        value: "true"
+
+    backup:
+      enabled: true
+      schedule: '0 3 * * *'
+      s3:
+        endpoint: https://0fa2f8672cf2637118d8cfee9fe6b95f.r2.cloudflarestorage.com
+        bucket: vaultwarden-backup
+        prefix: prod
+        existingSecret: vaultwarden-r2-credentials
+
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        memory: 256Mi
+        cpu: 200m
+
+    data:
+      persistence:
+        enabled: true
+        size: 5Gi

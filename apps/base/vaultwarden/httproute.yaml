@@ -1,0 +1,18 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: vaultwarden
+spec:
+  parentRefs:
+    - name: default-gateway
+  hostnames:
+    - vw.isning.moe
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: vaultwarden-vaultwarden
+          port: 80
