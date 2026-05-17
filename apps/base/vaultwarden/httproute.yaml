@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: default-gateway
   hostnames:
-    - vw.isning.moe
+    - vault.isning.moe
   rules:
     - matches:
         - path:
