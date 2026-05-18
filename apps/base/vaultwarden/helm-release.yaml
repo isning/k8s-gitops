@@ -20,7 +20,8 @@ spec:
       invitationsAllowed: true
       sendsAllowed: true
       passwordIterations: 600000
-      proxy.ipHeader: X-Envoy-External-Address
+      proxy:
+        ipHeader: X-Envoy-External-Address
 
     admin:
       existingSecret: vaultwarden-admin
