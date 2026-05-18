@@ -36,7 +36,7 @@ metadata:
   name: cnpg-plugin-barman-cloud
   namespace: cnpg-system
 spec:
-  releaseName: cnpg
+  releaseName: cnpg-plugin-barman-cloud
   interval: 30m
   chartRef:
     kind: OCIRepository
