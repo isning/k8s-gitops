@@ -15,10 +15,12 @@ spec:
     domain: 'https://vault.isning.moe'
 
     vaultwarden:
-      signupsAllowed: true
+      signupsAllowed: false
+      signupsVerify: true
       invitationsAllowed: true
       sendsAllowed: true
       passwordIterations: 600000
+      proxy.ipHeader: X-Envoy-External-Address
 
     admin:
       existingSecret: vaultwarden-admin
@@ -51,8 +53,6 @@ spec:
           secretKeyRef:
             name: vaultwarden-push
             key: PUSH_INSTALLATION_KEY
-      - name: IP_HEADER
-        value: "X-Envoy-External-Address"
       - name: SSO_ENABLED
         value: "true"
       - name: SSO_SIGNUPS_MATCH_EMAIL # On SSO Signup if a user with a matching email already exists make the association (default true)
