@@ -207,6 +207,48 @@
     ];
   }
   {
+    imageName = "docker.io/helmforge/mc";
+    imageDigest = "sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727";
+    finalImageName = "docker.io/helmforge/mc";
+    finalImageTag = "1.0.0";
+    archiveHash = "sha256-8xPttbm6vhgjwnRXIxocms9wrClLTETa8bU31hrsC2s=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "vaultwarden"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "vaultwarden"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "CronJob"; namespace = "unknown ns"; name = "vaultwarden-vaultwarden-backup"; }
+    ];
+  }
+  {
+    imageName = "docker.io/library/alpine";
+    imageDigest = "sha256:310c62b5e7ca5b08167e4384c68db0fd2905dd9c7493756d356e893909057601";
+    finalImageName = "docker.io/library/alpine";
+    finalImageTag = "3.22";
+    archiveHash = "sha256-VHY3iJVzBNemI5WJ1BRfsfjOUDv6N/UZSJJYmoikFXI=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "vaultwarden"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "vaultwarden"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "CronJob"; namespace = "unknown ns"; name = "vaultwarden-vaultwarden-backup"; }
+    ];
+  }
+  {
     imageName = "docker.io/rancher/local-path-provisioner";
     imageDigest = "sha256:1eba82e9c386038b4af6d69cca7519fac738c28c42735ed48ce70c882ad0d80f";
     finalImageName = "docker.io/rancher/local-path-provisioner";
@@ -225,6 +267,27 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "kube-system"; name = "local-path-provisioner"; }
+    ];
+  }
+  {
+    imageName = "docker.io/vaultwarden/server";
+    imageDigest = "sha256:d626d04934cd1192ad8ced1adb975099fca78cec33ab467d2d3c923cde7f3b0c";
+    finalImageName = "docker.io/vaultwarden/server";
+    finalImageTag = "1.36.0";
+    archiveHash = "sha256-0nfPTInWIYZGyPwRRC1aYKAKC7jVQeRlIWe3HmyNzrE=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "vaultwarden"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "vaultwarden"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "unknown ns"; name = "vaultwarden-vaultwarden"; }
     ];
   }
   {
@@ -266,6 +329,27 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "cnpg-system"; name = "cnpg-cloudnative-pg"; }
+    ];
+  }
+  {
+    imageName = "ghcr.io/cloudnative-pg/plugin-barman-cloud";
+    imageDigest = "sha256:0b9c428123313d93efbec26bdef85e91f2130a7bd8e382a767de12b3938f6271";
+    finalImageName = "ghcr.io/cloudnative-pg/plugin-barman-cloud";
+    finalImageTag = "v0.12.0";
+    archiveHash = "sha256-W0glk+3dwzIHLJZ9XsIKXr494zBa6O+xZykwLLTKeug=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "cnpg-system"; name = "cnpg-plugin-barman-cloud"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "cnpg-system"; name = "cnpg-plugin-barman-cloud"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "cnpg-system"; name = "cnpg-plugin-barman-cloud"; }
     ];
   }
   {
@@ -1095,10 +1179,10 @@
   }
   {
     imageName = "soulter/astrbot";
-    imageDigest = "sha256:90e938a7833e073c6fa80e1115690378fb9815321c46bcb7912c7d2829fad835";
+    imageDigest = "sha256:d26eacf8aba492ae09ef781038ceea08a7c6f3bffbe222dbd8679ce642ed5c5f";
     finalImageName = "soulter/astrbot";
-    finalImageTag = "v4.25.0";
-    archiveHash = "sha256-hUMKKnpM9ME+FobhC/f3P6qndkzkBKLl74NJen9bSds=";
+    finalImageTag = "v4.25.1";
+    archiveHash = "sha256-llrK0OfBUhR9yraCQu3eVPrzR3Nc4w9moYzZ4N0FgSk=";
     os = "linux";
     arch = "amd64";
     sources = [
