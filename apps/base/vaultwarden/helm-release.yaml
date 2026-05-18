@@ -51,6 +51,8 @@ spec:
           secretKeyRef:
             name: vaultwarden-push
             key: PUSH_INSTALLATION_KEY
+      - name: IP_HEADER
+        value: "X-Envoy-External-Address"
       - name: SSO_ENABLED
         value: "true"
       - name: SSO_SIGNUPS_MATCH_EMAIL # On SSO Signup if a user with a matching email already exists make the association (default true)
