@@ -5,6 +5,13 @@ metadata:
 spec:
   instances: 1
 
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: logto-pg-objectstore
+        serverName: logto-pg-cluster
+
   # Logto requires superuser access:
   # https://github.com/logto-io/logto/issues/6842
   # https://github.com/logto-io/logto/issues/8275
@@ -28,5 +35,5 @@ spec:
   storage:
     size: 10Gi
     storageClass: local-path-nocow
-  
+
   enableSuperuserAccess: true
