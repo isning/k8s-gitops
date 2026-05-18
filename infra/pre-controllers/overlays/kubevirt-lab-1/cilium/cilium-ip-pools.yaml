@@ -16,4 +16,4 @@ metadata:
 spec:
   allowFirstLastIPs: No
   blocks:
-  - cidr: "2409:8a04:a020:8010:caf0::0/112"
+  - cidr: "2409:8a04:a021:a870:caf0::0/112"
