@@ -36,6 +36,7 @@ spec:
 
     config:
       # baseURL: https://headlamp.isning.moe
+      watchPlugins: true
       oidc:
         clientID: "xktx7x81fvdwvx3a0ly62"
         issuerURL: "https://logto.isning.moe/oidc"
