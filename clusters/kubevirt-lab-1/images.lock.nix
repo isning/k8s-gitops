@@ -1219,10 +1219,10 @@
   }
   {
     imageName = "victoriametrics/operator";
-    imageDigest = "sha256:8b637eaf5f8694ce7847a67b781f3e9a9df298eaa2c5d7fe6ff15cc3fd3f5bf6";
+    imageDigest = "sha256:9c2c3028c78c75c3324f890b31f28f6abaff3c0c05c4733c780fc0ea1b7f324d";
     finalImageName = "victoriametrics/operator";
-    finalImageTag = "v0.69.0";
-    archiveHash = "sha256-JY5FQDL+GSP7shLu71+SY/iYetdmIRMPyf9/SWPqVFU=";
+    finalImageTag = "v0.70.0";
+    archiveHash = "sha256-zyvRmVrQKUu0HP2w4jgLyqjXdaAsFk00P9LkIVSE4VM=";
     os = "linux";
     arch = "amd64";
     sources = [
