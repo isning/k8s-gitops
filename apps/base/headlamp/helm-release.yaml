@@ -63,6 +63,10 @@ spec:
         image:
           reference: ghcr.io/headlamp-k8s/headlamp-plugin-cert-manager:v0.1.0
           pullPolicy: IfNotPresent
+      - name: plugin-kubevirt
+        image:
+          reference: ghcr.io/naval-group/headlamp-kubevirt:0.2.2
+          pullPolicy: IfNotPresent
     volumeMounts:
       - name: plugin-flux
         mountPath: /headlamp/plugins/flux
@@ -70,4 +74,7 @@ spec:
       - name: plugin-cert-manager
         mountPath: /headlamp/plugins/cert-manager
         subPath: plugins/cert-manager/
+      - name: plugin-kubevirt
+        mountPath: /headlamp/plugins/kubevirt
+        subPath: plugins/kubevirt/
   # Note: OIDC credentials are provided via the external Secret `headlamp-oidc` in namespace `prod`.
