@@ -11,6 +11,7 @@ resources:
   - ./../../../base/flux-operator/
   - ./../../../base/astrbot/
   - ./../../../base/newapi/
+  - ./../../../base/metapi/
   - ./../../../base/speaches/
   - ./../../../base/siyuan/
   - ./../../../base/vaultwarden/
