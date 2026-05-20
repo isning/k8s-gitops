@@ -14,5 +14,5 @@ data:
       "accessControlMode": "none",
       "ipWhitelist": [],
       "ipBlacklist": [],
-      "enableXForwardedFor": true,
+      "enableXForwardedFor": true
     }
