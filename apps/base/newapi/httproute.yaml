@@ -1,38 +1,28 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: clirelay-manage
+  name: newapi-route
   labels:
-    app: clirelay
+    app: newapi
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: default-gateway
   hostnames:
-    - "clirelay.isning.moe"
+    - "llm-dash.isning.moe"
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /manage
-      backendRefs:
-        - name: clirelay
-          port: 8317
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /v0/management
-      backendRefs:
-        - name: clirelay
-          port: 8317
+    - backendRefs:
+        - name: newapi
+          port: 80
+
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: clirelay-api
+  name: newapi-api
   labels:
-    app: clirelay
+    app: newapi
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
@@ -46,12 +36,13 @@ spec:
             type: PathPrefix
             value: /v1
       backendRefs:
-        - name: clirelay
-          port: 8317
+        - name: newapi
+          port: 80
     - matches:
         - path:
             type: PathPrefix
-            value: /api/provider
+            value: /v1beta
       backendRefs:
-        - name: clirelay
-          port: 8317
+        - name: newapi
+          port: 80
+

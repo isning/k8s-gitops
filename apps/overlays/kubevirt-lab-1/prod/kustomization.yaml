@@ -10,7 +10,7 @@ resources:
   - ./../../../base/headlamp/
   - ./../../../base/flux-operator/
   - ./../../../base/astrbot/
-  - ./../../../base/clirelay/
+  - ./../../../base/newapi/
   - ./../../../base/speaches/
   - ./../../../base/siyuan/
   - ./../../../base/vaultwarden/
