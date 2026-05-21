@@ -3,5 +3,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./default-tunnel.yaml
+  - ./default-tunnel-v6-deployment.yaml
   - ./tunnel-binding-gateway.yaml
   - ./dns-binding.yaml
