@@ -102,6 +102,26 @@
     ];
   }
   {
+    imageName = "calciumion/new-api";
+    imageDigest = "sha256:af1f10306055076b58acb17298e2a775a484ee3fdc1eddae35e431f243e1e950";
+    finalImageName = "calciumion/new-api";
+    finalImageTag = "v1.0.0-rc.7";
+    archiveHash = "sha256-8pcYA3weskM9pYwQgGXs2nFI+lfrWEvIZOmGorlgGqI=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "StatefulSet"; namespace = "prod"; name = "newapi"; }
+    ];
+  }
+  {
     imageName = "docker.io/goharbor/harbor-core";
     imageDigest = "sha256:32a13f6693a278261e9c9cb7eb606c5e2aa021308ae44fdc73225755048500a8";
     finalImageName = "docker.io/goharbor/harbor-core";
@@ -311,6 +331,26 @@
     ];
   }
   {
+    imageName = "ghcr.io/cita-777/metapi";
+    imageDigest = "sha256:46cada1a8a7e55d6d40752c9e2e6b61c38de4edf0dde85e0f398b79994cc16e8";
+    finalImageName = "ghcr.io/cita-777/metapi";
+    finalImageTag = "v1.3.0";
+    archiveHash = "sha256-bNFHxgkIsRAFt1pdbZq3i0SDJiN5f3Q9w04Hr1sPlGU=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "StatefulSet"; namespace = "prod"; name = "metapi"; }
+    ];
+  }
+  {
     imageName = "ghcr.io/cloudnative-pg/cloudnative-pg";
     imageDigest = "sha256:0dfff19ba7b52ca25851a1010028b6940fff2e233290465af1cfb08a5f3f4661";
     finalImageName = "ghcr.io/cloudnative-pg/cloudnative-pg";
@@ -354,10 +394,10 @@
   }
   {
     imageName = "ghcr.io/controlplaneio-fluxcd/flux-operator";
-    imageDigest = "sha256:9a689c27cd1f0c8b78d06a711e27aa7e64f217beb0c56510d7ef8a3bffa50322";
+    imageDigest = "sha256:d7423e1d6b0e206cc5b9758fa8615d7694664ed906c5087f4202eeb14187421a";
     finalImageName = "ghcr.io/controlplaneio-fluxcd/flux-operator";
-    finalImageTag = "v0.49.0";
-    archiveHash = "sha256-kyLE/j2c9aIi3vEHTNy3HlRK1U9hDgpXfPBdygGo54Q=";
+    finalImageTag = "v0.50.0";
+    archiveHash = "sha256-WUndNOtEwGizy/ix1TK2YrJXfGWaOT6eqsDopVyW0u8=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -496,26 +536,6 @@
     ];
   }
   {
-    imageName = "ghcr.io/kittors/clirelay";
-    imageDigest = "sha256:cd71a43c7feee1831511fc5bd3e6cf1a417bdb856b2464799def509fa479367d";
-    finalImageName = "ghcr.io/kittors/clirelay";
-    finalImageTag = "main";
-    archiveHash = "sha256-2IXUqmYaoEZEzUkvh85u6o3CEbPpMFgvle4diBhx9FM=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-      ]
-    ];
-    targets = [
-      { kind = "Deployment"; namespace = "prod"; name = "clirelay"; }
-    ];
-  }
-  {
     imageName = "ghcr.io/logto-io/logto";
     imageDigest = "sha256:9dc15595766961d0d81d1026fc38294eacf3ce32d6dab2e9dbeb6d9b10e7a031";
     finalImageName = "ghcr.io/logto-io/logto";
@@ -536,6 +556,25 @@
       { kind = "Deployment"; namespace = "unknown ns"; name = "logto"; }
       { kind = "Job"; namespace = "unknown ns"; name = "logto-pre-app-1"; }
     ];
+  }
+  {
+    imageName = "ghcr.io/naval-group/headlamp-kubevirt";
+    imageDigest = "sha256:7cdff58fdda4f3ad7b7a208b83744ec82648795056cf726f0ce5df2501ee3d14";
+    finalImageName = "ghcr.io/naval-group/headlamp-kubevirt";
+    finalImageTag = "0.2.2";
+    archiveHash = "sha256-kF1hnipCHJmyujf3G8o1q/LtogrPKMDMW5jD1976rKk=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [];
   }
   {
     imageName = "ghcr.io/sagernet/sing-box";
@@ -1012,10 +1051,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis-exporter";
-    imageDigest = "sha256:839260c04bc3858980157da2f69219681bdcd8874fdb0a58c40b396050b5100d";
+    imageDigest = "sha256:3326f940f59cd06f0a96aeca2ab78c02b1dd2fd209a8d52b0317c4c3a24530b1";
     finalImageName = "registry-1.docker.io/bitnami/redis-exporter";
     finalImageTag = "latest";
-    archiveHash = "sha256-7cbM3OtQQ+UgBTloxdE7JMNM9Mhc04ssFiOoSdT8/Q8=";
+    archiveHash = "sha256-V8SexXt+5SgJE2APQOtMND/H7M+tvtFbjfYahXnxBQc=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1219,10 +1258,10 @@
   }
   {
     imageName = "victoriametrics/operator";
-    imageDigest = "sha256:9c2c3028c78c75c3324f890b31f28f6abaff3c0c05c4733c780fc0ea1b7f324d";
+    imageDigest = "sha256:fb5ebef9cba3746d73ee0dee1bb9e4bc80539687518fd1e2e6ab7776b438048a";
     finalImageName = "victoriametrics/operator";
-    finalImageTag = "v0.70.0";
-    archiveHash = "sha256-zyvRmVrQKUu0HP2w4jgLyqjXdaAsFk00P9LkIVSE4VM=";
+    finalImageTag = "v0.70.1";
+    archiveHash = "sha256-/p8F8uFvV55QDnspaGTsiFYmSSQQrdKHf2Zvv5m0Kpc=";
     os = "linux";
     arch = "amd64";
     sources = [
