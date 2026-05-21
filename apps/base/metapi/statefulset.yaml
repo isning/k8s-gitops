@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: metapi
-        image: ghcr.io/cita-777/metapi:v1.3.0
+        image: ghcr.io/cita-777/metapi:v1.3.0@sha256:46cada1a8a7e55d6d40752c9e2e6b61c38de4edf0dde85e0f398b79994cc16e8
         ports:
         - name: http
           containerPort: 4000
