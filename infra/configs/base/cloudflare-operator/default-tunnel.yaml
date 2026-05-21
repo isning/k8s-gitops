@@ -9,3 +9,56 @@ spec:
     domain: isning.moe
     secret: cloudflare-tunnel-secret
     accountId: 0fa2f8672cf2637118d8cfee9fe6b95f
+  deployPatch: |
+    spec:
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - name: cloudflared
+              image: cloudflare/cloudflared:2026.5.0
+              env:
+                - name: TUNNEL_TRANSPORT_PROTOCOL
+                  value: "http2"
+                - name: TUNNEL_EDGE_IP_VERSION
+                  value: "4"
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
+
+---
+apiVersion: networking.cfargotunnel.com/v1alpha2
+kind: Tunnel
+metadata:
+  name: default-tunnel-v6
+  namespace: cloudflare-operator-system
+spec:
+  cloudflare:
+    email: isning_sf@outlook.com
+    domain: isning.moe
+    secret: cloudflare-tunnel-secret
+    accountId: 0fa2f8672cf2637118d8cfee9fe6b95f
+  deployPatch: |
+    spec:
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - name: cloudflared
+              image: cloudflare/cloudflared:2026.5.0
+              env:
+                - name: TUNNEL_TRANSPORT_PROTOCOL
+                  value: "http2"
+                - name: TUNNEL_EDGE_IP_VERSION
+                  value: "6"
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
