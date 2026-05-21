@@ -2,7 +2,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./default-tunnel-cred-secret.yaml
+  - ./default-tunnel-secret.yaml
   - ../../../base/cloudflare-operator/
 
 patches:
