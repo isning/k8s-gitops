@@ -11,6 +11,12 @@ patches:
       kind: Tunnel
       name: default-tunnel
       namespace: cloudflare-operator-system
+  - path: ./default-tunnel-patch.yaml
+    target:
+      group: networking.cfargotunnel.com
+      kind: Tunnel
+      name: default-tunnel-v6
+      namespace: cloudflare-operator-system
   - target:
       group: networking.cfargotunnel.com
       kind: TunnelBinding
@@ -38,4 +44,3 @@ patches:
       - op: replace
         path: /spec/endpoints/0/dnsName
         value: "*.kubevirt-lab-1.isning.moe"
-    
