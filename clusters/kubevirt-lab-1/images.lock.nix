@@ -102,23 +102,23 @@
     ];
   }
   {
-    imageName = "calciumion/new-api";
-    imageDigest = "sha256:af1f10306055076b58acb17298e2a775a484ee3fdc1eddae35e431f243e1e950";
-    finalImageName = "calciumion/new-api";
-    finalImageTag = "v1.0.0-rc.7";
-    archiveHash = "sha256-8pcYA3weskM9pYwQgGXs2nFI+lfrWEvIZOmGorlgGqI=";
+    imageName = "cloudflare/cloudflared";
+    imageDigest = "sha256:59bab8d3aceec09bf6bdb07d6beca0225ca5cd7ab79436a87ea97978fe1dc4f9";
+    finalImageName = "cloudflare/cloudflared";
+    finalImageTag = "2026.5.0";
+    archiveHash = "sha256-FpaPCgFbDip5MAOAfgzRQJUg0SlFvYb4ZsCijIt2n4I=";
     os = "linux";
     arch = "amd64";
     sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
     ];
     sourceChains = [
       [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
       ]
     ];
     targets = [
-      { kind = "StatefulSet"; namespace = "prod"; name = "newapi"; }
+      { kind = "Deployment"; namespace = "cloudflare-operator-system"; name = "default-tunnel-v6"; }
     ];
   }
   {
@@ -436,10 +436,10 @@
   }
   {
     imageName = "ghcr.io/grafana/grafana-operator";
-    imageDigest = "sha256:d45fc24e8f43d83286d81625ee8d919d0fc88255a6500b63f68d7966a4f9e9af";
+    imageDigest = "sha256:3abeaccdf54e9e02c2f4b6215be594c8f78b94a866961ada7f92b677bf33c9b4";
     finalImageName = "ghcr.io/grafana/grafana-operator";
-    finalImageTag = "v5.22.2";
-    archiveHash = "sha256-jxWbNumHUxLF4Ppd8ETUTNXISKX8Of8ThU8ydcXT+9A=";
+    finalImageTag = "v5.23.0";
+    archiveHash = "sha256-lJeZ0Xv3Sg3UUWJsniCgpU1r+kPmMmsf5dzpNdjiuMM=";
     os = "linux";
     arch = "amd64";
     sources = [
