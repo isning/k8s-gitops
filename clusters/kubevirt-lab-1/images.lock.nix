@@ -62,10 +62,10 @@
   }
   {
     imageName = "busybox";
-    imageDigest = "sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e";
+    imageDigest = "sha256:b6762ddf4a50aabb5f4d21aa6f447d05d5633fb09f09c08b33f22356a2f98be0";
     finalImageName = "busybox";
-    finalImageTag = "1.37.0";
-    archiveHash = "sha256-YkbVQz3aVQO3DeNDLRHZ+/rd+6/FMlMqAvAwCOYxiz4=";
+    finalImageTag = "1.38.0";
+    archiveHash = "sha256-qNInGrIGVVzC6laDaEle3aboHAL/qX+elLPFv9YMVaY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -82,10 +82,10 @@
   }
   {
     imageName = "busybox";
-    imageDigest = "sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e";
+    imageDigest = "sha256:32015ee641bfecc97161986c9d24957068175444f66fbcbe08a664b6cf5c1c2e";
     finalImageName = "busybox";
     finalImageTag = "latest";
-    archiveHash = "sha256-cV3VHAgQWARdUSZk264jkDXG0KStLAWIH4Wfpc9QNtQ=";
+    archiveHash = "sha256-8rNboqeytGrAamWikc0rOzA1k4bM7IsL5ZZq7GC4e18=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -658,10 +658,10 @@
   }
   {
     imageName = "mlikiowa/napcat-docker";
-    imageDigest = "sha256:d8098fdabedfe5cbc570b994aebb685c3096a2bebbf4ea43ffb21655a4758e63";
+    imageDigest = "sha256:2acfef8952da052ec66d8608e69db555c02e5ccc6e27e2609d641a2bee99be23";
     finalImageName = "mlikiowa/napcat-docker";
-    finalImageTag = "v4.18.2";
-    archiveHash = "sha256-3cWLkFN39w71u3PK1XHUaCQIbFhWQxQB3cAiCZmii9M=";
+    finalImageTag = "v4.18.4";
+    archiveHash = "sha256-x/WdKPVf5g/xLK7kxcBOkwkb0UPLxhM+ufKYiElzRNk=";
     os = "linux";
     arch = "amd64";
     sources = [
