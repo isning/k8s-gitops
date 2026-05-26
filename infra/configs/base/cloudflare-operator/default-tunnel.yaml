@@ -23,7 +23,7 @@ spec:
                 - --metrics
                 - 0.0.0.0:2000
                 - run
-              image: cloudflare/cloudflared:2026.5.0
+              image: cloudflare/cloudflared:2026.5.1@sha256:a5b5e6fd9a372f054b9a843c219bfbcdceb54691605312a8b1ee72978bdf1aa1
               env:
                 - name: TUNNEL_TRANSPORT_PROTOCOL
                   value: "http2"
