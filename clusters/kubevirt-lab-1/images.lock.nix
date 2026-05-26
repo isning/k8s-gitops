@@ -82,10 +82,10 @@
   }
   {
     imageName = "busybox";
-    imageDigest = "sha256:32015ee641bfecc97161986c9d24957068175444f66fbcbe08a664b6cf5c1c2e";
+    imageDigest = "sha256:fd8d9aa63ba2f0982b5304e1ee8d3b90a210bc1ffb5314d980eb6962f1a9715d";
     finalImageName = "busybox";
     finalImageTag = "latest";
-    archiveHash = "sha256-8rNboqeytGrAamWikc0rOzA1k4bM7IsL5ZZq7GC4e18=";
+    archiveHash = "sha256-9DvvHCHyDfRTkn58IbNOZODsjIcbmFvRPwpC0uYofzQ=";
     os = "linux";
     arch = "amd64";
     sources = [
