@@ -15,9 +15,9 @@
   },
   "packageRules": [
     {
-      "description": "Automerge non-major updates",
+      "description": "Stop Automerge non-major updates",
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
+      "automerge": false,
       "automergeStrategy": "squash",
       "platformAutomerge": true
     },
