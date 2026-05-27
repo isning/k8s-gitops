@@ -103,10 +103,10 @@
   }
   {
     imageName = "cloudflare/cloudflared";
-    imageDigest = "sha256:59bab8d3aceec09bf6bdb07d6beca0225ca5cd7ab79436a87ea97978fe1dc4f9";
+    imageDigest = "sha256:a5b5e6fd9a372f054b9a843c219bfbcdceb54691605312a8b1ee72978bdf1aa1";
     finalImageName = "cloudflare/cloudflared";
-    finalImageTag = "2026.5.0";
-    archiveHash = "sha256-FpaPCgFbDip5MAOAfgzRQJUg0SlFvYb4ZsCijIt2n4I=";
+    finalImageTag = "2026.5.1";
+    archiveHash = "sha256-Z4hSYqnb7Pl7QvNQEObFO96sVpxA+mMDtmImVToum+s=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -266,6 +266,26 @@
     ];
     targets = [
       { kind = "CronJob"; namespace = "unknown ns"; name = "vaultwarden-vaultwarden-backup"; }
+    ];
+  }
+  {
+    imageName = "docker.io/library/python";
+    imageDigest = "sha256:dd4d2bd5b53d9b25a51da13addf2be586beebd5387e289e798e4083d94ca837a";
+    finalImageName = "docker.io/library/python";
+    finalImageTag = "3.14-alpine";
+    archiveHash = "sha256-oXI5nXZgQsPL29gXKudeiMC1LBelnSdIiXRxzW2F2T4=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "egress-system"; name = "proxy-engine"; }
     ];
   }
   {
@@ -716,26 +736,6 @@
     targets = [
       { kind = "Deployment"; namespace = "unknown ns"; name = "logto"; }
       { kind = "Job"; namespace = "unknown ns"; name = "logto-pre-app-1"; }
-    ];
-  }
-  {
-    imageName = "python";
-    imageDigest = "sha256:dd4d2bd5b53d9b25a51da13addf2be586beebd5387e289e798e4083d94ca837a";
-    finalImageName = "python";
-    finalImageTag = "3.14-alpine";
-    archiveHash = "sha256-aG7L6i/2ZKsHBcrRKVZADgBWF2sfUDbqL2fXYUHbL6E=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-      ]
-    ];
-    targets = [
-      { kind = "Deployment"; namespace = "egress-system"; name = "proxy-engine"; }
     ];
   }
   {
