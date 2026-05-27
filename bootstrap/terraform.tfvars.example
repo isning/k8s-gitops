@@ -1,0 +1,7 @@
+kubeconfig = "~/.kube/config"
+# Set explicitly when the kubeconfig contains multiple clusters.
+# kube_context = "kubevirt-lab-1"
+cluster_name       = "kubevirt-lab-1"
+bootstrap_revision = 1
+
+# Supply the age private key through TF_VAR_sops_age_key, not this file.
