@@ -127,4 +127,4 @@ spec:
           sizeLimit: 50Mi
       - name: work-cache
         persistentVolumeClaim:
-          claimName: work-cache
+          claimName: proxy-engine-work-cache
