@@ -21,6 +21,12 @@ spec:
           key: uri
     endpoint: "https://logto.isning.moe"
 
+    autoSeeding:
+      enabled: true
+    autoAlteration:
+      enabled: true
+    deployOfficialConnectors: true
+
     httpRoute:
       enabled: true
       parentRefs:
