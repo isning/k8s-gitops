@@ -41,10 +41,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:bc37f11268208ce646cc91aadc482eb9a2b3f291c4576318772f164a13033f9e";
+    imageDigest = "sha256:9c362260ef11ec664c36f34e0cb263b5cacd5b2f64e4c9b93aa3c3dc95549315";
     finalImageName = "bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-QK9vYkX7I+ATyXn3F5pSCyhH54cX0IyKlTiX5L8fPjY=";
+    archiveHash = "sha256-8Z2sgwT7FCV2ViPB2lpmOt3vINxdmp9GY5VHvbixL4w=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1051,10 +1051,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis-exporter";
-    imageDigest = "sha256:ac57a310fd6b4fcb9dc59d1d499eb0e47f1a34e5c57225a9dbf65101e50fe19d";
+    imageDigest = "sha256:031b5a1206e057135ddb056efccc889970854fc121b9f2277a260e60bb10c0a6";
     finalImageName = "registry-1.docker.io/bitnami/redis-exporter";
     finalImageTag = "latest";
-    archiveHash = "sha256-7K+4Bs/ZJMXns5wBBxq7BUKCGRIZuxogzHYczDrPkLg=";
+    archiveHash = "sha256-ediQj48IKjycPQSAjzET7REwZkllJPTFdin9/06bKAo=";
     os = "linux";
     arch = "amd64";
     sources = [
