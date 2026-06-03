@@ -27,7 +27,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: helm-chart-longhorn
-    namespace: controllers
+    namespace: longhorn-system
   values:
     image:
       longhorn:
