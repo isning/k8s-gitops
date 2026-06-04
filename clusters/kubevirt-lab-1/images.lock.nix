@@ -41,10 +41,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:9c362260ef11ec664c36f34e0cb263b5cacd5b2f64e4c9b93aa3c3dc95549315";
+    imageDigest = "sha256:172d4889e49c3b66d91a3a5afc289448fa1407dda782b9817ccfd8d1b064660b";
     finalImageName = "bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-8Z2sgwT7FCV2ViPB2lpmOt3vINxdmp9GY5VHvbixL4w=";
+    archiveHash = "sha256-sOCkIO+BgkhMlJecfPYwthjSJ9ntCrGXOSYh+aEGlWI=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -119,6 +119,26 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "cloudflare-operator-system"; name = "default-tunnel-v6"; }
+    ];
+  }
+  {
+    imageName = "docker.io/1467078763/metapi";
+    imageDigest = "sha256:d29e74b18ce0734555c2088f1f6638e301a7fc01873ff979961ff8a1ac618da8";
+    finalImageName = "docker.io/1467078763/metapi";
+    finalImageTag = "latest";
+    archiveHash = "sha256-g8Tmwah+ZgTtvRviqdhfICWyQA9MQw3zv2qCan6rU9c=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "StatefulSet"; namespace = "prod"; name = "metapi"; }
     ];
   }
   {
@@ -348,26 +368,6 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "prod"; name = "bay"; }
-    ];
-  }
-  {
-    imageName = "ghcr.io/cita-777/metapi";
-    imageDigest = "sha256:46cada1a8a7e55d6d40752c9e2e6b61c38de4edf0dde85e0f398b79994cc16e8";
-    finalImageName = "ghcr.io/cita-777/metapi";
-    finalImageTag = "v1.3.0";
-    archiveHash = "sha256-bNFHxgkIsRAFt1pdbZq3i0SDJiN5f3Q9w04Hr1sPlGU=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-      ]
-    ];
-    targets = [
-      { kind = "StatefulSet"; namespace = "prod"; name = "metapi"; }
     ];
   }
   {
@@ -1051,10 +1051,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis-exporter";
-    imageDigest = "sha256:031b5a1206e057135ddb056efccc889970854fc121b9f2277a260e60bb10c0a6";
+    imageDigest = "sha256:27abbdd44585399a5b34f3dc329235381c5e1091b264e886757812d99d5666e3";
     finalImageName = "registry-1.docker.io/bitnami/redis-exporter";
     finalImageTag = "latest";
-    archiveHash = "sha256-ediQj48IKjycPQSAjzET7REwZkllJPTFdin9/06bKAo=";
+    archiveHash = "sha256-9rs3hmKNKXgP3t+5X3fzsFBWzjrQsH1PPoj/tCWOl1I=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1072,10 +1072,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis";
-    imageDigest = "sha256:1347d526ecec0c6537e99eac09e7c3405c21664f6044ff60e78b0898da37abd2";
+    imageDigest = "sha256:1d391b67aeec1254d333aa2640bca526e7d7026e93b2035ccfbc62f7a7a8c248";
     finalImageName = "registry-1.docker.io/bitnami/redis";
     finalImageTag = "latest";
-    archiveHash = "sha256-/TUHolOlho3654jwbAabp0cXehl2AHwPnBbB3h/48bQ=";
+    archiveHash = "sha256-NQjvvMwkfflIICFFmuN48KMhT0Q+JXlugUN/JSUDYLU=";
     os = "linux";
     arch = "amd64";
     sources = [
