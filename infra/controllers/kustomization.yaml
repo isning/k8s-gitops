@@ -1,0 +1,6 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Gate kustomization: infra-controllers depends on this, but the real work is in
+# foundation/networking/monitoring/general overlays chained in infrastructure.yaml.
+resources: []

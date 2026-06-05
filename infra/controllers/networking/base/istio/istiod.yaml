@@ -1,0 +1,67 @@
+# https://fluxcd.io/flux/components/helm/helmreleases/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istiod
+  namespace: istio-system
+spec:
+  dependsOn:
+    - name: istio-base
+  releaseName: istiod
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-istiod
+    namespace: istio-system
+  # https://github.com/istio/istio/blob/1.27.0/manifests/charts/istio-control/istio-discovery/values.yaml
+  values:
+    profile: ambient
+    global:
+      # Used to locate istiod.
+      istioNamespace: istio-system
+      # enable pod disruption budget for the control plane, which is used to
+      # ensure Istio control plane components are gradually upgraded or recovered.
+      defaultPodDisruptionBudget:
+        enabled: true
+
+      # A minimal set of requested resources to applied to all deployments so that
+      # Horizontal Pod Autoscaler will be able to function (if set).
+      # Each component can overwrite these default values by adding its own resources
+      # block in the relevant section below and setting the desired resources values.
+      defaultResources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+    # Enable dual-stack for ambient mode: https://github.com/istio/istio/discussions/57723
+    pilot:
+      env:
+        ISTIO_DUAL_STACK: "true"
+        PILOT_ENABLE_ALPHA_GATEWAY_API: "true"
+    meshConfig:
+      extensionProviders:
+        - name: oauth2-proxy
+          envoyExtAuthzHttp:
+            service: oauth2-proxy.prod.svc.cluster.local
+            port: "80"
+            pathPrefix: /oauth2/auth
+            includeRequestHeadersInCheck:
+              - cookie
+              - x-auth-request-redirect
+            headersToUpstreamOnAllow:
+              - x-oauth2-gateway-user
+              - x-oauth2-gateway-email
+              - x-oauth2-gateway-access-token
+              - x-oauth2-gateway-groups
+              - x-oauth2-gateway-id-token
+            headersToDownstreamOnDeny:
+              - content-type
+              - set-cookie
+              - location
+      defaultConfig:
+        proxyMetadata:
+          ISTIO_DUAL_STACK: "true"
+    ipFamilyPolicy: PreferDualStack

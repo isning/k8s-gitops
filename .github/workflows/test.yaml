@@ -183,7 +183,6 @@ jobs:
         env:
           CLUSTER: ${{ matrix.cluster }}
           RESOURCE: ${{ matrix.resource }}
-          DIFF_OUTPUT: ${{ steps.diff.outputs.diff }}
           DIFF_OUTCOME: ${{ steps.diff.outcome }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
         run: |
@@ -192,11 +191,17 @@ jobs:
           import json
           import os
 
+          diff_path = os.path.join(os.environ["GITHUB_WORKSPACE"], "diff.patch")
+          diff = ""
+          if os.path.exists(diff_path):
+              with open(diff_path, encoding="utf-8") as f:
+                  diff = f.read()
+
           payload = {
             "cluster": os.environ["CLUSTER"],
             "resource": os.environ["RESOURCE"],
             "outcome": os.environ["DIFF_OUTCOME"],
-            "diff": os.environ.get("DIFF_OUTPUT", ""),
+            "diff": diff,
             "run_url": os.environ["RUN_URL"],
           }
 
@@ -246,6 +251,7 @@ jobs:
           cat > build_comment.py <<'PYEOF'
           import glob
           import json
+          import os
           from collections import defaultdict
 
           files = sorted(glob.glob("artifacts/**/*.json", recursive=True))
@@ -282,19 +288,15 @@ jobs:
             else:
               total_failed += 1
 
-          short_sha = "${{ github.sha }}"[:7]
-          print("## flux-local diff summary")
-          print()
-          print(f"Commit: `{short_sha}` | Clusters: {len(grouped)} | Resources: {total_resources}")
-          print(f"Changed: {total_changed} | No change: {total_no_change} | Failed: {total_failed}")
-          print()
+          short_sha = os.environ["GITHUB_SHA"][:7]
+          body = "## flux-local diff summary\n"
+          body += f"\nCommit: `{short_sha}` | Clusters: {len(grouped)} | Resources: {total_resources}\n"
+          body += f"Changed: {total_changed} | No change: {total_no_change} | Failed: {total_failed}\n"
 
           if not grouped:
-            print("No matrix diff artifacts were found.")
-            print()
+            body += "\nNo matrix diff artifacts were found.\n"
           elif total_changed == 0 and total_failed == 0:
-            print("✅ No updates across all clusters/resources.")
-            print()
+            body += "\n✅ No updates across all clusters/resources.\n"
           else:
             for cluster in sorted(grouped):
               entries = sorted(grouped[cluster], key=lambda entry: entry["resource"])
@@ -303,46 +305,37 @@ jobs:
               failed = sum(1 for entry in entries if entry["status"] == "failed")
 
               if changed == 0 and failed == 0:
-                print(f"- Cluster `{cluster}`: ✅ no updates")
-                print()
+                body += f"\n- Cluster `{cluster}`: ✅ no updates\n"
                 continue
 
-              print(f"### Cluster: `{cluster}` ({len(entries)} resources: {changed} changed, {no_change} no-change, {failed} failed)")
-              print()
+              body += f"\n### Cluster: `{cluster}` ({len(entries)} resources: {changed} changed, {no_change} no-change, {failed} failed)\n"
 
               for entry in entries:
                 resource = entry["resource"]
                 status = entry["status"]
                 if status == "no-change":
-                  print(f"- Resource `{resource}`: ✅ no updates")
+                  body += f"\n- Resource `{resource}`: ✅ no updates\n"
                 elif status == "failed":
-                  print(f"<details><summary>Resource `{resource}`: ❌ diff failed</summary>")
-                  print()
-                  print("Please inspect workflow logs for the `flux-local diff` step.")
-                  print()
-                  print("</details>")
+                  body += f"\n<details><summary>Resource `{resource}`: ❌ diff failed</summary>\n\n"
+                  body += "Please inspect workflow logs for the `flux-local diff` step.\n\n</details>\n"
                 else:
-                  print(f"<details><summary>Resource `{resource}`: ⚠️ updates detected</summary>")
-                  print()
-                  print("```diff")
-                  print(entry["diff"].rstrip())
-                  print("```")
-                  print()
-                  print("</details>")
-              print()
+                  body += f"\n<details><summary>Resource `{resource}`: ⚠️ updates detected</summary>\n\n"
+                  body += "```diff\n"
+                  body += entry["diff"].rstrip() + "\n"
+                  body += "```\n\n</details>\n"
+
+          run_url = os.environ["RUN_URL"]
+          body += f"\n[Open workflow logs]({run_url})\n"
+
+          # Write to both GITHUB_OUTPUT and a file
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"body<<EOF\n{body}\nEOF\n")
+          with open("pr_comment.md", "w", encoding="utf-8") as f:
+              f.write(body)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write(body)
           PYEOF
-          {
-            echo "body<<EOF"
-            python3 build_comment.py
-            echo
-            echo "[Open workflow logs](${RUN_URL})"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-      - name: Upload combined result to action summary
-        run: |
-          {
-            echo "${{ steps.build_comment.outputs.body }}"
-          } >> "$GITHUB_STEP_SUMMARY"
+          python3 build_comment.py
       - name: Comment combined diff on PR
         if: ${{ github.event_name == 'pull_request' }}
         uses: mshick/add-pr-comment@8e4927817251f1ff60c001f04568532b38e0b4a0 # v3
@@ -350,4 +343,4 @@ jobs:
           repo-token: ${{ steps.app-token.outputs.token }}
           message-id: flux-local/${{ github.event.pull_request.number }}/combined
           message-failure: Unable to post flux-local diff comment
-          message: ${{ steps.build_comment.outputs.body }}
+          message-path: pr_comment.md

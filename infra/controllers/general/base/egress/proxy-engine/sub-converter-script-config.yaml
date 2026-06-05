@@ -1,0 +1,358 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sub-converter-script-config
+  namespace: egress-system
+data:
+  update_sub.py: |
+    import copy
+    import json
+    import os
+    import re
+    import sys
+    import time
+    import urllib.request
+
+    # Configuration
+    URLS_ENV = os.environ.get('SUB_URLS', '')
+    OUTPUT_PATH = '/shared-nodes/nodes.json'
+    LAST_GOOD_PATH = '/shared-nodes/nodes-last-good.json'
+    USER_AGENT = 'sing-box'
+    TIMEOUT = 15
+    RETRY_LIMIT = int(os.environ.get('FETCH_NODES_RETRY_LIMIT', '3'))
+    RETRY_BASE_DELAY = float(os.environ.get('FETCH_NODES_RETRY_BASE_DELAY_SECONDS', '1'))
+
+    class FetchNodesError(Exception):
+        pass
+
+    if not URLS_ENV:
+        print('FETCH_NODES_FAILURE reason=empty_sub_urls')
+        sys.exit(1)
+
+    # Parse SUB_URLS into a list of tuples: (sub_tag, sub_url)
+    sub_list = []
+    for i, item in enumerate(URLS_ENV.split(',')):
+        item = item.strip()
+        if not item:
+            continue
+        if not item.startswith('http') and ':' in item:
+            parts = item.split(':', 1)
+            sub_tag = parts[0].strip()
+            sub_url = parts[1].strip()
+        else:
+            sub_tag = f'Sub_{i + 1}'
+            sub_url = item
+        sub_list.append((sub_tag, sub_url))
+
+    # ==========================================
+    # MIGRATION ARCHITECTURE
+    # ==========================================
+
+    def migrate_domain_strategy_1_12_0(node):
+        """
+        Migrates the deprecated 'domain_strategy' dial field to the new 'domain_resolver' object.
+        Introduced in sing-box 1.12.0.
+        Reference: https://sing-box.sagernet.org/migration/#migrate-outbound-domain-strategy-option-to-domain-resolver
+        """
+        if 'domain_strategy' in node:
+            strategy = node.pop('domain_strategy')
+            # Only set it if the provider hasn't already included a domain_resolver
+            if 'domain_resolver' not in node:
+                node['domain_resolver'] = {
+                    'server': 'local',
+                    'strategy': strategy
+                }
+
+    # Add future migration functions to this list
+    MIGRATIONS = [migrate_domain_strategy_1_12_0]
+
+    def apply_migrations(node):
+        """
+        Safely applies all functions in the MIGRATIONS list to a node.
+        """
+        for migration in MIGRATIONS:
+            try:
+                migration(node)
+            except Exception:
+                # Silently pass to ensure a migration failure doesn't drop the node
+                pass
+
+    # ==========================================
+    # NODE PROCESSING
+    # ==========================================
+
+    def get_multiplier(tag):
+        """
+        Extracts a multiplier suffix from the tag.
+        Matches patterns like [0.5x], (2x), or ' 1.5x' (with a preceding space) at the end of the string.
+        The multiplier must be preceded by '[', '(' or whitespace.
+        """
+        match = re.search(r'[\[\(\s]([0-9.]+)x[\]\)]?$', tag, re.IGNORECASE)
+        if match:
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return 1.0
+        return 1.0
+
+    def parse_group_selections(value):
+        selections = {}
+        for raw_line in value.splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith('#'):
+                continue
+            match = re.match(r'^([^=]+?)\s*=\s*\[(.*)\]\s*$', line)
+            if not match:
+                print(f'Warning: ignoring invalid selection line: {line}')
+                continue
+            group_name = match.group(1).strip()
+            items = []
+            for raw_item in match.group(2).split(','):
+                item = raw_item.strip().strip('"').strip("'")
+                if item:
+                    items.append(item)
+            if items:
+                selections[group_name] = items
+        return selections
+
+    def fetch_subscription_with_retry(sub_tag, url):
+        last_error = None
+        for attempt in range(1, RETRY_LIMIT + 1):
+            try:
+                req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+                with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+                    content = resp.read().decode('utf-8')
+                    data = json.loads(content)
+                    if not isinstance(data, dict):
+                        raise FetchNodesError('subscription data is not a JSON object')
+                    nodes = data.get('outbounds', [])
+                    valid = [n for n in nodes if 'server' in n and 'tag' in n]
+                    if not valid:
+                        raise FetchNodesError('no valid outbounds (missing server/tag)')
+                    return data, attempt - 1
+            except Exception as error:
+                last_error = error
+                if attempt < RETRY_LIMIT:
+                    delay = RETRY_BASE_DELAY * (2 ** (attempt - 1))
+                    print(f'[{sub_tag}] retry attempt={attempt} delay_seconds={delay} error={error}')
+                    time.sleep(delay)
+        raise FetchNodesError(f'[{sub_tag}] exhausted retries error={last_error}')
+
+    def build_nodes_config():
+        all_nodes = []
+        seen_tags = set()
+        fetch_success_count = 0
+        fetch_failure_count = 0
+        total_retries = 0
+
+        print(f'Starting to process {len(sub_list)} subscriptions...')
+        for sub_tag, url in sub_list:
+            try:
+                sub_data, retries_used = fetch_subscription_with_retry(sub_tag, url)
+                total_retries += retries_used
+                count = 0
+                for node in sub_data.get('outbounds', []):
+                    # Basic validation: must have a server and tag
+                    if 'server' not in node or 'tag' not in node:
+                        continue
+                    # Apply data schema migrations
+                    apply_migrations(node)
+
+                    original_tag = node['tag']
+                    # Detect Multiplier based on the original name
+                    node['multiplier'] = get_multiplier(original_tag)
+                    # Preserve the original tag for region matching (before prefixing)
+                    node['_original_tag'] = original_tag
+                    # Prepend the subscription tag to the node name
+                    tagged_name = f'[{sub_tag}] {original_tag}'
+
+                    # Deduplicate tags
+                    final_tag = tagged_name
+                    counter = 1
+                    while final_tag in seen_tags:
+                        final_tag = f'{tagged_name}_{counter}'
+                        counter += 1
+
+                    node['tag'] = final_tag
+                    seen_tags.add(final_tag)
+                    all_nodes.append(node)
+                    count += 1
+
+                fetch_success_count += 1
+                print(f'[{sub_tag}] Successfully fetched {count} nodes.')
+            except Exception as error:
+                fetch_failure_count += 1
+                print(f'[{sub_tag}] Failed to fetch subscription. error={error}')
+
+        if not all_nodes:
+            raise FetchNodesError('no_nodes_retrieved')
+
+        # Categorization using Regex: match against original (un-prefixed) tag
+        def filter_nodes(pattern):
+            return [n['tag'] for n in all_nodes if re.search(pattern, n.get('_original_tag', n['tag']), re.IGNORECASE)]
+
+        groups = {
+            'HongKong': r'🇭🇰|HK|Hong Kong|香港',
+            'Macau': r'🇲🇴|MO|Macau|澳门',
+            'Taiwan': r'🇹🇼|TW|Taiwan|台湾',
+            'Singapore': r'🇸🇬|SG|Singapore|狮城|新加坡',
+            'UnitedStates': r'🇺🇸|US|America|United States|美国',
+            'Japan': r'🇯🇵|JP|Japan|日本',
+            'Korea': r'🇰🇷|KR|Korea|韩国',
+            'UnitedKingdom': r'🇬🇧|UK|United Kingdom|英国',
+            'Germany': r'🇩🇪|DE|Germany|德国'
+        }
+        # Groups that must have at least one node; missing nodes are a hard error.
+        strict_groups = {'UnitedStates'}
+        # Optional group overrides, format:
+        # HongKong = [ 'HongKong URLTest', '[YZT] 香港1', '[YZT] 香港2' ]
+        group_selections = parse_group_selections(os.environ.get('NODE_SELECTIONS', ''))
+
+        def resolve_tag(name):
+            for node in all_nodes:
+                if node['tag'] == name or node.get('_original_tag', node['tag']) == name:
+                    return node['tag']
+            for node in all_nodes:
+                if node['tag'].lower() == name.lower() or node.get('_original_tag', node['tag']).lower() == name.lower():
+                    return node['tag']
+            return None
+
+        custom_outbounds = []
+        # 1. Add all proxy nodes
+        custom_outbounds.extend(all_nodes)
+
+        # 2. Per-region urltest + selector groups.
+        high_rate_tag_set = set(n['tag'] for n in all_nodes if n.get('multiplier', 1.0) >= 2.0)
+        for group_name, pattern in groups.items():
+            all_region_nodes = filter_nodes(pattern)
+            if not all_region_nodes:
+                if group_name in strict_groups:
+                    raise FetchNodesError(f'missing_strict_group={group_name}')
+                print(f"Warning: No nodes found for group '{group_name}'. Skipping.")
+                continue
+
+            normal = [t for t in all_region_nodes if t not in high_rate_tag_set]
+            region_high = [t for t in all_region_nodes if t in high_rate_tag_set]
+
+            selector_outbounds = []
+            if normal:
+                urltest_tag = f'{group_name} URLTest'
+                custom_outbounds.append({'type': 'urltest', 'tag': urltest_tag, 'outbounds': normal})
+                selector_outbounds.append(urltest_tag)
+
+                sub_groups = {}
+                for tag in normal:
+                    m = re.match(r'^\[([^\]]+)\]', tag)
+                    if m:
+                        sub_groups.setdefault(m.group(1), []).append(tag)
+                for sub_tag, sub_nodes in sorted(sub_groups.items()):
+                    sub_group_tag = f'{group_name} [{sub_tag}]'
+                    custom_outbounds.append({'type': 'urltest', 'tag': sub_group_tag, 'outbounds': sub_nodes})
+                    selector_outbounds.append(sub_group_tag)
+                selector_outbounds += normal
+
+            if region_high:
+                rate_urltest_tag = f'{group_name} HighRate URLTest'
+                custom_outbounds.append({'type': 'urltest', 'tag': rate_urltest_tag, 'outbounds': region_high})
+                rate_selector_tag = f'{group_name} HighRate'
+                custom_outbounds.append({
+                    'type': 'selector', 'tag': rate_selector_tag,
+                    'outbounds': [rate_urltest_tag] + region_high
+                })
+                selector_outbounds.append(rate_selector_tag)
+                selector_outbounds += region_high
+
+            for item in group_selections.get(group_name, []):
+                resolved_tag = resolve_tag(item)
+                if resolved_tag is None:
+                    print(f"Warning: group '{group_name}' references unknown outbound '{item}'.")
+                    continue
+                if resolved_tag not in selector_outbounds:
+                    selector_outbounds.append(resolved_tag)
+            custom_outbounds.append({'type': 'selector', 'tag': group_name, 'outbounds': selector_outbounds})
+
+        # 3. Low-Rate group (Multiplier <= 0.5x).
+        low_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) <= 0.5]
+        if not low_rate_nodes:
+            print('Warning: No low-rate nodes found. Skipping LowRateNodes group.')
+        else:
+            custom_outbounds.append({'type': 'urltest', 'tag': 'LowRateNodes', 'outbounds': low_rate_nodes})
+
+        # 4. High-Rate group (Multiplier >= 2.0x), e.g. home broadband nodes.
+        high_rate_nodes = [n['tag'] for n in all_nodes if n.get('multiplier', 1.0) >= 2.0]
+        if not high_rate_nodes:
+            print('Warning: No high-rate nodes found. Skipping HighRateNodes group.')
+        else:
+            custom_outbounds.append({'type': 'urltest', 'tag': 'HighRateNodes URLTest', 'outbounds': high_rate_nodes})
+            custom_outbounds.append({'type': 'selector', 'tag': 'HighRateNodes', 'outbounds': ['HighRateNodes URLTest'] + high_rate_nodes})
+
+        # 5. Global AllNodes urltest group (excluding high-rate nodes).
+        all_node_tags = [n['tag'] for n in all_nodes if n['tag'] not in high_rate_tag_set]
+        custom_outbounds.append({'type': 'urltest', 'tag': 'AllNodes', 'outbounds': all_node_tags})
+
+        final_outbounds = []
+        for outbound in custom_outbounds:
+            cleaned = copy.deepcopy(outbound)
+            # Remove internal helper keys before writing to JSON
+            cleaned.pop('multiplier', None)
+            cleaned.pop('_original_tag', None)
+            final_outbounds.append(cleaned)
+
+        config = {'outbounds': final_outbounds}
+        stats = {
+            'total_nodes': len(all_nodes),
+            'low_rate_nodes': len(low_rate_nodes),
+            'fetch_success_count': fetch_success_count,
+            'fetch_failure_count': fetch_failure_count,
+            'retries_used': total_retries
+        }
+        return config, stats
+
+    def write_json(path, payload):
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w', encoding='utf-8') as file_handle:
+            json.dump(payload, file_handle, indent=2, ensure_ascii=False)
+
+    def load_last_good_if_exists():
+        if not os.path.exists(LAST_GOOD_PATH):
+            return None
+        with open(LAST_GOOD_PATH, 'r', encoding='utf-8') as file_handle:
+            return json.load(file_handle)
+
+    started = time.time()
+    try:
+        final_config, stats = build_nodes_config()
+        write_json(OUTPUT_PATH, final_config)
+        write_json(LAST_GOOD_PATH, final_config)
+        elapsed = round(time.time() - started, 3)
+        print(
+            'FETCH_NODES_SUCCESS '
+            f"subscriptions={len(sub_list)} "
+            f"fetch_success_count={stats['fetch_success_count']} "
+            f"fetch_failure_count={stats['fetch_failure_count']} "
+            f"retries_used={stats['retries_used']} "
+            f"total_nodes={stats['total_nodes']} "
+            f"low_rate_nodes={stats['low_rate_nodes']} "
+            f"duration_seconds={elapsed}"
+        )
+        print(f"Output saved to: {OUTPUT_PATH}")
+    except Exception as error:
+        elapsed = round(time.time() - started, 3)
+        last_good_config = load_last_good_if_exists()
+        if last_good_config is not None:
+            write_json(OUTPUT_PATH, last_good_config)
+            print(
+                'FETCH_NODES_FALLBACK '
+                f'reason={error} '
+                f'duration_seconds={elapsed} '
+                f'last_good_path={LAST_GOOD_PATH}'
+            )
+            sys.exit(0)
+        print(
+            'FETCH_NODES_FAILURE '
+            f'reason={error} '
+            f'duration_seconds={elapsed} '
+            'fallback_available=false'
+        )
+        sys.exit(1)
