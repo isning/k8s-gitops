@@ -6,4 +6,3 @@ resources:
   - ../../base/external-dns/
   - ../../base/gateway-api/
   - ../../base/generic-device-plugin/
-  - ../../base/longhorn/
