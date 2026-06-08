@@ -1084,10 +1084,10 @@
   }
   {
     imageName = "registry-1.docker.io/bitnami/redis-exporter";
-    imageDigest = "sha256:45bb5398ae0fe3494a5b435e565ee5f8c882e37bf4da9a5ae7677af5aabcac65";
+    imageDigest = "sha256:2642b99f28260354ea4ec7b18244496a55e5e09d9c425cfc564f690da191dc47";
     finalImageName = "registry-1.docker.io/bitnami/redis-exporter";
     finalImageTag = "latest";
-    archiveHash = "sha256-6EMEvwCwWgxHRzTLFpGatFK5RkV71mqsWSX2l39LwkY=";
+    archiveHash = "sha256-2k3V/yLAvmMASysbjYBrvZ8RjGBBUxZKnSFKI/87KhY=";
     os = "linux";
     arch = "amd64";
     sources = [
