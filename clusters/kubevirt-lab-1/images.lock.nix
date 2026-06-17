@@ -123,6 +123,28 @@
     ];
   }
   {
+    imageName = "docker.dragonflydb.io/dragonflydb/operator";
+    imageDigest = "sha256:b11411142935f92ed0ec30a5ddeb31680e09ab66beecb827cb0224f1c4238638";
+    finalImageName = "docker.dragonflydb.io/dragonflydb/operator";
+    finalImageTag = "v1.6.1";
+    archiveHash = "sha256-d4VjIAjgxAylnFnRP42WMKLZMNYa/ViiapofUJ/Tq8M=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
+    ];
+  }
+  {
     imageName = "docker.io/1467078763/metapi";
     imageDigest = "sha256:d29e74b18ce0734555c2088f1f6638e301a7fc01873ff979961ff8a1ac618da8";
     finalImageName = "docker.io/1467078763/metapi";
@@ -459,6 +481,25 @@
     ];
   }
   {
+    imageName = "ghcr.io/dragonflydb/dragonfly";
+    imageDigest = "sha256:0fa01a2b929e704c7a9300d23e7f52002ebd39e90996fb8bb63826aed92fa06f";
+    finalImageName = "ghcr.io/dragonflydb/dragonfly";
+    finalImageTag = "v1.39.0";
+    archiveHash = "sha256-iIDGqc3+JjQzLRviDZH4secv7tolk/CvSgA1BC/KNiI=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [];
+  }
+  {
     imageName = "ghcr.io/flux-iac/tofu-controller";
     imageDigest = "sha256:e16d8295e66f73d66f6904a9129d8aedfa84612d1e8b5a8e122fda99d28af09c";
     finalImageName = "ghcr.io/flux-iac/tofu-controller";
@@ -781,6 +822,28 @@
     ];
     targets = [
       { kind = "Job"; namespace = "unknown ns"; name = "logto-pre-app-1"; }
+    ];
+  }
+  {
+    imageName = "quay.io/brancz/kube-rbac-proxy";
+    imageDigest = "sha256:ad0fa9f0adc928b557663297bd22c610533960d77acdec289ce8a636f0ea2114";
+    finalImageName = "quay.io/brancz/kube-rbac-proxy";
+    finalImageTag = "v0.20.2";
+    archiveHash = "sha256-5iI3n2Y1tiZVcNANWOsZ35+Vg1+CbOZUDTEmZrjqeKo=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "dragonfly-operator-system"; name = "dragonfly-operator"; }
     ];
   }
   {
