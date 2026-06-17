@@ -1083,48 +1083,6 @@
     ];
   }
   {
-    imageName = "registry-1.docker.io/bitnami/redis-exporter";
-    imageDigest = "sha256:ebd0b87cf0f67d01888f215ebff892d2a77fbc5a6627955ed4cfb3753b5218d8";
-    finalImageName = "registry-1.docker.io/bitnami/redis-exporter";
-    finalImageTag = "latest";
-    archiveHash = "sha256-FnN/Vyurwa1BOVkaC1GmbA2NU+PCwJ/japP/gYQOfME=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "harbor"; name = "harbor-redis"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "harbor"; name = "harbor-redis"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
-      ]
-    ];
-    targets = [
-      { kind = "StatefulSet"; namespace = "harbor"; name = "harbor-redis-master"; }
-    ];
-  }
-  {
-    imageName = "registry-1.docker.io/bitnami/redis";
-    imageDigest = "sha256:d842c434ff617b84f954700b60fd99ac8b567ce16292daccb18cfc214cdcc2ec";
-    finalImageName = "registry-1.docker.io/bitnami/redis";
-    finalImageTag = "latest";
-    archiveHash = "sha256-PEZWbtAeSpDBcKiZ+VcUQEXOH+ezqXfwwvV8qvxR4WE=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "harbor"; name = "harbor-redis"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "harbor"; name = "harbor-redis"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
-      ]
-    ];
-    targets = [
-      { kind = "StatefulSet"; namespace = "harbor"; name = "harbor-redis-master"; }
-    ];
-  }
-  {
     imageName = "registry.istio.io/release/install-cni";
     imageDigest = "sha256:c37347421fe4d99b34d193b79437e7186fda762b2ae8231f28e2b9add287b9b5";
     finalImageName = "registry.istio.io/release/install-cni";
