@@ -42,10 +42,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:08afc880eea24f36572644ccae85fb3e573a6ff1b7161135a3ae9a5eab222df2";
+    imageDigest = "sha256:b9f4412e53f09d76b0991cdd29c0feff4c1d1e112b307e0ab155e5b050a9f4ec";
     finalImageName = "docker.io/bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-unLiLmjN9+Z5P4fLJ8appipH/yZ+ezUpG8Vm0EoPiIY=";
+    archiveHash = "sha256-uqmz5n6EBAswRA6A58Se4VLK3lN2gqoWGeJkinL55m0=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -292,10 +292,10 @@
   }
   {
     imageName = "docker.io/library/alpine";
-    imageDigest = "sha256:310c62b5e7ca5b08167e4384c68db0fd2905dd9c7493756d356e893909057601";
+    imageDigest = "sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce";
     finalImageName = "docker.io/library/alpine";
     finalImageTag = "3.22";
-    archiveHash = "sha256-VHY3iJVzBNemI5WJ1BRfsfjOUDv6N/UZSJJYmoikFXI=";
+    archiveHash = "sha256-MSr0Qgn2cQO9gCDnbNBe+sEXNmw85QF886YZZ9rYH6Y=";
     os = "linux";
     arch = "amd64";
     sources = [
