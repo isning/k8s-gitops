@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: metapi
-        image: docker.io/1467078763/metapi:latest@sha256:d29e74b18ce0734555c2088f1f6638e301a7fc01873ff979961ff8a1ac618da8
+        image: ghcr.io/isning/metapi:latest@sha256:8a23560689984556a8d3434a1ddbc75dee8bc3dd267d31fa7c56fa6797ff1b42
         ports:
         - name: http
           containerPort: 4000
