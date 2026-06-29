@@ -145,26 +145,6 @@
     ];
   }
   {
-    imageName = "docker.io/1467078763/metapi";
-    imageDigest = "sha256:d29e74b18ce0734555c2088f1f6638e301a7fc01873ff979961ff8a1ac618da8";
-    finalImageName = "docker.io/1467078763/metapi";
-    finalImageTag = "latest";
-    archiveHash = "sha256-g8Tmwah+ZgTtvRviqdhfICWyQA9MQw3zv2qCan6rU9c=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-      ]
-    ];
-    targets = [
-      { kind = "StatefulSet"; namespace = "prod"; name = "metapi"; }
-    ];
-  }
-  {
     imageName = "docker.io/goharbor/harbor-core";
     imageDigest = "sha256:887a85b8ea98b76bfc9f715f1a0785bb99f9a1034241513902dd6e95be922a83";
     finalImageName = "docker.io/goharbor/harbor-core";
@@ -618,6 +598,26 @@
       ]
     ];
     targets = [];
+  }
+  {
+    imageName = "ghcr.io/isning/metapi";
+    imageDigest = "sha256:040ad65f5256ac57450c617dc64b6fb8a58e4f8ee5b91bf85d19070067f8b90d";
+    finalImageName = "ghcr.io/isning/metapi";
+    finalImageTag = "latest";
+    archiveHash = "sha256-SnBurQ7SD+wwNylbcAPBxeBc7wWYzcbdeK+LfX929fE=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "StatefulSet"; namespace = "prod"; name = "metapi"; }
+    ];
   }
   {
     imageName = "ghcr.io/isning/redroid-operator";
