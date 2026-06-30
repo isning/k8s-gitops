@@ -42,10 +42,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:b9f4412e53f09d76b0991cdd29c0feff4c1d1e112b307e0ab155e5b050a9f4ec";
+    imageDigest = "sha256:cd9daa0cc6968665402654b887bdc59aba0f774d0d0a36808eb9259fb642aa5c";
     finalImageName = "docker.io/bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-uqmz5n6EBAswRA6A58Se4VLK3lN2gqoWGeJkinL55m0=";
+    archiveHash = "sha256-TvtY2odJLezbduvK+o35Ogr0fXbiRGs+18bYXYHiTKU=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -601,10 +601,10 @@
   }
   {
     imageName = "ghcr.io/isning/metapi";
-    imageDigest = "sha256:040ad65f5256ac57450c617dc64b6fb8a58e4f8ee5b91bf85d19070067f8b90d";
+    imageDigest = "sha256:cb35faae3137d75dbb9ee201522af5c9d1f601ebf2822ce430881dddb4f8b18c";
     finalImageName = "ghcr.io/isning/metapi";
     finalImageTag = "latest";
-    archiveHash = "sha256-SnBurQ7SD+wwNylbcAPBxeBc7wWYzcbdeK+LfX929fE=";
+    archiveHash = "sha256-tuUvv6v6iIETdLcZ6/S9J+3GBgLbR/D2V1Wmi7Ju/I0=";
     os = "linux";
     arch = "amd64";
     sources = [
