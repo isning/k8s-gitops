@@ -601,10 +601,10 @@
   }
   {
     imageName = "ghcr.io/isning/metapi";
-    imageDigest = "sha256:cb35faae3137d75dbb9ee201522af5c9d1f601ebf2822ce430881dddb4f8b18c";
+    imageDigest = "sha256:eaa433f15ede608d885d74642fda9c0d539d65146d77906e838fe5ad6da545a3";
     finalImageName = "ghcr.io/isning/metapi";
     finalImageTag = "latest";
-    archiveHash = "sha256-tuUvv6v6iIETdLcZ6/S9J+3GBgLbR/D2V1Wmi7Ju/I0=";
+    archiveHash = "sha256-ZCyZ3Yhqwi5Wj+lKNg9GqXruKPwjyJ6NNLvZdyZsZ/k=";
     os = "linux";
     arch = "amd64";
     sources = [
