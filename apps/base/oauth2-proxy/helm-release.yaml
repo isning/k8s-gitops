@@ -3,14 +3,12 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: oauth2-proxy
-  namespace: oauth2-proxy
 spec:
   releaseName: oauth2-proxy
   interval: 30m
   chartRef:
     kind: OCIRepository
     name: helm-chart-oauth2-proxy
-    namespace: oauth2-proxy
   values:
     replicaCount: 1
     config:
@@ -75,7 +73,6 @@ spec:
       gatewayRef:
         kind: Gateway
         name: default-gateway
-        namespace: prod
       hostnames:
         - oauth2-gateway.isning.moe
     resources:
