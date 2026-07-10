@@ -9,7 +9,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: helm-chart-vaultwarden
-    namespace: prod
   values:
     # HTTPS required for Passkey support
     domain: 'https://vault.isning.moe'
