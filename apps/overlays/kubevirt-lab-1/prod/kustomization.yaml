@@ -10,6 +10,7 @@ resources:
   - ./../../../base/headlamp/
   - ./../../../base/flux-operator/
   - ./../../../base/astrbot/
+  - ./../../../base/oauth2-proxy/
   - ./../../../base/metapi/
   - ./../../../base/speaches/
   - ./../../../base/siyuan/
