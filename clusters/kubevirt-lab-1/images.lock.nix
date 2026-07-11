@@ -1125,6 +1125,27 @@
     ];
   }
   {
+    imageName = "quay.io/oauth2-proxy/oauth2-proxy";
+    imageDigest = "sha256:aa0bd8dd5ab0c78e4c91c92755ad573a5f92241f88138b4141b8ec803463b4fd";
+    finalImageName = "quay.io/oauth2-proxy/oauth2-proxy";
+    finalImageTag = "v7.15.2";
+    archiveHash = "sha256-oMGYyqPjF5RyzlQ+x1+8VaFaC59YWBkuii79QtBpPOs=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "oauth2-proxy"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "oauth2-proxy"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "prod"; name = "oauth2-proxy"; }
+    ];
+  }
+  {
     imageName = "rancher/kubectl";
     imageDigest = "sha256:05d2b313e2f397e0ade252136aed47abd72d56ead11d1b027ac70f66362c8495";
     finalImageName = "docker.io/rancher/kubectl";
