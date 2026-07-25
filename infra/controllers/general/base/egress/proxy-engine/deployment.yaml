@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,16 +29,19 @@ spec:
         env:
         - name: HOME
           value: /tmp
-        command: ["python3", "/scripts/update_sub.py"]
+        command:
+        - python3
+        - /scripts/update_sub.py
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           capabilities:
-            drop: ["ALL"]
+            drop:
+            - ALL
           seccompProfile:
             type: RuntimeDefault
         resources:
-          requests: 
+          requests:
             cpu: 50m
             memory: 32Mi
           limits:
@@ -54,25 +58,32 @@ spec:
       containers:
       - name: sing-box
         image: ghcr.io/sagernet/sing-box:v1.13.12@sha256:da0e2331395c9025a85fa58892772b4cdbe5f2e530e93defeec3968175d06c6d
-        command: 
-        - "sing-box"
-        - "run"
-        - "-D"
-        - "/var/lib/sing-box"
-        - "-c"
-        - "/etc/sing-box/main/main.json"
-        - "-c"
-        - "/etc/sing-box/temp/nodes.json"
+        command:
+        - sing-box
+        - run
+        - -D
+        - /var/lib/sing-box
+        - -c
+        - /etc/sing-box/main/main.json
+        - -c
+        - /etc/sing-box/temp/nodes.json
         ports:
         - containerPort: 7890
           name: mixed-proxy
+        - containerPort: 8891
+          name: public-http
+        - containerPort: 8892
+          name: public-v4
+        - containerPort: 8893
+          name: public-v6
         - containerPort: 9090
           name: clash-api
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           capabilities:
-            drop: ["ALL"]
+            drop:
+            - ALL
           seccompProfile:
             type: RuntimeDefault
         livenessProbe:
@@ -93,7 +104,7 @@ spec:
           successThreshold: 1
           failureThreshold: 3
         resources:
-          requests: 
+          requests:
             cpu: 50m
             memory: 32Mi
           limits:
@@ -106,8 +117,6 @@ spec:
         - name: config-temp
           mountPath: /etc/sing-box/temp
           readOnly: true
-        # This should be considered non-persistent and can be cleared on each restart,
-        # as it's mainly used for caching geoip and geosite data.
         - name: work-cache
           mountPath: /var/lib/sing-box
         - name: tmp

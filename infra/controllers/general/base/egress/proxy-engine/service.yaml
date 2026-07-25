@@ -10,9 +10,24 @@ spec:
   ports:
   - port: 7890
     name: mixed-proxy
-    appProtocol: tcp # Avoid sniffing this as HTTP by Istio, which causes 404
+    appProtocol: tcp
     protocol: TCP
     targetPort: 7890
+  - port: 8891
+    name: public-http
+    appProtocol: tcp
+    protocol: TCP
+    targetPort: 8891
+  - port: 8892
+    name: public-v4
+    appProtocol: tcp
+    protocol: TCP
+    targetPort: 8892
+  - port: 8893
+    name: public-v6
+    appProtocol: tcp
+    protocol: TCP
+    targetPort: 8893
   - port: 9090
     name: clash-api
     appProtocol: http

@@ -1,105 +1,61 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sing-box-main-config
   namespace: egress-system
 data:
-  # `route.auto_detect_interface` MUST be `false``, otherwise the proxy will detect the default network interface and bind to it,
-  # which will cause network unavailability when service mesh is enabled.
-  main.json: |
-    {
-      "experimental": {
-        "clash_api": {
-          "external_controller": "0.0.0.0:9090",
-          "external_ui": "metacubexd",
-          "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
-          "external_ui_download_detour": "AllNodes",
-          "access_control_allow_origin": [
-            "https://proxy-engine.isning.moe"
-          ]
-        }
-      },
-      "dns": {
-        "rules": [
-        ],
-        "servers": [
-          { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local" },
-          { "type": "tls", "server": "dot.pub", "detour": "direct", "tag": "local", "domain_resolver": "local-raw" },
-          { "type": "local", "detour": "direct", "tag": "local-raw" }
-        ],
-        "final": "local",
-        "disable_cache": false
-      },
-      "outbounds": [
-          { "type": "direct", "tag": "direct", "domain_resolver": "local" }
-      ],
-      "inbounds": [
-        {
-          "listen": "0.0.0.0",
-          "listen_port": 7890,
-          "tag": "mixed-in",
-          "type": "mixed"
-        }
-      ],
-      "route": {
-        "auto_detect_interface": false,
-        "default_domain_resolver": {
-          "server": "local"
-        },
-        "rules": [
-          { "action": "sniff" },
-          { "protocol": "dns", "action": "hijack-dns" },
-          { "rule_set": ["anthropic", "google-gemini", "google-deepmind"], "outbound": "UnitedStates" },
-          { "rule_set": ["geosite-geolocation-!cn"], "outbound": "AllNodes" },
-          { "rule_set": ["geosite-geolocation-cn", "geoip-cn"], "outbound": "direct" },
-          { "action": "resolve", "strategy": "prefer_ipv4"},
-          { "ip_is_private": true, "outbound": "direct" },
-          { "rule_set": ["geoip-cn"], "outbound": "direct" }
-        ],
-        "final": "AllNodes",
-        "rule_set": [
-          {
-            "tag": "geosite-geolocation-cn",
-            "type": "remote",
-            "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-cn.srs",
-            "download_detour": "direct"
-          },
-          {
-            "tag": "geosite-geolocation-!cn",
-            "type": "remote",
-            "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-!cn.srs",
-            "download_detour": "direct"
-          },
-          {
-            "tag": "anthropic",
-            "type": "remote",
-            "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-anthropic.srs",
-            "download_detour": "direct"
-          },
-          {
-            "tag": "google-gemini",
-            "type": "remote",
-            "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-gemini.srs",
-            "download_detour": "direct"
-          },
-          {
-            "tag": "google-deepmind",
-            "type": "remote",
-            "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-deepmind.srs",
-            "download_detour": "direct"
-          },
-          {
-            "tag": "geoip-cn",
-            "type": "remote",
-            "format": "binary",
-            "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs",
-            "download_detour": "direct"
-          }
-        ]
-      }
-    }
+  main.json: "{\n  \"experimental\": {\n    \"clash_api\": {\n      \"external_controller\": \"0.0.0.0:9090\"\
+    ,\n      \"access_control_allow_origin\": [\n        \"https://proxy-engine.isning.moe\"\n      ],\n\
+    \      \"external_ui\": \"metacubexd\",\n      \"external_ui_download_url\": \"https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip\"\
+    ,\n      \"external_ui_download_detour\": \"AllNodes\"\n    }\n  },\n  \"dns\": {\n    \"rules\":\
+    \ [],\n    \"servers\": [\n      {\n        \"type\": \"tls\",\n        \"server\": \"one.one.one.one\"\
+    ,\n        \"detour\": \"AllNodes\",\n        \"tag\": \"remote\",\n        \"domain_resolver\": \"\
+    local\"\n      },\n      {\n        \"type\": \"tls\",\n        \"server\": \"dot.pub\",\n       \
+    \ \"detour\": \"direct\",\n        \"tag\": \"local\",\n        \"domain_resolver\": \"local-raw\"\
+    \n      },\n      {\n        \"type\": \"local\",\n        \"detour\": \"direct\",\n        \"tag\"\
+    : \"local-raw\"\n      },\n      {\n        \"type\": \"tls\",\n        \"server\": \"223.5.5.5\"\
+    ,\n        \"server_port\": 853,\n        \"tls\": {\n          \"server_name\": \"dns.alidns.com\"\
+    \n        },\n        \"detour\": \"direct\",\n        \"tag\": \"public-egress-dot\"\n      }\n \
+    \   ],\n    \"final\": \"local\",\n    \"disable_cache\": false\n  },\n  \"outbounds\": [\n    {\n\
+    \      \"type\": \"direct\",\n      \"tag\": \"direct\",\n      \"domain_resolver\": \"local\"\n \
+    \   }\n  ],\n  \"inbounds\": [\n    {\n      \"listen\": \"0.0.0.0\",\n      \"listen_port\": 7890,\n\
+    \      \"tag\": \"mixed-in\",\n      \"type\": \"mixed\"\n    },\n    {\n      \"listen\": \"0.0.0.0\"\
+    ,\n      \"listen_port\": 8891,\n      \"tag\": \"public-egress-http\",\n      \"type\": \"http\"\n\
+    \    },\n    {\n      \"listen\": \"0.0.0.0\",\n      \"listen_port\": 8892,\n      \"tag\": \"public-egress-http-ipv4\"\
+    ,\n      \"type\": \"http\"\n    },\n    {\n      \"listen\": \"0.0.0.0\",\n      \"listen_port\"\
+    : 8893,\n      \"tag\": \"public-egress-http-ipv6\",\n      \"type\": \"http\"\n    }\n  ],\n  \"\
+    route\": {\n    \"auto_detect_interface\": false,\n    \"default_domain_resolver\": {\n      \"server\"\
+    : \"local\"\n    },\n    \"rules\": [\n      {\n        \"inbound\": [\n          \"public-egress-http\"\
+    \n        ],\n        \"action\": \"resolve\",\n        \"server\": \"public-egress-dot\",\n     \
+    \   \"strategy\": \"prefer_ipv4\"\n      },\n      {\n        \"inbound\": [\n          \"public-egress-http\"\
+    \n        ],\n        \"action\": \"route\",\n        \"outbound\": \"direct\"\n      },\n      {\n\
+    \        \"inbound\": [\n          \"public-egress-http-ipv4\"\n        ],\n        \"action\": \"\
+    resolve\",\n        \"server\": \"public-egress-dot\",\n        \"strategy\": \"ipv4_only\"\n    \
+    \  },\n      {\n        \"inbound\": [\n          \"public-egress-http-ipv6\"\n        ],\n      \
+    \  \"action\": \"resolve\",\n        \"server\": \"public-egress-dot\",\n        \"strategy\": \"\
+    ipv6_only\"\n      },\n      {\n        \"inbound\": [\n          \"public-egress-http-ipv4\",\n \
+    \         \"public-egress-http-ipv6\"\n        ],\n        \"outbound\": \"direct\"\n      },\n  \
+    \    {\n        \"action\": \"sniff\"\n      },\n      {\n        \"protocol\": \"dns\",\n       \
+    \ \"action\": \"hijack-dns\"\n      },\n      {\n        \"rule_set\": [\n          \"anthropic\"\
+    ,\n          \"google-gemini\",\n          \"google-deepmind\"\n        ],\n        \"outbound\":\
+    \ \"UnitedStates\"\n      },\n      {\n        \"rule_set\": [\n          \"geosite-geolocation-!cn\"\
+    \n        ],\n        \"outbound\": \"AllNodes\"\n      },\n      {\n        \"rule_set\": [\n   \
+    \       \"geosite-geolocation-cn\",\n          \"geoip-cn\"\n        ],\n        \"outbound\": \"\
+    direct\"\n      },\n      {\n        \"action\": \"resolve\",\n        \"strategy\": \"prefer_ipv4\"\
+    \n      },\n      {\n        \"ip_is_private\": true,\n        \"outbound\": \"direct\"\n      },\n\
+    \      {\n        \"rule_set\": [\n          \"geoip-cn\"\n        ],\n        \"outbound\": \"direct\"\
+    \n      }\n    ],\n    \"final\": \"AllNodes\",\n    \"rule_set\": [\n      {\n        \"tag\": \"\
+    geosite-geolocation-cn\",\n        \"type\": \"remote\",\n        \"format\": \"binary\",\n      \
+    \  \"url\": \"https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-cn.srs\"\
+    ,\n        \"download_detour\": \"direct\"\n      },\n      {\n        \"tag\": \"geosite-geolocation-!cn\"\
+    ,\n        \"type\": \"remote\",\n        \"format\": \"binary\",\n        \"url\": \"https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-!cn.srs\"\
+    ,\n        \"download_detour\": \"direct\"\n      },\n      {\n        \"tag\": \"anthropic\",\n \
+    \       \"type\": \"remote\",\n        \"format\": \"binary\",\n        \"url\": \"https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-anthropic.srs\"\
+    ,\n        \"download_detour\": \"direct\"\n      },\n      {\n        \"tag\": \"google-gemini\"\
+    ,\n        \"type\": \"remote\",\n        \"format\": \"binary\",\n        \"url\": \"https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-gemini.srs\"\
+    ,\n        \"download_detour\": \"direct\"\n      },\n      {\n        \"tag\": \"google-deepmind\"\
+    ,\n        \"type\": \"remote\",\n        \"format\": \"binary\",\n        \"url\": \"https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-google-deepmind.srs\"\
+    ,\n        \"download_detour\": \"direct\"\n      },\n      {\n        \"tag\": \"geoip-cn\",\n  \
+    \      \"type\": \"remote\",\n        \"format\": \"binary\",\n        \"url\": \"https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs\"\
+    ,\n        \"download_detour\": \"direct\"\n      }\n    ]\n  }\n}\n"
