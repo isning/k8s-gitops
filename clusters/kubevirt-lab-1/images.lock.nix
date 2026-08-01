@@ -42,10 +42,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:95de17e6eb92da83a58c90a9df0c4cede634f898d2e6b92ea04f4a6ee6ace08d";
+    imageDigest = "sha256:9e369df7ab3386b736d162348f167bcc02cb4ba3f5203e9151be854437d6e0af";
     finalImageName = "docker.io/bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-wXx1gxWKA8XPdby446Q5EF7TKYnSBPftHqiVh92MDUo=";
+    archiveHash = "sha256-wBM5QQUaotqxVfpSq2XdxeOw5FrrkE8DVb+ri4wQqbE=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -83,10 +83,10 @@
   }
   {
     imageName = "busybox";
-    imageDigest = "sha256:fd8d9aa63ba2f0982b5304e1ee8d3b90a210bc1ffb5314d980eb6962f1a9715d";
+    imageDigest = "sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616";
     finalImageName = "docker.io/library/busybox";
     finalImageTag = "latest";
-    archiveHash = "sha256-6QfG5F03Lx3394n+pKmScYo3EF/JI+f/zQ2RFd5CxQI=";
+    archiveHash = "sha256-8JHl6A6xiGtRTalpNBVAHcEoXQV196ryXb8BPyMRFOo=";
     os = "linux";
     arch = "amd64";
     sources = [
