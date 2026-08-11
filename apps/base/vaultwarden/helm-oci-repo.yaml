@@ -11,3 +11,4 @@ spec:
   url: oci://ghcr.io/helmforgedev/helm/vaultwarden
   ref:
     tag: "1.12.11"
+    digest: sha256:4407a8a7e9735071537dc08d028032cb19ada665755a7a26f3ae0577091362b0

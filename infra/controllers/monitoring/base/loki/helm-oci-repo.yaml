@@ -12,3 +12,4 @@ spec:
   url: oci://ghcr.io/grafana/helm-charts/loki
   ref:
     tag: "7.0.0"
+    digest: sha256:9b0f44213a16fea700852402ea05f45ce685fddb5a2fbe0d7e932e1a94610707

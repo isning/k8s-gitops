@@ -9,3 +9,4 @@ spec:
   url: oci://ghcr.io/flux-iac/charts/tofu-controller
   ref:
     tag: 0.16.3
+    digest: sha256:daf61d2c2fdd120ff522536d4c6351309b4973bd24cad7cd47f3dfbd80c61bdc

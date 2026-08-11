@@ -12,3 +12,4 @@ spec:
   url: oci://ghcr.io/grafana/helm-charts/k6-operator
   ref:
     tag: "4.4.1"
+    digest: sha256:4060fbf26087b4d70741dd1c03e1be2fb09ef2e6bce0c6e3b48e85b7e1a97e0a
