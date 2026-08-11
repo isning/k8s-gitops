@@ -11,3 +11,4 @@ spec:
   url: oci://ghcr.io/the-ccsn/charts/logto
   ref:
     tag: "0.3.1"
+    digest: sha256:20703c761c543667be727ebb1799464e5be002e013266dac5555303c504df75e

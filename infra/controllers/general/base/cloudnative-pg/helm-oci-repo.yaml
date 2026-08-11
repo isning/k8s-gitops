@@ -12,6 +12,7 @@ spec:
   url: oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg
   ref:
     tag: "0.28.2"
+    digest: sha256:395480811b5472e8e3c3f1d98d838596019d50b109e26bb0eb537c227fba679a
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -26,3 +27,4 @@ spec:
   url: oci://ghcr.io/cloudnative-pg/charts/plugin-barman-cloud
   ref:
     tag: "0.6.0"
+    digest: sha256:ca5f0e8f5ca7d9c2f436865a0bd62626c4fa4eb39a6326db55780f38a56342f3

@@ -11,3 +11,4 @@ spec:
   url: oci://ghcr.io/oauth2-proxy/charts/oauth2-proxy
   ref:
     tag: "10.6.0"
+    digest: sha256:7b850becf10ba98647a64c59412258c48e03a3efcefcf79b07ef757b03797dc1
