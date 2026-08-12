@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: siyuan
-          image: b3log/siyuan:v3.6.5@sha256:1a316554bfbf0c951ddabc7d3cb0292620152b44c087b6979d5d9b6bae065b1b
+          image: b3log/siyuan:v3.8.0@sha256:a2da59a722da6a2243f0c2a99286d9c8e73cc47dbc8757cc81ffd1137d6461a0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
