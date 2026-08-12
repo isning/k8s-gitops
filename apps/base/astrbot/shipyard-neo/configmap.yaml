@@ -95,7 +95,7 @@ data:
               - shell
             env: {}
           - name: browser
-            image: "ghcr.io/astrbotdevs/shipyard-neo-gull:latest@sha256:91547a323ef5bd0ba7602dc27ecf406eb1d382e5cc75edcdfa08ed1088f5d2a6"
+            image: "ghcr.io/astrbotdevs/shipyard-neo-gull:latest@sha256:429765f63fb01c91b77ac8b070c84c396b3d7fb396f8fe1268a3761c0060f3fd"
             runtime_type: gull
             runtime_port: 8115
             resources:
