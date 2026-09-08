@@ -26,7 +26,9 @@ spec:
 
   affinity:
     enablePodAntiAffinity: true
-    podAntiAffinityType: required
+    # The current cluster has one schedulable node. Prefer spreading replicas
+    # when more nodes exist without leaving replica bootstrap jobs Pending.
+    podAntiAffinityType: preferred
     topologyKey: kubernetes.io/hostname
 
   monitoring:
