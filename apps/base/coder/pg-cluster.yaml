@@ -4,7 +4,9 @@ kind: Cluster
 metadata:
   name: coder-pg-cluster
 spec:
-  instances: 3
+  # A single-node Kubernetes cluster has no independent failure domain for
+  # database replicas. Keep one instance and rely on continuous R2 backups.
+  instances: 1
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
@@ -23,13 +25,6 @@ spec:
   storage:
     size: 20Gi
     storageClass: local-path-nocow
-
-  affinity:
-    enablePodAntiAffinity: true
-    # The current cluster has one schedulable node. Prefer spreading replicas
-    # when more nodes exist without leaving replica bootstrap jobs Pending.
-    podAntiAffinityType: preferred
-    topologyKey: kubernetes.io/hostname
 
   monitoring:
     enablePodMonitor: true
