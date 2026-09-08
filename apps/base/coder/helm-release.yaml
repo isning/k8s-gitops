@@ -15,7 +15,7 @@ spec:
         - name: CODER_ACCESS_URL
           value: https://coder.isning.moe
         - name: CODER_WILDCARD_ACCESS_URL
-          value: https://*.coder.isning.moe
+          value: "*.coder.isning.moe"
         - name: CODER_PG_CONNECTION_URL
           valueFrom:
             secretKeyRef:
