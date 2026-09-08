@@ -26,6 +26,13 @@ spec:
     # https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-operator/values.yaml
     victoria-metrics-operator:
       enabled: true
+      crds:
+        # Plain CRDs are not updated by Helm itself. Keep the operator schema
+        # aligned to stop rejected status updates from causing a reconcile loop.
+        plain: true
+        upgrade:
+          enabled: true
+          forceConflicts: false
       serviceMonitor:
         enabled: true
         # -- Creates `VMServiceScrape` if `true` and `ServiceMonitor` otherwise.
