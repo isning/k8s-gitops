@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - ./gateway-infra.yaml
   - ./gateway-prod.yaml
+  - ./coder-certificate.yaml
   - ./gateway-staging.yaml
   - ./oauth2-redirect-envoyfilter.yaml
   - ./request-authentication.yaml

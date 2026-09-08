@@ -1,4 +1,5 @@
 *.agekey
+.terraform/
 
 
 # Byte-compiled / optimized / DLL files

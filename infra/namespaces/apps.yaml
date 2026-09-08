@@ -20,3 +20,10 @@ metadata:
     eventing.knative.dev/injection: enabled
     istio.io/dataplane-mode: ambient
     # istio.io/use-waypoint: waypoint
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: coder
+  labels:
+    app.kubernetes.io/part-of: coder

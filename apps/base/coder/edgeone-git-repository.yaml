@@ -1,0 +1,10 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: coder-edgeone
+spec:
+  interval: 1m
+  url: https://github.com/isning/k8s-gitops
+  ref:
+    branch: main

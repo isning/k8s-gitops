@@ -1,0 +1,24 @@
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: coder-pg-objectstore
+spec:
+  configuration:
+    # Reuse the existing R2 bucket under an application-specific prefix.
+    destinationPath: s3://logto-pg-backup/coder/
+    endpointURL: https://0fa2f8672cf2637118d8cfee9fe6b95f.r2.cloudflarestorage.com
+    s3Credentials:
+      accessKeyId:
+        name: logto-pg-s3-credentials
+        key: access-key
+      secretAccessKey:
+        name: logto-pg-s3-credentials
+        key: secret-key
+    wal:
+      compression: bzip2
+    data:
+      compression: bzip2
+  retentionPolicy: 14d
+  instanceSidecarConfiguration:
+    retentionPolicyIntervalSeconds: 86400
