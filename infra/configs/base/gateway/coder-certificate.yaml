@@ -21,7 +21,13 @@ spec:
   endpointSelector:
     matchLabels:
       gateway.networking.k8s.io/gateway-name: coder-gateway
-  ingress: []
+  # Selecting the Gateway with an ingress rule enables Cilium's ingress
+  # default-deny mode. This placeholder matches no real source; the Tofu-
+  # managed policy adds the current EdgeOne origin-pull CIDRs separately.
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            coder.isning.moe/origin: edgeone-managed-placeholder
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
