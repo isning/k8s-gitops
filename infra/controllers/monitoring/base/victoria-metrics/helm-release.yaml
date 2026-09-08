@@ -27,11 +27,11 @@ spec:
     victoria-metrics-operator:
       enabled: true
       crds:
-        # Plain CRDs are not updated by Helm itself. Keep the operator schema
-        # aligned to stop rejected status updates from causing a reconcile loop.
-        plain: true
+        # Render CRDs as regular Helm resources so schema updates do not depend
+        # on an extra upgrade Job on this single-node cluster.
+        plain: false
         upgrade:
-          enabled: true
+          enabled: false
           forceConflicts: false
       serviceMonitor:
         enabled: true
