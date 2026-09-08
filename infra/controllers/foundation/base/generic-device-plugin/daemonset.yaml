@@ -66,10 +66,12 @@ spec:
         resources:
           requests:
             cpu: 50m
-            memory: 10Mi
+            memory: 32Mi
           limits:
             cpu: 50m
-            memory: 20Mi
+            # A 20Mi limit continuously reclaimed the Go binary's file pages,
+            # saturating the single node's disk and stalling embedded etcd.
+            memory: 64Mi
         ports:
         - containerPort: 8080
           name: http
