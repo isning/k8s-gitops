@@ -1,0 +1,47 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: coder-edgeone
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    resourceNames:
+      - coder-gateway-istio
+    verbs:
+      - get
+  - apiGroups:
+      - externaldns.k8s.io
+    resources:
+      - dnsendpoints
+    verbs:
+      - get
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumnetworkpolicies
+    verbs:
+      - get
+      - create
+      - update
+      - patch
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: coder-edgeone
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: coder-edgeone
+subjects:
+  - kind: ServiceAccount
+    name: tf-runner
+    namespace: prod

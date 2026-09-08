@@ -15,4 +15,5 @@ resources:
   - ./../../../base/speaches/
   - ./../../../base/siyuan/
   - ./../../../base/vaultwarden/
+  - ./../../../base/coder/
   # - ./../../../base/maa/

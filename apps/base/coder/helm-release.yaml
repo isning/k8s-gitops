@@ -1,0 +1,71 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: coder
+spec:
+  releaseName: coder
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-coder
+  values:
+    coder:
+      env:
+        - name: CODER_ACCESS_URL
+          value: https://coder.isning.moe
+        - name: CODER_WILDCARD_ACCESS_URL
+          value: https://*.coder.isning.moe
+        - name: CODER_PG_CONNECTION_URL
+          valueFrom:
+            secretKeyRef:
+              name: coder-pg-cluster-app
+              key: uri
+        - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
+          value: "false"
+        - name: CODER_OIDC_ISSUER_URL
+          value: https://logto.isning.moe/oidc
+        - name: CODER_OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: coder-oidc
+              key: client-id
+        - name: CODER_OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: coder-oidc
+              key: client-secret
+        - name: CODER_OIDC_SCOPES
+          value: openid,profile,email,offline_access,roles
+        - name: CODER_OIDC_USERNAME_FIELD
+          value: username
+        - name: CODER_OIDC_SIGN_IN_TEXT
+          value: Sign in with Logto
+        - name: CODER_PROMETHEUS_ENABLE
+          value: "true"
+      serviceAccount:
+        # Keep user workspaces out of the prod control-plane namespace.
+        workspacePerms: false
+        workspaceNamespaces:
+          - name: coder
+            workspacePerms: true
+            enableDeployments: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 2
+          memory: 2Gi
+      service:
+        enable: true
+        type: ClusterIP
+        sessionAffinity: None
+      httproute:
+        enable: true
+        parentRefs:
+          - name: default-gateway
+          - name: coder-gateway
+            sectionName: https
+        host: coder.isning.moe
+        wildcardHost: '*.coder.isning.moe'

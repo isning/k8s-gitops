@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coder-metrics
+  labels:
+    app: coder
+spec:
+  selector:
+    app.kubernetes.io/instance: coder
+    app.kubernetes.io/name: coder
+  ports:
+    - name: prometheus-http
+      port: 2112
+      targetPort: prometheus-http

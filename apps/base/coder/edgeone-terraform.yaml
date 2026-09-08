@@ -1,0 +1,56 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: coder-edgeone-control
+spec:
+  interval: 5m
+  retryInterval: 1m
+  approvePlan: auto
+  path: ./apps/base/coder/tf
+  sourceRef:
+    kind: GitRepository
+    name: coder-edgeone
+  varsFrom:
+    - kind: Secret
+      name: coder-edgeone
+      varsKeys:
+        - edgeone_zone_id
+  runnerPodTemplate:
+    spec:
+      envFrom:
+        - secretRef:
+            name: coder-edgeone
+  writeOutputsToSecret:
+    name: coder-edgeone-output
+    outputs:
+      - edgeone_cname
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: coder-edgeone-sync
+spec:
+  interval: 5m
+  retryInterval: 1m
+  approvePlan: auto
+  path: ./apps/base/coder/tf/sync
+  sourceRef:
+    kind: GitRepository
+    name: coder-edgeone
+  dependsOn:
+    - name: coder-edgeone-control
+  varsFrom:
+    - kind: Secret
+      name: coder-edgeone
+      varsKeys:
+        - edgeone_zone_id
+    - kind: Secret
+      name: coder-edgeone-output
+      varsKeys:
+        - edgeone_cname
+  runnerPodTemplate:
+    spec:
+      envFrom:
+        - secretRef:
+            name: coder-edgeone
