@@ -7,11 +7,13 @@ import os
 import ssl
 import time
 import urllib.request
+from datetime import UTC, datetime
 
 
 API = "https://kubernetes.default.svc"
 TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 CA_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+NOTIFIED_CIDR_ANNOTATION = "networking.isning.moe/edgeone-notified-cidr"
 
 
 def request(path, method="GET", body=None):
@@ -72,12 +74,34 @@ def services_use_prefix(prefix):
     return public_ipv6 and all(address in prefix for address in public_ipv6)
 
 
+def notify_edgeone(pool_path, desired):
+    namespace = os.environ["EDGEONE_TERRAFORM_NAMESPACE"]
+    name = os.environ["EDGEONE_TERRAFORM_NAME"]
+    terraform_path = (
+        "/apis/infra.contrib.fluxcd.io/v1alpha2/namespaces/"
+        f"{namespace}/terraforms/{name}"
+    )
+    requested_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+    request(
+        terraform_path,
+        "PATCH",
+        {"metadata": {"annotations": {"reconcile.fluxcd.io/requestedAt": requested_at}}},
+    )
+    request(
+        pool_path,
+        "PATCH",
+        {"metadata": {"annotations": {NOTIFIED_CIDR_ANNOTATION: str(desired)}}},
+    )
+    print(f"Requested {namespace}/{name} reconciliation for {desired}", flush=True)
+
+
 def main():
     pool_name = os.environ["POOL_NAME"]
     desired = desired_pool_cidr(node_internal_ips(), os.environ["POOL_SUBNET_HEXTET"])
     path = f"/apis/cilium.io/v2/ciliumloadbalancerippools/{pool_name}"
     pool = request(path)
     current = [block.get("cidr") for block in pool.get("spec", {}).get("blocks", [])]
+    notified = pool.get("metadata", {}).get("annotations", {}).get(NOTIFIED_CIDR_ANNOTATION)
     if current != [str(desired)]:
         request(path, "PATCH", {"spec": {"blocks": [{"cidr": str(desired)}]}})
         print(f"Updated {pool_name}: {current} -> {desired}", flush=True)
@@ -85,6 +109,8 @@ def main():
     while time.monotonic() < deadline:
         if services_use_prefix(desired.supernet(new_prefix=64)):
             print(f"All public LoadBalancer IPv6 addresses use {desired.supernet(new_prefix=64)}", flush=True)
+            if notified != str(desired):
+                notify_edgeone(path, desired)
             return
         time.sleep(5)
     raise TimeoutError("LoadBalancer Services did not move to the current IPv6 prefix")

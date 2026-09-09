@@ -9,12 +9,15 @@ The CronJob runs every five minutes and performs these steps:
 1. read the global IPv6 `InternalIP` advertised by the Kubernetes Node;
 2. derive `<current-/64>:caf0::/112`;
 3. patch `default-public-ipv6-pool` only when that CIDR changed;
-4. wait until Cilium has reallocated every public IPv6 LoadBalancer address.
+4. wait until Cilium has reallocated every public IPv6 LoadBalancer address;
+5. trigger `prod/coder-edgeone-control` once for the new CIDR.
 
 ExternalDNS and the EdgeOne Terraform controllers consume Service status, so
 they update DNS and EdgeOne origins after Cilium finishes reallocating. The
 pool manifest uses Flux's `IfNotPresent` apply policy: Git provides the initial
 bootstrap object, while the reconciler owns its changing CIDR afterwards.
+The reconciler records the last CIDR sent to the EdgeOne controller as a pool
+annotation, avoiding an otherwise unnecessary Tofu run every five minutes.
 
 The job deliberately fails if Nodes expose different public `/64` prefixes.
 That prevents silently choosing the wrong uplink if the cluster later becomes

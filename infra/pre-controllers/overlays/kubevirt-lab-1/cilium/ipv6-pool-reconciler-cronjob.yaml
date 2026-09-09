@@ -35,6 +35,10 @@ spec:
                   value: default-public-ipv6-pool
                 - name: POOL_SUBNET_HEXTET
                   value: caf0
+                - name: EDGEONE_TERRAFORM_NAMESPACE
+                  value: prod
+                - name: EDGEONE_TERRAFORM_NAME
+                  value: coder-edgeone-control
               resources:
                 requests:
                   cpu: 10m
