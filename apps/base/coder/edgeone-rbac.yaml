@@ -45,3 +45,41 @@ subjects:
   - kind: ServiceAccount
     name: tf-runner
     namespace: prod
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: coder-edgeone-certificate
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: coder-edgeone-certificate
+rules:
+  - apiGroups:
+      - infra.contrib.fluxcd.io
+    resources:
+      - terraforms
+    verbs:
+      - get
+  - apiGroups:
+      - externaldns.k8s.io
+    resources:
+      - dnsendpoints
+    verbs:
+      - get
+      - create
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: coder-edgeone-certificate
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: coder-edgeone-certificate
+subjects:
+  - kind: ServiceAccount
+    name: coder-edgeone-certificate
+    namespace: prod

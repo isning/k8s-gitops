@@ -1,6 +1,6 @@
 # Coder
 
-This deploys Coder 2.34.7 with a three-instance CNPG PostgreSQL 16 database, CNPG barman-cloud
+This deploys Coder 2.34.7 with a single-instance CNPG PostgreSQL 16 database, CNPG barman-cloud
 backups to the existing Cloudflare R2 endpoint, Gateway API routing, OIDC via Logto,
 and VictoriaMetrics scraping for both Coder and PostgreSQL.
 
@@ -14,7 +14,9 @@ Before syncing the `prod` overlay:
 5. Connect `isning.moe` to an EdgeOne site in CNAME mode and note its zone ID.
 6. Run `sops apps/base/coder/edgeone-secret.yaml`, then replace the zone ID and the
    Tencent Cloud API credentials. Grant that identity only the TEO permissions needed
-   to manage acceleration domains, EdgeOne free certificates, and Origin ACLs.
+   by the Tofu resources plus `ApplyFreeCertificate`,
+   `CheckFreeCertificateVerification`, and `ModifyHostsCertificate` for certificate
+   issuance and deployment.
 
 `coder.isning.moe` uses the existing Cloudflare Tunnel and `default-gateway` path.
 Workspace applications use a dedicated IPv6-only `coder-gateway`. Its origin address
@@ -23,15 +25,24 @@ traffic to bypass EdgeOne. EdgeOne should receive the current LoadBalancer IPv6 
 directly through its API, while public wildcard DNS points only to EdgeOne. Origin
 ingress must also be restricted to the EdgeOne origin-pull IP ranges.
 
-Two Tofu states implement that ordering. `coder-edgeone-control` reads the IPv6 address
-from the Istio-generated `coder-gateway-istio` Service, configures the EdgeOne wildcard
-acceleration domain, enables its automatically managed free wildcard certificate and
+Two Tofu states and an ephemeral certificate reconciler implement that ordering.
+`coder-edgeone-control` reads the IPv6 address from the Istio-generated
+`coder-gateway-istio` Service, configures the EdgeOne wildcard acceleration domain and
 Origin ACL, then writes only the assigned EdgeOne CNAME to a Kubernetes Secret.
 `coder-edgeone-sync` reads the current and pending EdgeOne IPv6 origin-pull ranges,
 installs the Cilium allow policy, and only then creates the `*.coder.isning.moe`
 ExternalDNS CNAME. It also confirms pending Origin ACL rotations after the new ranges
 are installed. The static `coder-origin-default-deny` policy keeps the Gateway closed
 if either Tofu state fails or EdgeOne returns no IPv6 ranges.
+
+The `coder-edgeone-certificate` CronJob waits for both Tofu states to become Ready,
+requests EdgeOne DNS-delegated validation for the wildcard certificate, and publishes
+the returned `_acme-challenge` CNAME through a separate ExternalDNS `DNSEndpoint`.
+After EdgeOne confirms validation, it deploys the certificate with
+`eofreecert_manual`. The delegation record remains in Cloudflare so EdgeOne can renew
+the certificate automatically. Interrupted orders are resumed for up to 48 hours;
+only stale orders are replaced. The CronJob runs daily for reconciliation and creates
+no permanently running pod.
 
 The apex `coder.isning.moe` remains on the existing Cloudflare Tunnel and
 `default-gateway`; neither its DNS path nor the global Gateway is changed.

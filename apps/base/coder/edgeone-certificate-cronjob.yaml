@@ -1,0 +1,95 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: coder-edgeone-certificate
+spec:
+  # The DNS delegation record is persistent and EdgeOne renews the certificate.
+  # This daily reconciliation repairs interrupted initial issuance without a
+  # permanently running controller.
+  schedule: "17 3 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: coder-edgeone-certificate
+            app.kubernetes.io/part-of: coder
+        spec:
+          serviceAccountName: coder-edgeone-certificate
+          automountServiceAccountToken: true
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            fsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: reconcile
+              image: docker.io/tencentcom/tencentcloud-cli:latest@sha256:6f2ac4dda0e903e8ada38b7a0abfaaf7609e99764e7748db0bd2b03e35d147f3
+              command:
+                - python3
+                - /opt/coder-edgeone/certificate.py
+              env:
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: TENCENTCLOUD_SECRET_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: coder-edgeone
+                      key: TENCENTCLOUD_SECRET_ID
+                - name: TENCENTCLOUD_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: coder-edgeone
+                      key: TENCENTCLOUD_SECRET_KEY
+                - name: EDGEONE_ZONE_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: coder-edgeone
+                      key: edgeone_zone_id
+                - name: EDGEONE_DOMAIN
+                  value: "*.coder.isning.moe"
+                - name: CONTROL_TERRAFORM
+                  value: coder-edgeone-control
+                - name: SYNC_TERRAFORM
+                  value: coder-edgeone-sync
+                - name: CHALLENGE_DNS_ENDPOINT
+                  value: coder-edgeone-acme
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 192Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: script
+                  mountPath: /opt/coder-edgeone
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: script
+              configMap:
+                name: coder-edgeone-certificate-script
+                defaultMode: 0444
+            - name: tmp
+              emptyDir: {}

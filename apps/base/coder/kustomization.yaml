@@ -14,3 +14,9 @@ resources:
   - edgeone-secret.yaml
   - edgeone-rbac.yaml
   - edgeone-terraform.yaml
+  - edgeone-certificate-cronjob.yaml
+
+configMapGenerator:
+  - name: coder-edgeone-certificate-script
+    files:
+      - certificate.py=edgeone-certificate.py

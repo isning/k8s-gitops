@@ -1337,6 +1337,26 @@
     ];
   }
   {
+    imageName = "docker.io/tencentcom/tencentcloud-cli";
+    imageDigest = "sha256:6f2ac4dda0e903e8ada38b7a0abfaaf7609e99764e7748db0bd2b03e35d147f3";
+    finalImageName = "docker.io/tencentcom/tencentcloud-cli";
+    finalImageTag = "latest";
+    archiveHash = "sha256-+W3xrG36BSyrrEmrOPqMdVFmtECJKD5POxPaQJAAGzA=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "CronJob"; namespace = "prod"; name = "coder-edgeone-certificate"; }
+    ];
+  }
+  {
     imageName = "victoriametrics/operator";
     imageDigest = "sha256:fb5ebef9cba3746d73ee0dee1bb9e4bc80539687518fd1e2e6ab7776b438048a";
     finalImageName = "docker.io/victoriametrics/operator";

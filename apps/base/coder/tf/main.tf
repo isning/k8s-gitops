@@ -39,12 +39,6 @@ resource "tencentcloud_teo_acceleration_domain" "coder" {
   }
 }
 
-resource "tencentcloud_teo_certificate_config" "coder" {
-  zone_id = var.edgeone_zone_id
-  host    = tencentcloud_teo_acceleration_domain.coder.domain_name
-  mode    = "eofreecert"
-}
-
 resource "tencentcloud_teo_origin_acl" "coder" {
   zone_id = var.edgeone_zone_id
   l7_hosts = [
