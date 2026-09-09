@@ -15,10 +15,23 @@ SPEC.loader.exec_module(MODULE)
 
 class ChallengeValidationTest(unittest.TestCase):
     def test_accepts_expected_delegation(self):
-        MODULE.validate_challenge(
+        self.assertEqual(
+            MODULE.validate_challenge(
+                "_acme-challenge.coder.isning.moe",
+                "CNAME",
+                "validation.example.eo.dnse0.com",
+            ),
             "_acme-challenge.coder.isning.moe",
-            "CNAME",
-            "validation.example.eo.dnse0.com",
+        )
+
+    def test_expands_relative_edgeone_name(self):
+        self.assertEqual(
+            MODULE.validate_challenge(
+                "_acme-challenge.coder",
+                "CNAME",
+                "validation.example.eo.dnse0.com",
+            ),
+            "_acme-challenge.coder.isning.moe",
         )
 
     def test_rejects_record_outside_managed_zone(self):

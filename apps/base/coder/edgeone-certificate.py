@@ -95,15 +95,24 @@ def get_dns_endpoint(name: str) -> dict[str, Any] | None:
         raise
 
 
-def validate_challenge(subdomain: str, record_type: str, record_value: str) -> None:
+def normalize_challenge_name(subdomain: str) -> str:
     zone = "isning.moe"
+    expected_name = f"_acme-challenge.coder.{zone}"
     normalized_name = subdomain.rstrip(".").lower()
+    if not normalized_name.endswith(f".{zone}"):
+        normalized_name = f"{normalized_name}.{zone}"
+    if normalized_name != expected_name:
+        raise RuntimeError(f"EdgeOne returned unsafe challenge name {subdomain!r}")
+    return normalized_name
+
+
+def validate_challenge(subdomain: str, record_type: str, record_value: str) -> str:
+    normalized_name = normalize_challenge_name(subdomain)
     if record_type.upper() != "CNAME":
         raise RuntimeError(f"EdgeOne returned unsupported challenge record type {record_type!r}")
-    if not normalized_name.startswith("_acme-challenge.") or not normalized_name.endswith(f".{zone}"):
-        raise RuntimeError(f"EdgeOne returned unsafe challenge name {subdomain!r}")
     if not record_value.strip():
         raise RuntimeError("EdgeOne returned an empty challenge target")
+    return normalized_name
 
 
 def reconcile_dns_endpoint(
@@ -113,7 +122,7 @@ def reconcile_dns_endpoint(
     record_value: str,
     order_created_at: datetime | None = None,
 ) -> None:
-    validate_challenge(subdomain, record_type, record_value)
+    dns_name = validate_challenge(subdomain, record_type, record_value)
     created_at = order_created_at or datetime.now(timezone.utc)
     endpoint = {
         "apiVersion": "externaldns.k8s.io/v1alpha1",
@@ -132,7 +141,7 @@ def reconcile_dns_endpoint(
         "spec": {
             "endpoints": [
                 {
-                    "dnsName": subdomain.rstrip("."),
+                    "dnsName": dns_name,
                     "recordType": record_type.upper(),
                     "recordTTL": 60,
                     "targets": [record_value],
