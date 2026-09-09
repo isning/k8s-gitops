@@ -7,7 +7,6 @@ metadata:
 data:
   service: |
     spec:
-      externalTrafficPolicy: Local
       ipFamilyPolicy: SingleStack
       ipFamilies:
         - IPv6
