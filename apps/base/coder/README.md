@@ -22,24 +22,15 @@ Before syncing the `prod` overlay:
 Workspace applications use a dedicated IPv6-only `coder-gateway`. Its origin address
 must not be published through ExternalDNS: doing so would expose the origin and allow
 traffic to bypass EdgeOne. EdgeOne should receive the current LoadBalancer IPv6 address
-directly through its API, while public wildcard DNS points only to EdgeOne. Origin
-ingress must also be restricted to the EdgeOne origin-pull IP ranges.
+directly through its API, while public wildcard DNS points only to EdgeOne.
 
 Two Tofu states and an ephemeral certificate reconciler implement that ordering.
 `coder-edgeone-control` reads the IPv6 address from the Istio-generated
-`coder-gateway-istio` Service, configures the EdgeOne wildcard acceleration domain and
-the optional Origin ACL, then writes only the assigned EdgeOne CNAME to a Kubernetes Secret.
-`coder-edgeone-sync` reads the current and pending EdgeOne IPv6 origin-pull ranges,
-installs the Cilium allow policy, and only then creates the `*.coder.isning.moe`
-ExternalDNS CNAME. It also confirms pending Origin ACL rotations after the new ranges
-are installed. The static `coder-origin-default-deny` policy keeps the Gateway closed
-if either Tofu state fails or EdgeOne returns no IPv6 ranges.
-
-`enable_origin_acl` defaults to `false` because EdgeOne returns
-`PlanNotSupportOriginProtection` on plans without Origin Protection. In that state the
-certificate can still be issued, but the wildcard business CNAME remains unpublished
-and the origin remains default-denied. After upgrading the EdgeOne plan, set the
-variable to `true`; the allow policy is installed before DNS is published.
+`coder-gateway-istio` Service, configures the EdgeOne wildcard acceleration domain,
+then writes only the assigned EdgeOne CNAME to a Kubernetes Secret.
+`coder-edgeone-sync` publishes `*.coder.isning.moe` as that EdgeOne CNAME through
+ExternalDNS. Public DNS therefore exposes the EdgeOne endpoint rather than retaining
+the origin IPv6 address. Origin Protection is not required by this deployment.
 
 The `coder-edgeone-certificate` CronJob waits for both Tofu states to become Ready,
 requests EdgeOne DNS-delegated validation for the wildcard certificate, and publishes

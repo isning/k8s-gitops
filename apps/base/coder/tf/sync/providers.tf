@@ -3,7 +3,3 @@ provider "kubernetes" {
   token                  = try(file("/var/run/secrets/kubernetes.io/serviceaccount/token"), null)
   cluster_ca_certificate = try(file("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"), null)
 }
-
-provider "tencentcloud" {
-  domain = "tencentcloudapi.com"
-}
