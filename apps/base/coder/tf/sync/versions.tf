@@ -6,5 +6,9 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 3.2"
     }
+    tencentcloud = {
+      source  = "tencentcloudstack/tencentcloud"
+      version = "~> 1.83"
+    }
   }
 }

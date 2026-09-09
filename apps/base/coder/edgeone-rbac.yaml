@@ -46,6 +46,32 @@ subjects:
     name: tf-runner
     namespace: prod
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: coder-edgeone-crd-reader
+rules:
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: coder-edgeone-crd-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: coder-edgeone-crd-reader
+subjects:
+  - kind: ServiceAccount
+    name: tf-runner
+    namespace: prod
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:

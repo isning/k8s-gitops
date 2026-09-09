@@ -1,3 +1,8 @@
+variable "edgeone_zone_id" {
+  description = "EdgeOne site ID containing isning.moe"
+  type        = string
+}
+
 variable "edgeone_cname" {
   description = "CNAME allocated to the EdgeOne acceleration domain"
   type        = string

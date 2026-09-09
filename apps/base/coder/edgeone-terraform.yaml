@@ -42,6 +42,15 @@ spec:
     - name: coder-edgeone-control
   varsFrom:
     - kind: Secret
+      name: coder-edgeone
+      varsKeys:
+        - edgeone_zone_id
+    - kind: Secret
       name: coder-edgeone-output
       varsKeys:
         - edgeone_cname
+  runnerPodTemplate:
+    spec:
+      envFrom:
+        - secretRef:
+            name: coder-edgeone

@@ -30,7 +30,10 @@ Two Tofu states and an ephemeral certificate reconciler implement that ordering.
 then writes only the assigned EdgeOne CNAME to a Kubernetes Secret.
 `coder-edgeone-sync` publishes `*.coder.isning.moe` as that EdgeOne CNAME through
 ExternalDNS. Public DNS therefore exposes the EdgeOne endpoint rather than retaining
-the origin IPv6 address. Origin Protection is not required by this deployment.
+the origin IPv6 address. Origin Protection is not required by this deployment. The
+sync state still observes EdgeOne's current and pending origin IPv6 ranges. When the
+API returns a non-empty list, it installs a Cilium allow policy for those ranges; an
+empty list leaves the Gateway unfiltered rather than blocking all EdgeOne traffic.
 
 The `coder-edgeone-certificate` CronJob waits for both Tofu states to become Ready,
 requests EdgeOne DNS-delegated validation for the wildcard certificate, and publishes
