@@ -1,0 +1,21 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: ipv6-pool-reconciler
+  namespace: monitoring
+  labels:
+    app: monitoring
+spec:
+  groups:
+    - name: ipv6-pool-reconciler
+      rules:
+        - alert: IPv6PoolReconciliationStale
+          expr: |
+            (time() - max(kube_cronjob_status_last_successful_time{namespace="kube-system",cronjob="ipv6-pool-reconciler"}) > 1200)
+            or absent(kube_cronjob_status_last_successful_time{namespace="kube-system",cronjob="ipv6-pool-reconciler"})
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Public IPv6 pool reconciliation has no recent successful run"
+            description: "Check kube-system/ipv6-pool-reconciler Jobs, whitefox uplink IPv6, the Cilium pool and prod/coder-edgeone-control. Existing pool addresses are retained when discovery fails."

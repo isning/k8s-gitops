@@ -50,6 +50,16 @@ jobs:
               - '**/*.tfvars'
               - '**/*.tfvars.json'
 
+  ipv6-pool-regression:
+    if: ${{ needs.changes.outputs.gitops_related == 'true' }}
+    needs: [changes]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Test dynamic IPv6 pool reconciliation
+        run: python3 -m unittest discover -s infra/pre-controllers/overlays/kubevirt-lab-1/cilium -p 'test_*.py'
+
   terraform-validate:
     if:  ${{ needs.changes.outputs.terraform_related == 'true' }}
     needs:

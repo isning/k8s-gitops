@@ -31,7 +31,8 @@ then writes only the assigned EdgeOne CNAME to a Kubernetes Secret.
 The domain references a stable `GENERAL` origin group containing the current IPv6
 address. Prefix changes update that group's record without rewriting the domain's
 computed `$host` header (which EdgeOne's domain update API rejects as input).
-The Cilium prefix reconciler triggers this state after Service addresses converge.
+The Cilium prefix reconciler reads the actual host uplink (not Node InternalIP),
+owns the generated public pool, and triggers this state after Service addresses converge.
 The home overlay retains the allocated origin record ID to work around the
 provider's perpetual diff on the `records` set's Optional+Computed `record_id`.
 This is a stable remote resource identity, not a fixed IPv6 address. If intentionally

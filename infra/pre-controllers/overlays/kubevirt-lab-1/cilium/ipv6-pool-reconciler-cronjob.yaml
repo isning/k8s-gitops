@@ -19,6 +19,10 @@ spec:
             app.kubernetes.io/name: ipv6-pool-reconciler
         spec:
           serviceAccountName: ipv6-pool-reconciler
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+          nodeSelector:
+            kubernetes.io/hostname: whitefox
           restartPolicy: Never
           securityContext:
             runAsNonRoot: true
@@ -31,6 +35,10 @@ spec:
               image: docker.io/library/python:3.14-alpine@sha256:dd4d2bd5b53d9b25a51da13addf2be586beebd5387e289e798e4083d94ca837a
               command: ["python3", "/opt/reconciler/reconcile.py"]
               env:
+                - name: IPV6_INTERFACE
+                  value: ovsbr1
+                - name: IPV6_ROUTE_TARGET
+                  value: "2001:4860:4860::8888"
                 - name: POOL_NAME
                   value: default-public-ipv6-pool
                 - name: POOL_SUBNET_HEXTET

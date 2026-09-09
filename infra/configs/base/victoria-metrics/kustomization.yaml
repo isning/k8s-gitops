@@ -5,4 +5,5 @@ resources:
   - ./istio-metrics.yaml
   - ./loki-metrics.yaml
   - ./kubernetes-alerts.yaml
+  - ./ipv6-pool-alerts.yaml
   - ./node-metrics.yaml

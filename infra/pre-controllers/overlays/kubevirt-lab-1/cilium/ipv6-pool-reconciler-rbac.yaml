@@ -10,14 +10,17 @@ metadata:
   name: ipv6-pool-reconciler
 rules:
   - apiGroups: [""]
-    resources: ["nodes", "services"]
+    resources: ["services"]
     verbs: ["get", "list"]
   - apiGroups: ["cilium.io"]
     resources: ["ciliumloadbalancerippools"]
+    resourceNames: ["default-public-ipv6-pool"]
     verbs: ["get", "patch"]
-  - apiGroups: ["infra.contrib.fluxcd.io"]
-    resources: ["terraforms"]
-    verbs: ["get", "patch"]
+  # Kubernetes cannot restrict create by resourceNames; the script has an
+  # explicit ownership check and this account can create only this CRD kind.
+  - apiGroups: ["cilium.io"]
+    resources: ["ciliumloadbalancerippools"]
+    verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -27,6 +30,31 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: ipv6-pool-reconciler
+subjects:
+  - kind: ServiceAccount
+    name: ipv6-pool-reconciler
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ipv6-pool-reconciler-edgeone
+  namespace: prod
+rules:
+  - apiGroups: ["infra.contrib.fluxcd.io"]
+    resources: ["terraforms"]
+    resourceNames: ["coder-edgeone-control"]
+    verbs: ["patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ipv6-pool-reconciler-edgeone
+  namespace: prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ipv6-pool-reconciler-edgeone
 subjects:
   - kind: ServiceAccount
     name: ipv6-pool-reconciler
