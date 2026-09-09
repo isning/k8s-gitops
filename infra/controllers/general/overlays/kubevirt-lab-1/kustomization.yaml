@@ -7,3 +7,13 @@ resources:
   - ../../base/kubevirt/
   - ../../base/redroid-operator/
   - ../../base/dragonfly-operator/
+
+patches:
+  - target:
+      kind: Deployment
+      name: virt-operator
+      namespace: kubevirt
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1

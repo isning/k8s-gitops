@@ -4,6 +4,8 @@ metadata:
   name: will-be-ignored
 spec:
   values:
+    # Apply ConfigMap changes to the agent, not just to Helm's release state.
+    rollOutCiliumPods: true
     # https://github.com/cilium/cilium/pull/37601
     k8s:
       # Space separated
@@ -17,6 +19,9 @@ spec:
       replicas: 1 # For now that I have only 1 node
 
     bpf:
+      # Single-node home workload: keep headroom without multi-million-entry maps.
+      # Resizing maps can reset connections; observe map pressure after rollout.
+      mapDynamicSizeRatio: 0.01
       # Use l2 insead l3 for KubeVirt compatability https://github.com/cilium/cilium/issues/37265#issuecomment-2626483413
       datapathMode: netkit-l2
 

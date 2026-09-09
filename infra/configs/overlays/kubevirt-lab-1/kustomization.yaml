@@ -17,6 +17,15 @@ resources:
 
 patches:
   - target:
+      kind: KubeVirt
+      name: kubevirt
+      namespace: kubevirt
+    patch: |-
+      - op: add
+        path: /spec/infra
+        value:
+          replicas: 1
+  - target:
       kind: Gateway
       name: infra-gateway
       namespace: kube-system
