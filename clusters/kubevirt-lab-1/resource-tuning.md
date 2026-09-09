@@ -25,7 +25,24 @@ generated Deployments manually: the operator would restore its desired state.
 Single replicas remove redundant same-node processes but provide no controller
 redundancy. Revisit this override before adding more nodes.
 
-## Read-only checks
+## VictoriaMetrics cache budget
+
+The home overlay sets `vmsingle.spec.extraArgs.memory.allowedBytes` to `512MiB`.
+This bounds internal cache sizing, not total process memory. Existing process
+limits, scrape intervals, retention and PVCs are unchanged. Smaller caches can
+increase disk reads and CPU usage; revert this override if sustained cache
+misses, query latency or ingestion backlog increase.
+
+Use `MemTotal - MemAvailable` from the host's `/proc/meminfo` for before/after
+comparisons under comparable workload. Pod working sets and BPF memlock totals
+are not interchangeable with physical host memory savings. The initial host
+baseline was approximately 15.5 GiB used; a 12 GiB target is not yet verified.
+VictoriaMetrics was approximately 760 MiB RSS, and the host K3s service cgroup
+approximately 3.6 GiB. K3s/NixOS configuration is not owned by this repository;
+host-level tuning must be made in its configuration source, not a temporary
+systemd override. Coder workspaces are deliberately excluded from tuning.
+
+## Verification
 
 ```sh
 kubectl --context home get --raw=/readyz

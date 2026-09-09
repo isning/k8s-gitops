@@ -3,6 +3,11 @@ metadata:
   name: will-be-ignored
 spec:
   values:
+    vmsingle:
+      spec:
+        extraArgs:
+          # Bound cache growth without imposing a smaller process/OOM limit.
+          memory.allowedBytes: "512MiB"
     vmagent:
       spec:
         scrapeInterval: 20s
