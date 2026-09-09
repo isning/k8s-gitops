@@ -28,6 +28,10 @@ Two Tofu states and an ephemeral certificate reconciler implement that ordering.
 `coder-edgeone-control` reads the IPv6 address from the Istio-generated
 `coder-gateway-istio` Service, configures the EdgeOne wildcard acceleration domain,
 then writes only the assigned EdgeOne CNAME to a Kubernetes Secret.
+The domain references a stable `GENERAL` origin group containing the current IPv6
+address. Prefix changes update that group's record without rewriting the domain's
+computed `$host` header (which EdgeOne's domain update API rejects as input).
+The Cilium prefix reconciler triggers this state after Service addresses converge.
 `coder-edgeone-sync` publishes `*.coder.isning.moe` as that EdgeOne CNAME through
 ExternalDNS. Public DNS therefore exposes the EdgeOne endpoint rather than retaining
 the origin IPv6 address. Origin Protection is not required by this deployment. The
@@ -57,3 +61,7 @@ only in that namespace; set `namespace = "coder"` in Kubernetes-based Coder temp
 
 Group and role synchronization are intentionally not enabled because they require a
 Coder enterprise license. Basic OIDC login works with the open-source deployment.
+
+For this repository's live cluster, use `kubectl --context home` and
+`flux --context home`; verify the node is `whitefox` before running mutations.
+The `snc` context belongs to a different cluster.
