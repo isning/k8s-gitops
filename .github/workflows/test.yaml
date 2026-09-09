@@ -126,11 +126,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Setup yq
-        uses: fluxcd/pkg/actions/yq@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+        uses: fluxcd/pkg/actions/yq@6d8d5d9e03f8da11e9685652e205f20aeb99c4ba # main
       - name: Setup kubeconform
-        uses: fluxcd/pkg/actions/kubeconform@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+        uses: fluxcd/pkg/actions/kubeconform@6d8d5d9e03f8da11e9685652e205f20aeb99c4ba # main
       - name: Setup kustomize
-        uses: fluxcd/pkg/actions/kustomize@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+        uses: fluxcd/pkg/actions/kustomize@6d8d5d9e03f8da11e9685652e205f20aeb99c4ba # main
       - name: Validate manifests
         run: ./scripts/validate.sh
         env:
@@ -152,7 +152,7 @@ jobs:
       - name: Setup Flux CLI
         uses: fluxcd/flux2/action@889be9d6cc8afa8ed639e1e1ba4ab678e3b38d8c # v2.9.4
       - name: Setup kustomize
-        uses: fluxcd/pkg/actions/kustomize@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+        uses: fluxcd/pkg/actions/kustomize@6d8d5d9e03f8da11e9685652e205f20aeb99c4ba # main
       - name: flux-local test
         uses: allenporter/flux-local/action/test@92d3a538c009c3fec120fbf50f6ef33b3e0a569c # 8.4.0
         with:
@@ -179,7 +179,7 @@ jobs:
       - name: Setup Flux CLI
         uses: fluxcd/flux2/action@889be9d6cc8afa8ed639e1e1ba4ab678e3b38d8c # v2.9.4
       - name: Setup kustomize
-        uses: fluxcd/pkg/actions/kustomize@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+        uses: fluxcd/pkg/actions/kustomize@6d8d5d9e03f8da11e9685652e205f20aeb99c4ba # main
       - name: flux-local diff
         id: diff
         uses: allenporter/flux-local/action/diff@92d3a538c009c3fec120fbf50f6ef33b3e0a569c # 8.4.0
