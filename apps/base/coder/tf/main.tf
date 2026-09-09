@@ -48,6 +48,8 @@ resource "tencentcloud_teo_acceleration_domain" "coder" {
 }
 
 resource "tencentcloud_teo_origin_acl" "coder" {
+  count = var.enable_origin_acl ? 1 : 0
+
   zone_id = var.edgeone_zone_id
   l7_hosts = [
     tencentcloud_teo_acceleration_domain.coder.domain_name,
