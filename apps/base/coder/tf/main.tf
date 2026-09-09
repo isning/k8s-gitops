@@ -17,6 +17,14 @@ locals {
   gateway_ipv6 = one(local.gateway_ipv6_addresses)
 }
 
+# The initial controller run may have created the EdgeOne domain before its
+# interrupted apply persisted state. Keeping this import block makes recovery
+# declarative and is a no-op once the resource is tracked.
+import {
+  to = tencentcloud_teo_acceleration_domain.coder
+  id = "${var.edgeone_zone_id}#${var.acceleration_domain}"
+}
+
 resource "tencentcloud_teo_acceleration_domain" "coder" {
   zone_id     = var.edgeone_zone_id
   domain_name = var.acceleration_domain
