@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ipv6-pool-reconciler
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ipv6-pool-reconciler
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "services"]
+    verbs: ["get", "list"]
+  - apiGroups: ["cilium.io"]
+    resources: ["ciliumloadbalancerippools"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ipv6-pool-reconciler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ipv6-pool-reconciler
+subjects:
+  - kind: ServiceAccount
+    name: ipv6-pool-reconciler
+    namespace: kube-system

@@ -301,15 +301,20 @@
     arch = "amd64";
     sources = [
       { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-pre-controllers"; }
     ];
     sourceChains = [
       [
         { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
         { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
       ]
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-pre-controllers"; }
+      ]
     ];
     targets = [
       { kind = "Deployment"; namespace = "egress-system"; name = "proxy-engine"; }
+      { kind = "CronJob"; namespace = "kube-system"; name = "ipv6-pool-reconciler"; }
     ];
   }
   {

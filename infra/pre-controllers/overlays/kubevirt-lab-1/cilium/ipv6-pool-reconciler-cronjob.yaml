@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ipv6-pool-reconciler
+  namespace: kube-system
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 240
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ipv6-pool-reconciler
+        spec:
+          serviceAccountName: ipv6-pool-reconciler
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: reconcile
+              image: docker.io/library/python:3.14-alpine@sha256:dd4d2bd5b53d9b25a51da13addf2be586beebd5387e289e798e4083d94ca837a
+              command: ["python3", "/opt/reconciler/reconcile.py"]
+              env:
+                - name: POOL_NAME
+                  value: default-public-ipv6-pool
+                - name: POOL_SUBNET_HEXTET
+                  value: caf0
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 24Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: script
+                  mountPath: /opt/reconciler
+                  readOnly: true
+          volumes:
+            - name: script
+              configMap:
+                name: ipv6-pool-reconciler-script
+                defaultMode: 0444

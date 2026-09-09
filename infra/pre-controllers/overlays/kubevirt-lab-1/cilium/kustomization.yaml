@@ -4,3 +4,11 @@ kind: Kustomization
 resources:
   - ./cilium-ip-pools.yaml
   - ./cilium-l2-advertisement-policy.yaml
+  - ./ipv6-pool-reconciler-rbac.yaml
+  - ./ipv6-pool-reconciler-cronjob.yaml
+
+configMapGenerator:
+  - name: ipv6-pool-reconciler-script
+    namespace: kube-system
+    files:
+      - reconcile.py=ipv6-pool-reconciler.py
