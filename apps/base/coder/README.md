@@ -32,6 +32,11 @@ The domain references a stable `GENERAL` origin group containing the current IPv
 address. Prefix changes update that group's record without rewriting the domain's
 computed `$host` header (which EdgeOne's domain update API rejects as input).
 The Cilium prefix reconciler triggers this state after Service addresses converge.
+The home overlay retains the allocated origin record ID to work around the
+provider's perpetual diff on the `records` set's Optional+Computed `record_id`.
+This is a stable remote resource identity, not a fixed IPv6 address. If intentionally
+recreating the EdgeOne origin group, omit the overlay's ID on the initial apply,
+then retain the new `edgeone_origin_record_id` output in that overlay.
 `coder-edgeone-sync` publishes `*.coder.isning.moe` as that EdgeOne CNAME through
 ExternalDNS. Public DNS therefore exposes the EdgeOne endpoint rather than retaining
 the origin IPv6 address. Origin Protection is not required by this deployment. The

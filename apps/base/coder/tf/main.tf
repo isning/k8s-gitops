@@ -26,9 +26,10 @@ resource "tencentcloud_teo_origin_group" "coder" {
   type    = "GENERAL"
 
   records {
-    record = local.gateway_ipv6
-    type   = "IP_DOMAIN"
-    weight = 100
+    record    = local.gateway_ipv6
+    record_id = var.edgeone_origin_record_id
+    type      = "IP_DOMAIN"
+    weight    = 100
   }
 
   lifecycle {

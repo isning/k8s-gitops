@@ -17,3 +17,6 @@ resources:
   - ./../../../base/vaultwarden/
   - ./../../../base/coder/
   # - ./../../../base/maa/
+
+patches:
+  - path: coder-edgeone-record.yaml

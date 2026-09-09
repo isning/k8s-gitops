@@ -7,3 +7,8 @@ output "gateway_ipv6" {
   description = "Current dynamic Coder Gateway origin address"
   value       = local.gateway_ipv6
 }
+
+output "edgeone_origin_record_id" {
+  description = "Record identity to retain in the cluster overlay after initial creation"
+  value       = one(tencentcloud_teo_origin_group.coder.records).record_id
+}

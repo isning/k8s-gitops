@@ -1,0 +1,10 @@
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: coder-edgeone-control
+spec:
+  vars:
+    # Keep the existing remote record identity, not its changing IPv6 address.
+    # The provider otherwise perpetually replaces its Optional+Computed set ID.
+    - name: edgeone_origin_record_id
+      value: record-8ac5d068-ac2a-11f1-a2ec-525400f3589e

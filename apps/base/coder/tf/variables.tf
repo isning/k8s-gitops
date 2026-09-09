@@ -3,6 +3,12 @@ variable "edgeone_zone_id" {
   type        = string
 }
 
+variable "edgeone_origin_record_id" {
+  description = "Existing EdgeOne origin record identity; null only for initial group creation"
+  type        = string
+  default     = null
+}
+
 variable "acceleration_domain" {
   description = "Wildcard Coder workspace acceleration domain"
   type        = string
