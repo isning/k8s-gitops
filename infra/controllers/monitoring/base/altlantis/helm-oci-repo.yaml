@@ -11,5 +11,5 @@ spec:
     operation: copy
   url: oci://ghcr.io/runatlantis/charts/atlantis
   ref:
-    tag: "6.4.0"
-    digest: sha256:f5b47aa4bb8aa5ab58180b9ebf643b12fb58a3d6640555d6eaa2ffddffbef477
+    tag: "6.16.0"
+    digest: sha256:1692f79c9b0a3a737d24b0dacd841bfd9aa0021babf46d9dccf307b5685acd79
