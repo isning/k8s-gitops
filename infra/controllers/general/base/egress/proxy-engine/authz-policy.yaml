@@ -103,7 +103,10 @@ spec:
     matchLabels:
       app: proxy-engine
   mtls:
-    mode: STRICT
+    mode: PERMISSIVE
+  portLevelMtls:
+    '9090':
+      mode: STRICT
 ---
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
@@ -123,10 +126,6 @@ spec:
         - '8891'
         - '8892'
         - '8893'
-    from:
-    - source:
-        principals:
-        - '*'
   - from:
     - source:
         principals:
@@ -176,7 +175,3 @@ spec:
         - '8891'
         - '8892'
         - '8893'
-    from:
-    - source:
-        principals:
-        - '*'
