@@ -6,9 +6,9 @@ metadata:
 spec:
   interval: 12h
   layerSelector:
-    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   url: oci://ghcr.io/helmforgedev/helm/vaultwarden
   ref:
-    tag: "1.12.11"
-    digest: sha256:4407a8a7e9735071537dc08d028032cb19ada665755a7a26f3ae0577091362b0
+    tag: 1.14.2
+    digest: sha256:4640f35bcb24ea5d048501da8bbe7438099758d8de7be662a5d4a57f8116f1df
