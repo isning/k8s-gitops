@@ -13,10 +13,10 @@ spec:
   provider:
     name: oauth2-proxy
   rules:
-    - to:
-        - operation:
-            hosts:
-              - proxy-engine.isning.moe
+  - to:
+    - operation:
+        hosts:
+        - proxy-engine.isning.moe
 ---
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
@@ -30,11 +30,153 @@ spec:
     name: default-gateway
   action: DENY
   rules:
-    - to:
-        - operation:
-            hosts:
-              - proxy-engine.isning.moe
-      when:
-        - key: request.auth.claims[roles]
-          notValues:
-            - proxy-engine:admin
+  - to:
+    - operation:
+        hosts:
+        - proxy-engine.isning.moe
+    when:
+    - key: request.auth.claims[roles]
+      notValues:
+      - proxy-engine:admin
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-webui-direct-access
+  namespace: egress-system
+spec:
+  selector:
+    matchLabels:
+      app: proxy-dashboard
+  action: DENY
+  rules:
+  - from:
+    - source:
+        notPrincipals:
+        - cluster.local/ns/prod/sa/default-gateway-istio
+        - cluster.local/ns/egress-system/sa/waypoint
+    to:
+    - operation:
+        ports:
+        - '8080'
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-webui-service-access
+  namespace: egress-system
+spec:
+  targetRefs:
+  - group: ''
+    kind: Service
+    name: proxy-dashboard
+  action: DENY
+  rules:
+  - from:
+    - source:
+        notPrincipals:
+        - cluster.local/ns/prod/sa/default-gateway-istio
+    to:
+    - operation:
+        ports:
+        - '8080'
+---
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: proxy-dashboard-mtls
+  namespace: egress-system
+spec:
+  selector:
+    matchLabels:
+      app: proxy-dashboard
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: proxy-engine-mtls
+  namespace: egress-system
+spec:
+  selector:
+    matchLabels:
+      app: proxy-engine
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-engine-access
+  namespace: egress-system
+spec:
+  selector:
+    matchLabels:
+      app: proxy-engine
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        ports:
+        - '7890'
+        - '8891'
+        - '8892'
+        - '8893'
+    from:
+    - source:
+        principals:
+        - '*'
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/egress-system/sa/proxy-dashboard
+    to:
+    - operation:
+        ports:
+        - '9090'
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-engine-api-service-access
+  namespace: egress-system
+spec:
+  targetRefs:
+  - group: ''
+    kind: Service
+    name: proxy-engine-headless
+  action: DENY
+  rules:
+  - from:
+    - source:
+        notPrincipals:
+        - cluster.local/ns/egress-system/sa/proxy-dashboard
+    to:
+    - operation:
+        ports:
+        - '9090'
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: proxy-service-access
+  namespace: egress-system
+spec:
+  targetRefs:
+  - group: ''
+    kind: Service
+    name: proxy-svc
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        ports:
+        - '7890'
+        - '8891'
+        - '8892'
+        - '8893'
+    from:
+    - source:
+        principals:
+        - '*'

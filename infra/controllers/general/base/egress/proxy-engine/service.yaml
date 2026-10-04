@@ -28,10 +28,36 @@ spec:
     appProtocol: tcp
     protocol: TCP
     targetPort: 8893
-  - port: 9090
-    name: clash-api
-    appProtocol: http
-    protocol: TCP
-    targetPort: 9090
   selector:
     app: proxy-engine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-engine-headless
+  namespace: egress-system
+  labels:
+    istio.io/use-waypoint: none
+spec:
+  clusterIP: None
+  ports:
+  - port: 9090
+    name: http-clash-api
+    appProtocol: http
+    targetPort: clash-api
+  selector:
+    app: proxy-engine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-dashboard
+  namespace: egress-system
+spec:
+  ports:
+  - port: 8080
+    name: http-webui
+    appProtocol: http
+    targetPort: http-webui
+  selector:
+    app: proxy-dashboard
