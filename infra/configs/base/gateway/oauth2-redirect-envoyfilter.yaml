@@ -29,7 +29,7 @@ spec:
                 - append:
                     header:
                       key: X-Auth-Request-Redirect
-                      value: "%REQ(:scheme)%://%REQ(:authority)%%REQ(:path)%"
+                      value: "https://%REQ(:authority)%%REQ(:path)%"
                     append_action: OVERWRITE_IF_EXISTS_OR_ADD
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -62,7 +62,7 @@ spec:
                 - append:
                     header:
                       key: X-Auth-Request-Redirect
-                      value: "%REQ(:scheme)%://%REQ(:authority)%%REQ(:path)%"
+                      value: "https://%REQ(:authority)%%REQ(:path)%"
                     append_action: OVERWRITE_IF_EXISTS_OR_ADD
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -95,5 +95,5 @@ spec:
                 - append:
                     header:
                       key: X-Auth-Request-Redirect
-                      value: "%REQ(:scheme)%://%REQ(:authority)%%REQ(:path)%"
+                      value: "https://%REQ(:authority)%%REQ(:path)%"
                     append_action: OVERWRITE_IF_EXISTS_OR_ADD
