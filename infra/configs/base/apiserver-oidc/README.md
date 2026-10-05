@@ -2,7 +2,12 @@ This should cooperate with https://github.com/isning/nix-config/commit/438ed686e
 
 For login: 
 ```sh
-kubectl oidc-login setup --oidc-issuer-url=https://logto.isning.moe/oidc --oidc-client-id=xktx7x81fvdwvx3a0ly62 --oidc-extra-scope profile,roles
+oidc_client_id="$(kubectl -n flux-system get secret kubernetes-cluster-managed-application -o jsonpath='{.data.clientId}' | base64 --decode)"
+kubectl oidc-login setup --oidc-issuer-url=https://logto.isning.moe/oidc --oidc-client-id="$oidc_client_id" --oidc-extra-scope profile,roles
 ```
+
+Use the same runtime client ID in the API server's OIDC configuration in
+isning/nix-config. External application IDs are assigned by the provider and
+remain in Kubernetes; do not pin them in Git.
 
 Reference: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#using-authentication-configuration

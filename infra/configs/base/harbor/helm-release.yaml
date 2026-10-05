@@ -14,12 +14,11 @@ spec:
         kind: HelmRepository
         name: harbor
         namespace: flux-system
-      version: "1.*"
+      version: 1.*
       interval: 12h
   values:
     existingSecretAdminPassword: harbor-admin-auth
     existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
-
     expose:
       type: route
       route:
@@ -33,13 +32,10 @@ spec:
       tls:
         enabled: false
     externalURL: https://harbor.isning.moe
-
-    # Route Harbor's outbound requests through the cluster egress proxy.
     proxy:
       httpProxy: http://proxy-svc.egress-system.svc.cluster.local:7890
       httpsProxy: http://proxy-svc.egress-system.svc.cluster.local:7890
       noProxy: 127.0.0.1,localhost,.svc,.cluster.local,harbor.harbor.svc,core,jobservice,registry,portal
-
     database:
       type: external
       external:
@@ -53,13 +49,9 @@ spec:
       external:
         addr: harbor-dragonfly:6379
         username: default
-        # Use an existing secret to connect to Dragonfly. The key must be REDIS_PASSWORD.
         existingSecret: harbor-redis-auth
-
-    # Disable scanners to reduce footprint; can be enabled later.
     trivy:
       enabled: false
-
     persistence:
       enabled: true
       resourcePolicy: keep
@@ -73,26 +65,30 @@ spec:
           size: 10Gi
         redis:
           size: 5Gi
-
-  valuesFrom:
-    - kind: Secret
-      name: harbor-oidc
-      valuesKey: values.yaml
-
+    core:
+      extraEnvVars:
+      - name: OIDC_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: harbor-managed-oidc
+            key: clientId
+      - name: OIDC_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: harbor-managed-oidc
+            key: clientSecret
+      - name: CONFIG_OVERWRITE_JSON
+        value: '{"self_registration":false,"auth_mode":"oidc_auth","primary_auth_mode":true,"oidc_name":"Logto
+          ISNing","oidc_endpoint":"https://logto.isning.moe/oidc","oidc_scope":"openid,profile,email,roles,offline_access","oidc_client_id":"$(OIDC_CLIENT_ID)","oidc_client_secret":"$(OIDC_CLIENT_SECRET)","oidc_verify_cert":true,"oidc_auto_onboard":true,"oidc_user_claim":"username","oidc_groups_claim":"roles","oidc_group_filter":"^harbor:[a-z]+$","oidc_admin_group":"harbor:admin","oidc_logout":true}'
   postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              version: v1
-              kind: ConfigMap
-              name: harbor-core
-              namespace: harbor
-            patch: |
-              apiVersion: v1
-              kind: ConfigMap
-              metadata:
-                name: harbor-core
-                namespace: harbor
-              data:
-                PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE: "ali-acr,aws-ecr,azure-acr,docker-hub,docker-registry,github-ghcr,google-gcr,harbor,huawei-SWR,jfrog-artifactory,tencent-tcr,volcengine-cr"
-                REPLICATION_ADAPTER_WHITELIST: "ali-acr,aws-ecr,azure-acr,docker-hub,docker-registry,github-ghcr,google-gcr,harbor,huawei-SWR,jfrog-artifactory,tencent-tcr,volcengine-cr"
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: ConfigMap
+          name: harbor-core
+          namespace: harbor
+        patch: "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: harbor-core\n  namespace: harbor\n\
+          data:\n  PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE: \"ali-acr,aws-ecr,azure-acr,docker-hub,docker-registry,github-ghcr,google-gcr,harbor,huawei-SWR,jfrog-artifactory,tencent-tcr,volcengine-cr\"\
+          \n  REPLICATION_ADAPTER_WHITELIST: \"ali-acr,aws-ecr,azure-acr,docker-hub,docker-registry,github-ghcr,google-gcr,harbor,huawei-SWR,jfrog-artifactory,tencent-tcr,volcengine-cr\"\
+          \n"

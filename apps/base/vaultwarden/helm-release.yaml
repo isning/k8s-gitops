@@ -10,9 +10,7 @@ spec:
     kind: OCIRepository
     name: helm-chart-vaultwarden
   values:
-    # HTTPS required for Passkey support
-    domain: 'https://vault.isning.moe'
-
+    domain: https://vault.isning.moe
     vaultwarden:
       signupsAllowed: false
       signupsVerify: true
@@ -21,11 +19,9 @@ spec:
       passwordIterations: 600000
       proxy:
         ipHeader: X-Envoy-External-Address
-
     admin:
       existingSecret: vaultwarden-admin
       existingSecretTokenKey: admin-token
-
     smtp:
       enabled: true
       host: smtp.office365.com
@@ -36,53 +32,52 @@ spec:
       username: noreply@isning.moe
       existingSecret: vaultwarden-smtp
       existingSecretPasswordKey: password
-
     database:
       mode: sqlite
-
     extraEnv:
-      - name: PUSH_ENABLED
-        value: "true"
-      - name: PUSH_INSTALLATION_ID
-        valueFrom:
-          secretKeyRef:
-            name: vaultwarden-push
-            key: PUSH_INSTALLATION_ID
-      - name: PUSH_INSTALLATION_KEY
-        valueFrom:
-          secretKeyRef:
-            name: vaultwarden-push
-            key: PUSH_INSTALLATION_KEY
-      - name: SSO_ENABLED
-        value: "true"
-      - name: SSO_SIGNUPS_MATCH_EMAIL # On SSO Signup if a user with a matching email already exists make the association (default true)
-        value: "true"
-      - name: SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION # Allow unknown email verification status (default false). Allowing this with SSO_SIGNUPS_MATCH_EMAIL open potential account takeover.
-        value: "false"
-      - name: SSO_AUTHORITY
-        value: "https://logto.isning.moe/oidc"
-      - name: SSO_SCOPES
-        value: "openid email profile offline_access"
-      - name: SSO_AUTHORIZE_EXTRA_PARAMS
-        value: "prompt=consent"
-      - name: SSO_CLIENT_ID
-        value: "4ggb667if8rr9gcgk51vq"
-      - name: SSO_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: vaultwarden-oidc
-            key: SSO_CLIENT_SECRET
-
+    - name: PUSH_ENABLED
+      value: 'true'
+    - name: PUSH_INSTALLATION_ID
+      valueFrom:
+        secretKeyRef:
+          name: vaultwarden-push
+          key: PUSH_INSTALLATION_ID
+    - name: PUSH_INSTALLATION_KEY
+      valueFrom:
+        secretKeyRef:
+          name: vaultwarden-push
+          key: PUSH_INSTALLATION_KEY
+    - name: SSO_ENABLED
+      value: 'true'
+    - name: SSO_SIGNUPS_MATCH_EMAIL
+      value: 'true'
+    - name: SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION
+      value: 'false'
+    - name: SSO_AUTHORITY
+      value: https://logto.isning.moe/oidc
+    - name: SSO_SCOPES
+      value: openid email profile offline_access
+    - name: SSO_AUTHORIZE_EXTRA_PARAMS
+      value: prompt=consent
+    - name: SSO_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: vaultwarden-managed-oidc
+          key: clientId
+    - name: SSO_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: vaultwarden-managed-oidc
+          key: clientSecret
     backup:
       enabled: true
-      schedule: '0 3 * * *'
+      schedule: 0 3 * * *
       s3:
         endpoint: https://0fa2f8672cf2637118d8cfee9fe6b95f.r2.cloudflarestorage.com
         bucket: vaultwarden-backup
         prefix: prod
-        createBucketIfNotExists: false # The token has no CreateBucket permission
+        createBucketIfNotExists: false
         existingSecret: vaultwarden-r2-credentials
-
     resources:
       requests:
         memory: 64Mi
@@ -90,7 +85,6 @@ spec:
       limits:
         memory: 256Mi
         cpu: 200m
-
     data:
       persistence:
         enabled: true

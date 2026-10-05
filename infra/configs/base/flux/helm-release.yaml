@@ -1,0 +1,77 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: flux-operator
+  namespace: flux-system
+spec:
+  releaseName: flux-operator
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-flux-operator
+    namespace: flux-system
+  values:
+    web:
+      config:
+        baseURL: https://flux.isning.moe
+        authentication:
+          type: OAuth2
+          oauth2:
+            provider: OIDC
+            issuerURL: https://logto.isning.moe/oidc
+            scopes:
+            - openid
+            - profile
+            - offline_access
+            - roles
+            variables:
+            - name: username
+              expression: '(has(claims.username) && type(claims.username) == string) ? "flux:" + string(claims.username)
+                : "flux:uid:" + claims.sub'
+            - name: groups
+              expression: "!has(claims.roles) ? [] :\n  type(claims.roles) == list ? \n    dyn(claims.roles).filter(r,\
+                \ r.startsWith(\"flux:\")) : \n  type(claims.roles) == string ? \n    string(claims.roles).split(\"\
+                ,\").filter(r, r.startsWith(\"flux:\")) : \n  []\n"
+            profile:
+              name: '(has(claims.name) && type(claims.username) == string) ? claims.name : ((has(claims.username)
+                && type(claims.username) == string) ? claims.username : claims.sub)'
+            impersonation:
+              username: variables.username
+              groups: variables.groups
+        userActions:
+          audit:
+          - '*'
+  valuesFrom:
+  - kind: Secret
+    name: flux-web-managed-oidc
+    valuesKey: clientId
+    targetPath: web.config.authentication.oauth2.clientID
+  - kind: Secret
+    name: flux-web-managed-oidc
+    valuesKey: clientSecret
+    targetPath: web.config.authentication.oauth2.clientSecret
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: flux-operator-web-ambient
+  namespace: flux-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: flux-operator
+      app.kubernetes.io/name: flux-operator
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: prod
+      podSelector:
+        matchLabels:
+          gateway.networking.k8s.io/gateway-name: default-gateway
+    ports:
+    - protocol: TCP
+      port: 15008
