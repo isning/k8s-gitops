@@ -5,8 +5,6 @@ metadata:
   name: kiali
   namespace: kiali-operator
 spec:
-  # The base chart contains the basic CRDs and cluster roles required to set up Istio
-  # This should be installed prior to any other Istio component.
   releaseName: kiali-operator
   interval: 30m
   chartRef:
@@ -16,100 +14,79 @@ spec:
   values:
     cr:
       create: true
-      # the namespace where the CR will be created
-      # (the default will be the operator namespace).
       namespace: kiali-operator
       spec:
-        version: "default"
-
+        version: default
         auth:
           strategy: openid
           openid:
-            client_id: "xktx7x81fvdwvx3a0ly62"
-            issuer_uri: "https://logto.isning.moe/oidc"
+            client_id: ${clientId}
+            issuer_uri: https://logto.isning.moe/oidc
             scopes:
-              - "openid"
-              - "profile"
-              - "roles"
-            username_claim: "username"
-
+            - openid
+            - profile
+            - roles
+            username_claim: username
         deployment:
           cluster_wide_access: true
           ingress:
             enabled: false
           hpa:
-            api_version: "autoscaling/v1"
+            api_version: autoscaling/v1
             spec:
               minReplicas: 1
               maxReplicas: 2
               targetCPUUtilizationPercentage: 80
-          instance_name: "kiali"
-          namespace: "kiali-operator"
+          instance_name: kiali
+          namespace: kiali-operator
           network_policy:
             enabled: true
           replicas: 1
           resources:
             requests:
-              cpu: "10m"
-              memory: "64Mi"
+              cpu: 10m
+              memory: 64Mi
             limits:
-              memory: "1Gi"
+              memory: 1Gi
           view_only_mode: false
-        
-        installation_tag: "Kiali@kubevirt-lab-1"
-
+        installation_tag: Kiali@kubevirt-lab-1
         external_services:
-          # [Required] Kiali requires Prometheus to generate the topology graph,
-          # show metrics, calculate health and for several other features.
-          # If Prometheus is missing or Kiali can’t reach it, Kiali won’t work properly.
           prometheus:
             auth:
               type: none
             cache_duration: 10
             cache_enabled: true
             cache_expiration: 300
-            health_check_url: ""
+            health_check_url: ''
             is_core: true
             query_scope:
-              cluster: "kubevirt-lab-1"
-            url: "http://vmsingle-victoriametrics-vmks.monitoring.svc.cluster.local:8428" # "https://prometheus.isning.moe"
-          # [Optional] Kiali will query Grafana and try to fetch the configured Istio dashboards.
-          # For this reason Kiali must be able to reach Grafana, authenticate, and find the Istio dashboards.
-          # https://kiali.io/docs/configuration/p8s-jaeger-grafana/grafana/
+              cluster: kubevirt-lab-1
+            url: http://vmsingle-victoriametrics-vmks.monitoring.svc.cluster.local:8428
           grafana:
             auth:
               type: bearer
               use_kiali_token: true
             enabled: true
             is_core: false
-            # Grafana service name is "grafana" and is in the "telemetry" namespace.
-            internal_url: 'http://grafana-service.prod.svc.cluster.local:3000/'
-            # Public facing URL of Grafana
-            external_url: 'https://grafana.isning.moe'
-          # [Optional] Jaeger is a highly recommended service because Kiali uses distributed tracing data for
-          # several features, providing an enhanced experience.
+            internal_url: http://grafana-service.prod.svc.cluster.local:3000/
+            external_url: https://grafana.isning.moe
           tracing:
             enabled: false
-
         kiali_feature_flags:
           istio_annotation_action: true
           istio_injection_action: true
           istio_upgrade_action: false
           ui_defaults:
             i18n:
-              language: "en"
+              language: en
               show_selector: true
-
         server:
           audit_log: true
           gzip_enabled: true
           port: 20001
-          # Defines the public domain where Kiali is being served. This is the ‘domain’ part of the URL (usually it’s a fully-qualified domain name). For example, kiali.example.org. When empty, Kiali will try to guess this value from HTTP headers. On non-OpenShift clusters, you must populate this value if you want to enable cross-linking between Kiali instances in a multi-cluster setup.
-          web_fqdn: ""
-          # Defines the ingress port where the connections come from. This is usually necessary when the application responds through a proxy/ingress, and it does not forward the correct headers (when this happens, Kiali cannot guess the port). When empty, Kiali will try to guess this value from HTTP headers.
-          web_port: ""
-          # Defines the context root path for the Kiali console and API endpoints and readiness probes. When providing a context root path that is not /, do not add a trailing slash (i.e. use /kiali not /kiali/). When empty, this will default to / on OpenShift and /kiali on other Kubernetes environments.
-          web_root: "/"
+          web_fqdn: ''
+          web_port: ''
+          web_root: /
           observability:
             metrics:
               enabled: true

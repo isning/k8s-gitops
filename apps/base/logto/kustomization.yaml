@@ -8,3 +8,4 @@ resources:
   - ./scheduled-backup.yaml
   - ./helm-oci-repo.yaml
   - ./helm-release.yaml
+  - ./management-credentials.yaml

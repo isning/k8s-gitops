@@ -7,9 +7,12 @@ metadata:
 spec:
   interval: 5m
   dependsOn:
-    - name: infra-namespaces
-    - name: infra-controllers
-    - name: infra-configs
+  - name: infra-namespaces
+  - name: infra-controllers
+  - name: infra-configs
+  - name: identity-applications
+  - name: gateway-identity
+    namespace: prod
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -17,8 +20,11 @@ spec:
   prune: true
   wait: true
   timeout: 1m
-  # https://fluxcd.io/flux/components/kustomize/kustomizations/#decryption
   decryption:
     provider: sops
     secretRef:
       name: sops-age
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: kubernetes-cluster-managed-application
