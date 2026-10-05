@@ -63,6 +63,8 @@ spec:
         value: "https://logto.isning.moe/oidc"
       - name: SSO_SCOPES
         value: "openid email profile offline_access"
+      - name: SSO_AUTHORIZE_EXTRA_PARAMS
+        value: "prompt=consent"
       - name: SSO_CLIENT_ID
         value: "4ggb667if8rr9gcgk51vq"
       - name: SSO_CLIENT_SECRET
