@@ -1,0 +1,28 @@
+---
+apiVersion: application.logto.m.crossplane.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: harbor
+  annotations:
+    crossplane.io/external-name: 534gp0torf1s2dsokwcwo
+spec:
+  managementPolicies:
+  - Observe
+  forProvider:
+    name: Harbor
+    type: Traditional
+    description: ''
+    isThirdParty: false
+    redirectUris:
+    - https://harbor.isning.moe/c/oidc/callback
+    postLogoutRedirectUris:
+    - https://harbor.isning.moe/account/sign-in
+    corsAllowedOrigins: []
+    oidcClientMetadataExtra: '{"backchannelLogoutSessionRequired":false}'
+    customClientMetadataExtra: '{"idTokenTtl":3600,"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":false,"rotateRefreshToken":true,"allowTokenExchange":false}'
+  providerConfigRef:
+    name: isning-logto
+    kind: ClusterProviderConfig
+  writeConnectionSecretToRef:
+    name: harbor-managed-application

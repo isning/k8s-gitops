@@ -1,0 +1,27 @@
+---
+apiVersion: application.logto.m.crossplane.io/v1alpha1
+kind: Application
+metadata:
+  name: vaultwarden
+  namespace: prod
+  annotations:
+    crossplane.io/external-name: 4ggb667if8rr9gcgk51vq
+spec:
+  managementPolicies:
+  - Observe
+  forProvider:
+    name: Vaultwarden
+    type: Traditional
+    description: ''
+    isThirdParty: false
+    redirectUris:
+    - https://vault.isning.moe/identity/connect/oidc-signin
+    postLogoutRedirectUris: []
+    corsAllowedOrigins: []
+    oidcClientMetadataExtra: '{"backchannelLogoutSessionRequired":false}'
+    customClientMetadataExtra: '{"idTokenTtl":3600,"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":false,"rotateRefreshToken":true,"allowTokenExchange":false}'
+  providerConfigRef:
+    name: isning-logto
+    kind: ClusterProviderConfig
+  writeConnectionSecretToRef:
+    name: vaultwarden-managed-application

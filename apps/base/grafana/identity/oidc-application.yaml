@@ -1,0 +1,29 @@
+---
+apiVersion: application.logto.m.crossplane.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: prod
+  annotations:
+    crossplane.io/external-name: 94sbueqrwkfne9im2ilhp
+spec:
+  managementPolicies:
+  - Observe
+  forProvider:
+    name: Grafana
+    type: Traditional
+    description: ''
+    isThirdParty: false
+    redirectUris:
+    - https://grafana.isning.moe/login/generic_oauth
+    postLogoutRedirectUris:
+    - https://grafana.isning.moe/login
+    corsAllowedOrigins:
+    - https://grafana.isning.moe
+    oidcClientMetadataExtra: '{"backchannelLogoutSessionRequired":false}'
+    customClientMetadataExtra: '{"idTokenTtl":3600,"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":false,"rotateRefreshToken":true,"allowTokenExchange":false}'
+  providerConfigRef:
+    name: isning-logto
+    kind: ClusterProviderConfig
+  writeConnectionSecretToRef:
+    name: grafana-managed-application

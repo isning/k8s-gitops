@@ -8,3 +8,4 @@ resources:
 - ./cilium
 - ../../base/flux/
 - ../../base/tofu-controller/
+- ../../base/crossplane/
