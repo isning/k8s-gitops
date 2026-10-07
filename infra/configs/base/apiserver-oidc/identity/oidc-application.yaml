@@ -22,7 +22,7 @@ spec:
     postLogoutRedirectUris: []
     corsAllowedOrigins: []
     oidcClientMetadataExtra: '{"backchannelLogoutSessionRequired":false}'
-    customClientMetadataExtra: '{"idTokenTtl":3600,"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":false,"rotateRefreshToken":true,"allowTokenExchange":false}'
+    customClientMetadataExtra: '{"idTokenTtl":3600,"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true,"allowTokenExchange":false}'
   writeConnectionSecretToRef:
     name: kubernetes-cluster-managed-application
   providerConfigRef:
