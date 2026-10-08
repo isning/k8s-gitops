@@ -1,0 +1,92 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: oidcclientvariables.identity.isning.moe
+spec:
+  scope: Namespaced
+  group: identity.isning.moe
+  names:
+    kind: OIDCClientVariables
+    plural: oidcclientvariables
+  defaultCompositionRef:
+    name: oidc-client-variables
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: [secretName, configMapName]
+            properties:
+              secretName:
+                type: string
+                minLength: 1
+              configMapName:
+                type: string
+                minLength: 1
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: oidc-client-variables
+spec:
+  compositeTypeRef:
+    apiVersion: identity.isning.moe/v1alpha1
+    kind: OIDCClientVariables
+  mode: Pipeline
+  pipeline:
+  - step: public-client-id
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      options: [missingkey=error]
+      inline:
+        template: |
+          {{- $xr := getCompositeResource . -}}
+          {{- $existing := getComposedResource . "variables" | default dict -}}
+          {{- $clientID := dig "data" "clientId" "" $existing -}}
+          {{- $available := false -}}
+          {{- with (get . "extraResources") -}}
+          {{- with (index . "oidc-connection") -}}
+          {{- if eq (len .items) 1 -}}
+          {{- $secret := (index .items 0).resource -}}
+          {{- $clientID = dig "data" "clientId" "" $secret | b64dec -}}
+          {{- $available = ne $clientID "" -}}
+          {{- end -}}
+          {{- end -}}
+          {{- end }}
+          apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+          kind: ExtraResources
+          requirements:
+            oidc-connection:
+              apiVersion: v1
+              kind: Secret
+              namespace: {{ $xr.metadata.namespace | quote }}
+              matchName: {{ $xr.spec.secretName | quote }}
+          {{- if ne $clientID "" }}
+          ---
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: {{ $xr.spec.configMapName | quote }}
+            namespace: {{ $xr.metadata.namespace | quote }}
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: variables
+              gotemplating.fn.crossplane.io/ready: {{ and $available (eq $clientID (dig "data" "clientId" "" $existing)) | ternary "True" "False" | quote }}
+          data:
+            clientId: {{ $clientID | quote }}
+          {{- end }}
+          ---
+          apiVersion: identity.isning.moe/v1alpha1
+          kind: OIDCClientVariables
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/ready: {{ and $available (eq $clientID (dig "data" "clientId" "" $existing)) | ternary "True" "False" | quote }}
+          status: {}
