@@ -25,5 +25,3 @@ spec:
   providerConfigRef:
     name: isning-logto
     kind: ClusterProviderConfig
-  writeConnectionSecretToRef:
-    name: harbor-managed-application

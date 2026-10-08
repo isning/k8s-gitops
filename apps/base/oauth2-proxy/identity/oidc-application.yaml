@@ -24,5 +24,3 @@ spec:
   providerConfigRef:
     name: isning-logto
     kind: ClusterProviderConfig
-  writeConnectionSecretToRef:
-    name: oauth2-proxy-managed-application
