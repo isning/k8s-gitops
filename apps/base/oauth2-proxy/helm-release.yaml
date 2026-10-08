@@ -15,72 +15,73 @@ spec:
       forceLegacyConfig: false
       existingSecret: oauth2-proxy-secrets
       emailDomains:
-        - "*"
+      - '*'
+      requiredSecretKeys:
+      - cookie-secret
     alphaConfig:
       enabled: true
       configData:
         upstreamConfig:
           upstreams:
-            - id: default
-              path: /
-              static: true
-              staticCode: 200
+          - id: default
+            path: /
+            static: true
+            staticCode: 200
         providers:
-          - id: oidc
-            provider: oidc
-            clientID: ${OAUTH2_PROXY_CLIENT_ID}
-            clientSecret: ${OAUTH2_PROXY_CLIENT_SECRET}
-            scope: openid profile email roles offline_access
-            additionalClaims:
-              - roles
-            oidcConfig:
-              issuerURL: https://logto.isning.moe/oidc
-              groupsClaim: roles
-            profileURL: https://logto.isning.moe/oidc/me
+        - id: oidc
+          provider: oidc
+          scope: openid profile email roles offline_access
+          additionalClaims:
+          - roles
+          oidcConfig:
+            issuerURL: https://logto.isning.moe/oidc
+            groupsClaim: roles
+          profileURL: https://logto.isning.moe/oidc/me
+          clientSecretFile: /etc/oauth2-proxy/credentials/clientSecret
         injectResponseHeaders:
-          - name: X-OAuth2-Gateway-User
-            values:
-              - claimSource:
-                  claim: preferred_username
-          - name: X-OAuth2-Gateway-Email
-            values:
-              - claimSource:
-                  claim: email
-          - name: X-OAuth2-Gateway-Groups
-            values:
-              - claimSource:
-                  claim: roles
-          - name: X-OAuth2-Gateway-Id-Token
-            values:
-              - claimSource:
-                  claim: id_token
-          - name: X-OAuth2-Gateway-Access-Token
-            values:
-              - claimSource:
-                  claim: access_token
+        - name: X-OAuth2-Gateway-User
+          values:
+          - claimSource:
+              claim: preferred_username
+        - name: X-OAuth2-Gateway-Email
+          values:
+          - claimSource:
+              claim: email
+        - name: X-OAuth2-Gateway-Groups
+          values:
+          - claimSource:
+              claim: roles
+        - name: X-OAuth2-Gateway-Id-Token
+          values:
+          - claimSource:
+              claim: id_token
+        - name: X-OAuth2-Gateway-Access-Token
+          values:
+          - claimSource:
+              claim: access_token
     extraArgs:
-      redirect-url: "https://oauth2-gateway.isning.moe/oauth2/callback"
-      reverse-proxy: "true"
-      skip-provider-button: "true"
-      cookie-secure: "true"
-      cookie-expire: "168h" # 7 days, no support for 'd' suffix
-      cookie-refresh: "15m"
-      cookie-samesite: "lax"
-      cookie-domain: ".isning.moe"
-      whitelist-domain: ".isning.moe"
+      redirect-url: https://oauth2-gateway.isning.moe/oauth2/callback
+      reverse-proxy: 'true'
+      skip-provider-button: 'true'
+      cookie-secure: 'true'
+      cookie-expire: 168h
+      cookie-refresh: 15m
+      cookie-samesite: lax
+      cookie-domain: .isning.moe
+      whitelist-domain: .isning.moe
     gatewayApi:
       enabled: true
       gatewayRef:
         kind: Gateway
         name: default-gateway
       hostnames:
-        - oauth2-gateway.isning.moe
+      - oauth2-gateway.isning.moe
     resources:
       requests:
-        cpu: "10m"
-        memory: "64Mi"
+        cpu: 10m
+        memory: 64Mi
       limits:
-        memory: "256Mi"
+        memory: 256Mi
     podSecurityContext:
       runAsNonRoot: true
       seccompProfile:
@@ -91,4 +92,17 @@ spec:
       readOnlyRootFilesystem: true
       capabilities:
         drop:
-          - ALL
+        - ALL
+    extraVolumes:
+    - name: oauth-credentials
+      secret:
+        secretName: oauth2-proxy-managed-oidc
+    extraVolumeMounts:
+    - name: oauth-credentials
+      mountPath: /etc/oauth2-proxy/credentials
+      readOnly: true
+  valuesFrom:
+  - kind: Secret
+    name: oauth2-proxy-managed-oidc
+    valuesKey: clientId
+    targetPath: alphaConfig.configData.providers[0].clientID

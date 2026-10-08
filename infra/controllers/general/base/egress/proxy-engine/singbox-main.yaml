@@ -4,34 +4,58 @@ metadata:
   name: sing-box-main-config
   namespace: egress-system
 data:
-  # `route.auto_detect_interface` MUST be `false``, otherwise the proxy will detect the default network interface and bind to it,
-  # which will cause network unavailability when service mesh is enabled.
   main.json: |
     {
       "experimental": {
         "clash_api": {
           "external_controller": "0.0.0.0:9090",
-          "external_ui": "metacubexd",
-          "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
-          "external_ui_download_detour": "AllNodes",
           "access_control_allow_origin": [
             "https://proxy-engine.isning.moe"
           ]
         }
       },
       "dns": {
-        "rules": [
-        ],
+        "rules": [],
         "servers": [
-          { "type": "tls", "server": "one.one.one.one", "detour": "AllNodes", "tag": "remote", "domain_resolver": "local" },
-          { "type": "tls", "server": "dot.pub", "detour": "direct", "tag": "local", "domain_resolver": "local-raw" },
-          { "type": "local", "detour": "direct", "tag": "local-raw" }
+          {
+            "type": "tls",
+            "server": "one.one.one.one",
+            "detour": "AllNodes",
+            "tag": "remote",
+            "domain_resolver": "local"
+          },
+          {
+            "type": "tls",
+            "server": "dot.pub",
+            "detour": "direct",
+            "tag": "local",
+            "domain_resolver": "local-raw"
+          },
+          {
+            "type": "local",
+            "detour": "direct",
+            "tag": "local-raw"
+          },
+          {
+            "type": "tls",
+            "server": "223.5.5.5",
+            "server_port": 853,
+            "tls": {
+              "server_name": "dns.alidns.com"
+            },
+            "detour": "direct",
+            "tag": "public-egress-dot"
+          }
         ],
         "final": "local",
         "disable_cache": false
       },
       "outbounds": [
-          { "type": "direct", "tag": "direct", "domain_resolver": "local" }
+        {
+          "type": "direct",
+          "tag": "direct",
+          "domain_resolver": "local"
+        }
       ],
       "inbounds": [
         {
@@ -39,6 +63,24 @@ data:
           "listen_port": 7890,
           "tag": "mixed-in",
           "type": "mixed"
+        },
+        {
+          "listen": "0.0.0.0",
+          "listen_port": 8891,
+          "tag": "public-egress-http",
+          "type": "http"
+        },
+        {
+          "listen": "0.0.0.0",
+          "listen_port": 8892,
+          "tag": "public-egress-http-ipv4",
+          "type": "http"
+        },
+        {
+          "listen": "0.0.0.0",
+          "listen_port": 8893,
+          "tag": "public-egress-http-ipv6",
+          "type": "http"
         }
       ],
       "route": {
@@ -47,14 +89,86 @@ data:
           "server": "local"
         },
         "rules": [
-          { "action": "sniff" },
-          { "protocol": "dns", "action": "hijack-dns" },
-          { "rule_set": ["anthropic", "google-gemini", "google-deepmind"], "outbound": "UnitedStates" },
-          { "rule_set": ["geosite-geolocation-!cn"], "outbound": "AllNodes" },
-          { "rule_set": ["geosite-geolocation-cn", "geoip-cn"], "outbound": "direct" },
-          { "action": "resolve", "strategy": "prefer_ipv4"},
-          { "ip_is_private": true, "outbound": "direct" },
-          { "rule_set": ["geoip-cn"], "outbound": "direct" }
+          {
+            "inbound": [
+              "public-egress-http"
+            ],
+            "action": "resolve",
+            "server": "public-egress-dot",
+            "strategy": "prefer_ipv4"
+          },
+          {
+            "inbound": [
+              "public-egress-http"
+            ],
+            "action": "route",
+            "outbound": "direct"
+          },
+          {
+            "inbound": [
+              "public-egress-http-ipv4"
+            ],
+            "action": "resolve",
+            "server": "public-egress-dot",
+            "strategy": "ipv4_only"
+          },
+          {
+            "inbound": [
+              "public-egress-http-ipv6"
+            ],
+            "action": "resolve",
+            "server": "public-egress-dot",
+            "strategy": "ipv6_only"
+          },
+          {
+            "inbound": [
+              "public-egress-http-ipv4",
+              "public-egress-http-ipv6"
+            ],
+            "outbound": "direct"
+          },
+          {
+            "action": "sniff"
+          },
+          {
+            "protocol": "dns",
+            "action": "hijack-dns"
+          },
+          {
+            "rule_set": [
+              "anthropic",
+              "google-gemini",
+              "google-deepmind"
+            ],
+            "outbound": "UnitedStates"
+          },
+          {
+            "rule_set": [
+              "geosite-geolocation-!cn"
+            ],
+            "outbound": "AllNodes"
+          },
+          {
+            "rule_set": [
+              "geosite-geolocation-cn",
+              "geoip-cn"
+            ],
+            "outbound": "direct"
+          },
+          {
+            "action": "resolve",
+            "strategy": "prefer_ipv4"
+          },
+          {
+            "ip_is_private": true,
+            "outbound": "direct"
+          },
+          {
+            "rule_set": [
+              "geoip-cn"
+            ],
+            "outbound": "direct"
+          }
         ],
         "final": "AllNodes",
         "rule_set": [

@@ -1,13 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices"],
+  "extends": [
+    "config:best-practices"
+  ],
   "timezone": "Asia/Shanghai",
   "dependencyDashboard": true,
   "flux": {
-    "managerFilePatterns": ["/\\.ya?ml$/"]
+    "managerFilePatterns": [
+      "/\\.ya?ml$/"
+    ]
   },
   "kubernetes": {
-    "managerFilePatterns": ["/\\.ya?ml$/"],
+    "managerFilePatterns": [
+      "/\\.ya?ml$/"
+    ],
     "ignorePaths": [
       "**/*-v*.*.*.yaml",
       "infra/configs/base/cloudnative-pg/official-image-catalogs/**"
@@ -16,20 +22,54 @@
   "packageRules": [
     {
       "description": "Stop Automerge non-major updates",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": false,
       "automergeStrategy": "squash",
       "platformAutomerge": true
     },
     {
-      "matchPackageNames": ["adyanth/cloudflare-operator"],
+      "matchPackageNames": [
+        "adyanth/cloudflare-operator"
+      ],
       "allowedVersions": "!/^(10|10\\.0|10\\.0\\.2)$/"
     },
     {
       "description": "Bump tofu runner tags",
-      "matchPackageNames": ["ghcr.io/isning/k8s-gitops/tf-runner"],
+      "matchPackageNames": [
+        "ghcr.io/isning/k8s-gitops/tf-runner"
+      ],
       "allowedVersions": "/^v\\d+\\.\\d+\\.\\d+-custom-\\d{12}$/",
       "versioning": "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-custom-(?<build>\\d{12})$"
+    },
+    {
+      "description": "Track versioned Headlamp plugin image volumes",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "apps/base/headlamp/helm-release.yaml"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "pinDigests": false,
+      "ignoreUnstable": true
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^apps/base/headlamp/helm-release\\.yaml$/"
+      ],
+      "matchStrings": [
+        "reference:\\s*(?<depName>ghcr\\.io/[^\\s:]+):(?<currentValue>v?\\d+\\.\\d+\\.\\d+(?:-[^\\s]+)?)"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
     }
   ]
 }

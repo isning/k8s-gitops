@@ -5,10 +5,13 @@ metadata:
   namespace: egress-system
 spec:
   schedule: "0 4 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 300
       template:
         spec:
           serviceAccountName: proxy-engine-restarter-sa
@@ -23,7 +26,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - "kubectl rollout restart deployment/proxy-engine -n egress-system && echo \"Triggered sing-box restart at $(date)\""
+            - "kubectl rollout restart statefulset/proxy-engine -n egress-system && echo \"Triggered sing-box restart at $(date)\""
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

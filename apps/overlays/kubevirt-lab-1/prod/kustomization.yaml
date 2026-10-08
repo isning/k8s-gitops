@@ -5,18 +5,15 @@ namespace: prod
 commonLabels:
   app.kubernetes.io/env: prod
 resources:
-  - ./../../../base/grafana/
-  - ./../../../base/logto/
-  - ./../../../base/headlamp/
-  - ./../../../base/flux-operator/
-  - ./../../../base/astrbot/
-  - ./../../../base/oauth2-proxy/
-  - ./../../../base/metapi/
-  - ./../../../base/speaches/
-  - ./../../../base/siyuan/
-  - ./../../../base/vaultwarden/
-  - ./../../../base/coder/
-  # - ./../../../base/maa/
-
+- ./../../../base/grafana/
+- ./../../../base/headlamp/
+- ./../../../base/flux-operator/
+- ./../../../base/astrbot/
+- ./../../../base/oauth2-proxy/
+- ./../../../base/metapi/
+- ./../../../base/speaches/
+- ./../../../base/siyuan/
+- ./../../../base/vaultwarden/
+- ./../../../base/coder/
 patches:
-  - path: coder-edgeone-record.yaml
+- path: coder-edgeone-record.yaml

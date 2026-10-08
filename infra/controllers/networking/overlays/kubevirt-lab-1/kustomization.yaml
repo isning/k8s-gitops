@@ -2,6 +2,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base/cloudflare-operator/
-  - ../../base/istio/
-  - ../../base/kiali/
+- ../../base/cloudflare-operator/
+- ../../base/istio/
+images:
+- name: adyanth/cloudflare-operator
+  newName: ghcr.io/isning/cloudflare-operator
+  newTag: sha-123c94c
+  digest: sha256:c04ced87671c54ad2c242d03eaba4d62298ab46bee571c71d5e136d8e192c87b

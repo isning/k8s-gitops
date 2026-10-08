@@ -1,0 +1,10 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../../apps/base/grafana/identity/
+- ../../../../apps/base/vaultwarden/identity/
+- ../../../../apps/base/oauth2-proxy/identity/
+- ../../../../infra/configs/base/harbor/identity/
+- ../../../../infra/configs/base/flux/identity/
+- ../../../../infra/configs/base/apiserver-oidc/identity/

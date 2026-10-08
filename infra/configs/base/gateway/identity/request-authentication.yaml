@@ -10,12 +10,12 @@ spec:
     kind: Gateway
     name: infra-gateway
   jwtRules:
-    - issuer: https://logto.isning.moe/oidc
-      audiences:
-        - m8rwqva1rsy9p2b3tbsad
-      forwardOriginalToken: false
-      fromHeaders:
-        - name: X-OAuth2-Gateway-Id-Token
+  - issuer: https://logto.isning.moe/oidc
+    audiences:
+    - ${clientId}
+    forwardOriginalToken: false
+    fromHeaders:
+    - name: X-OAuth2-Gateway-Id-Token
 ---
 apiVersion: security.istio.io/v1
 kind: RequestAuthentication
@@ -28,12 +28,12 @@ spec:
     kind: Gateway
     name: default-gateway
   jwtRules:
-    - issuer: https://logto.isning.moe/oidc
-      audiences:
-        - m8rwqva1rsy9p2b3tbsad
-      forwardOriginalToken: false
-      fromHeaders:
-        - name: X-OAuth2-Gateway-Id-Token
+  - issuer: https://logto.isning.moe/oidc
+    audiences:
+    - ${clientId}
+    forwardOriginalToken: false
+    fromHeaders:
+    - name: X-OAuth2-Gateway-Id-Token
 ---
 apiVersion: security.istio.io/v1
 kind: RequestAuthentication
@@ -46,9 +46,9 @@ spec:
     kind: Gateway
     name: default-gateway
   jwtRules:
-    - issuer: https://logto.isning.moe/oidc
-      audiences:
-        - m8rwqva1rsy9p2b3tbsad
-      forwardOriginalToken: false
-      fromHeaders:
-        - name: X-OAuth2-Gateway-Id-Token
+  - issuer: https://logto.isning.moe/oidc
+    audiences:
+    - ${clientId}
+    forwardOriginalToken: false
+    fromHeaders:
+    - name: X-OAuth2-Gateway-Id-Token
