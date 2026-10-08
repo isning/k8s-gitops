@@ -1,0 +1,15 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: agent-sandbox
+  namespace: agent-sandbox-system
+spec:
+  interval: 12h
+  timeout: 2m
+  url: https://github.com/kubernetes-sigs/agent-sandbox
+  ref:
+    tag: v1.0.5
+    commit: 82d410efd5a279e887cdcf8c01e742a345fef63d
+  ignore: |
+    /*
+    !/helm/

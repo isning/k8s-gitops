@@ -1,0 +1,53 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: agent-sandbox
+  namespace: agent-sandbox-system
+  annotations:
+    image-lock/extra-images: registry.k8s.io/agent-sandbox/agent-sandbox-controller:v1.0.5
+spec:
+  interval: 1h
+  timeout: 5m
+  chart:
+    spec:
+      chart: ./helm
+      reconcileStrategy: Revision
+      interval: 12h
+      sourceRef:
+        kind: GitRepository
+        name: agent-sandbox
+  install:
+    crds: Create
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  values:
+    namespace:
+      create: false
+      name: agent-sandbox-system
+    image:
+      tag: v1.0.5
+    replicaCount: 1
+    controller:
+      extensions: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: [ALL]

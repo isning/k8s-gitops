@@ -1,0 +1,29 @@
+name: Prepare Agent Sandbox chart
+description: Check out the pinned upstream chart for the legacy flux-local renderer
+runs:
+  using: composite
+  steps:
+    - name: Setup yq
+      uses: fluxcd/pkg/actions/yq@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+    - name: Read pinned chart commit
+      id: source
+      shell: bash
+      run: |
+        chart_commit=$(yq '.spec.ref.commit' infra/controllers/general/base/agent-sandbox/git-repository.yaml)
+        [[ "$chart_commit" =~ ^[0-9a-f]{40}$ ]]
+        echo "commit=$chart_commit" >> "$GITHUB_OUTPUT"
+    - name: Checkout upstream chart
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        repository: kubernetes-sigs/agent-sandbox
+        ref: ${{ steps.source.outputs.commit }}
+        path: .local/agent-sandbox-chart
+        sparse-checkout: helm
+        persist-credentials: false
+    - name: Expose chart to flux-local
+      shell: bash
+      run: |
+        chart_directory="$GITHUB_WORKSPACE/.local/agent-sandbox-chart/helm"
+        chart_link="$GITHUB_WORKSPACE/helm"
+        [[ -e "$chart_link" ]] || ln -s "$chart_directory" "$chart_link"
+        [[ "$(realpath "$chart_link")" == "$chart_directory" ]]
