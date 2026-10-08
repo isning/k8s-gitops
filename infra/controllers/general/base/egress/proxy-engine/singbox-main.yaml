@@ -25,11 +25,14 @@ data:
             "domain_resolver": "local"
           },
           {
-            "type": "tls",
-            "server": "dot.pub",
+            "type": "https",
+            "server": "223.5.5.5",
+            "server_port": 443,
+            "tls": {
+              "server_name": "dns.alidns.com"
+            },
             "detour": "direct",
-            "tag": "local",
-            "domain_resolver": "local-raw"
+            "tag": "local"
           },
           {
             "type": "local",
@@ -37,9 +40,9 @@ data:
             "tag": "local-raw"
           },
           {
-            "type": "tls",
+            "type": "https",
             "server": "223.5.5.5",
-            "server_port": 853,
+            "server_port": 443,
             "tls": {
               "server_name": "dns.alidns.com"
             },
