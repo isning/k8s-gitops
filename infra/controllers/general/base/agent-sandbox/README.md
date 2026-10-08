@@ -9,7 +9,7 @@ core and extensions into `kubevirt-lab-1` through Flux.
    `agent-sandbox` for workloads. Both enforce the Kubernetes v1.36 restricted Pod
    Security Standard. Namespace pruning stays disabled.
 2. `infra-controllers-general` creates a pinned OCIRepository and a HelmRelease
-   using our CI-published package of the official upstream chart. Helm installs the
+   using an OCI package of the official upstream chart. Helm installs the
    four CRDs, controller RBAC, metrics Service, and one controller replica with
    extensions    enabled. Chart values set resource limits and a restricted security context;
    the chart supplies health probes.
@@ -29,48 +29,25 @@ manually or push directly to `main`.
 
 ## Pinned OCI chart and CRD lifecycle
 
-The official chart lives in the upstream repository's `helm/` directory and is
-not published to an official remote chart registry. Our
-[publication workflow](../../../../../.github/workflows/publish-agent-sandbox-chart.yaml)
-packages that chart into
-`oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox`.
-Flux consumes this package through OCIRepository + HelmRelease. The cluster does
-not fetch the upstream Git repository.
+The official chart lives in the upstream repository's `helm/` directory.
+Chart packaging and publication belong in a separate repository. This GitOps
+repository owns only the OCIRepository, HelmRelease, and workload configuration.
+Flux does not fetch the upstream Git repository.
 
-[The publication config](../../../../../.github/agent-sandbox-chart.json) pins
-upstream release `v1.0.5`, commit
-`82d410efd5a279e887cdcf8c01e742a345fef63d`, and our package version
-`1.0.5-repack.1`. This package version belongs to our distribution; the upstream
-Chart.yaml version is `0.1.1`. Only chart version and appVersion metadata change;
-templates and CRDs come from the pinned upstream checkout. Archive timestamps and
-ownership are normalized so repeated builds produce identical package bytes.
-The controller uses the matching upstream `v1.0.5` image with digest
+The current bootstrap package at
+`oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox` already exists and has been
+verified by anonymously downloading its OCI manifest and chart blob. Its source
+is official release `v1.0.5`, commit
+`82d410efd5a279e887cdcf8c01e742a345fef63d`; its package version is
+`1.0.5-repack.1` and its OCI manifest digest is
+`sha256:6a86bce200e67256bf3f078643ed9cb83da2ec399456478914f59130a342d860`.
+The publication workflow has been removed from this repository. Before merging,
+replace the bootstrap OCI URL and digest with the artifact published by the
+separate chart repository once that repository is selected.
+
+The matching upstream controller image is `v1.0.5`, pinned to digest
 `sha256:28a9cbdbfd6ac0a4e5c7e9261ace1aa30ee2da681cb640dccdfed98e8dd9d98b`.
 Extensions are enabled. The official chart does not deploy a router.
-
-The publication workflow lints and renders packages on PRs. Pushes that change the
-publication config, script, or workflow publish using GitHub's built-in token;
-manual workflow dispatch supports retries after the workflow reaches `main`.
-Publishing on feature-branch pushes makes the package available before deployment
-CI and Flux need it. Existing tags are verified and never overwritten; use a new
-package version if content changes. Publication pulls the package back and compares
-it byte-for-byte with the local build. The upload artifact contains the package
-and rendered manifests; Helm's log reports the OCI digest.
-
-The initial package has been verified by downloading both its OCI manifest and
-chart blob anonymously and comparing the chart bytes with the local build. Its
-manifest digest is pinned in `helm-oci-repo.yaml`:
-`sha256:6a86bce200e67256bf3f078643ed9cb83da2ec399456478914f59130a342d860`.
-For a new registry path, verify anonymous pull before deployment; if the package
-is private, change its visibility to public in GitHub package settings. Record
-the newly published OCI manifest digest in the source manifest before merging.
-
-Local package preparation (requires the pinned upstream checkout):
-
-```bash
-nix run .#agent-sandbox-chart -- prepare \
-  --source .local/agent-sandbox/helm --output .cache/agent-sandbox/publish
-```
 
 The chart does not create a Namespace; `infra-namespaces` owns both namespaces.
 The HelmRelease installs CRDs with `Create` and upgrades them with `CreateReplace`;
@@ -80,10 +57,10 @@ Kustomization's prune inventory. Deleting a CRD would cascade into user resource
 so CRD retirement remains a separate review. Keep the controller running until
 claims, pools, and sandboxes have been retired and their finalizers have completed.
 
-For upgrades, update the publication config with the reviewed upstream commit and
-a new package version. Publish it, then update the OCI chart version and digest
-together with the matching controller image tag and digest. Review the rendered
-manifest diff, chart changes, and upstream release notes before merging.
+For upgrades, publish the reviewed upstream chart in the separate chart repository,
+then update the OCI URL, version, and digest together with the matching controller
+image tag and digest here. Review the rendered manifest diff and upstream release
+notes before merging.
 The image lock is maintained by the repository's existing update workflow; do not
 introduce an unpinned upstream URL or regenerate unrelated locks for an initial rollout.
 The template declares `image-lock/extra-images` because the current lock generator

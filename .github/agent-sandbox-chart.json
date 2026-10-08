@@ -1,6 +1,0 @@
-{
-  "upstream_commit": "82d410efd5a279e887cdcf8c01e742a345fef63d",
-  "upstream_version": "v1.0.5",
-  "chart_version": "1.0.5-repack.1",
-  "registry": "oci://ghcr.io/isning/k8s-gitops/charts"
-}
