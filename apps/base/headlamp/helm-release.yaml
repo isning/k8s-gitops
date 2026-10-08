@@ -64,6 +64,14 @@ spec:
       env:
       - name: HOME
         value: /tmp
+      - name: NODE_USE_ENV_PROXY
+        value: '1'
+      - name: HTTP_PROXY
+        value: http://proxy-svc.egress-system.svc.cluster.local:7890
+      - name: HTTPS_PROXY
+        value: http://proxy-svc.egress-system.svc.cluster.local:7890
+      - name: NO_PROXY
+        value: localhost,127.0.0.1,.svc,.cluster.local
       resources:
         requests:
           cpu: 10m
