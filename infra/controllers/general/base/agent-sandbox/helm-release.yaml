@@ -20,16 +20,15 @@ spec:
   driftDetection:
     mode: enabled
   values:
-    fullnameOverride: agent-sandbox-controller
+    namespace:
+      create: false
+      name: agent-sandbox-system
     image:
       repository: registry.k8s.io/agent-sandbox/agent-sandbox-controller
-      tag: v1.0.1
-      digest: sha256:e1787f95cda406e2d81322e8637b6dfa2d77514fbbd0536a872b8e5d409b7154
+      tag: v1.0.5@sha256:28a9cbdbfd6ac0a4e5c7e9261ace1aa30ee2da681cb640dccdfed98e8dd9d98b
     replicaCount: 1
-    extensions:
-      enabled: true
-    router:
-      enabled: false
+    controller:
+      extensions: true
     resources:
       requests:
         cpu: 100m
@@ -41,7 +40,7 @@ spec:
       runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
-    securityContext:
+    containerSecurityContext:
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: true
       capabilities:

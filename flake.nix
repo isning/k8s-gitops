@@ -27,6 +27,13 @@
       };
 
       packages = forAllSystems (pkgs: {
+        agent-sandbox-chart = pkgs.writeShellApplication {
+          name = "agent-sandbox-chart";
+          runtimeInputs = [ pkgs.git pkgs.kubernetes-helm (pkgs.python3.withPackages (p: [ p.pyyaml ])) ];
+          text = ''
+            exec python ${./scripts/agent-sandbox-chart.py} "$@"
+          '';
+        };
         gen-image-lock = let
           fluxLocalSource = pkgs.fetchFromGitHub {
             owner = "allenporter";

@@ -8,7 +8,6 @@ spec:
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
-  url: oci://ghcr.io/unique-ag/helm-charts/agent-sandbox-controller
+  url: oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox
   ref:
-    tag: "1.0.1"
-    digest: sha256:cb1bbacda71ca8d86078d8b019f1e3efcb8883e5245ffd57472a6f7c66158717
+    tag: "1.0.5-repack.1"

@@ -9,9 +9,9 @@ core and extensions into `kubevirt-lab-1` through Flux.
    `agent-sandbox` for workloads. Both enforce the Kubernetes v1.36 restricted Pod
    Security Standard. Namespace pruning stays disabled.
 2. `infra-controllers-general` creates a pinned OCIRepository and a HelmRelease
-   using Unique AI's published chart for the upstream controller. Helm installs the four CRDs,
-   controller RBAC, metrics Service, and one controller replica with extensions
-   enabled. Chart values set resource limits and a restricted security context;
+   using our CI-published package of the official upstream chart. Helm installs the
+   four CRDs, controller RBAC, metrics Service, and one controller replica with
+   extensions    enabled. Chart values set resource limits and a restricted security context;
    the chart supplies health probes.
 3. `infra-configs`, which depends on healthy controllers, installs the workload
    ServiceAccount, DNS-only NetworkPolicies, ResourceQuota, and `restricted-shell`
@@ -29,20 +29,46 @@ manually or push directly to `main`.
 
 ## Pinned OCI chart and CRD lifecycle
 
-The published [Unique AI chart](https://github.com/Unique-AG/helm-charts/tree/main/charts/agent-sandbox-controller)
-packages the Kubernetes SIGs controller and its CRDs. Its registry is
-`oci://ghcr.io/unique-ag/helm-charts/agent-sandbox-controller`. This is a third-party
-distribution of the upstream project. Flux consumes the chart through the same
-OCIRepository + HelmRelease pattern as the other controllers in this repository.
+The official chart lives in the upstream repository's `helm/` directory and is
+not published to an official remote chart registry. Our
+[publication workflow](../../../../../.github/workflows/publish-agent-sandbox-chart.yaml)
+packages that chart into
+`oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox`.
+Flux consumes this package through OCIRepository + HelmRelease. The cluster does
+not fetch the upstream Git repository.
 
-The chart is pinned to version `1.0.1` and OCI manifest digest
-`sha256:cb1bbacda71ca8d86078d8b019f1e3efcb8883e5245ffd57472a6f7c66158717`.
-The controller is the matching upstream `v1.0.1` image, pinned to digest
-`sha256:e1787f95cda406e2d81322e8637b6dfa2d77514fbbd0536a872b8e5d409b7154`.
-Keeping the image and bundled CRDs at the chart's upstream version avoids mixing
-release schemas. Extensions are enabled; the optional router is disabled during
-the initial rollout. `fullnameOverride` preserves the controller resource name
-`agent-sandbox-controller` used by the verification commands.
+[The publication config](../../../../../.github/agent-sandbox-chart.json) pins
+upstream release `v1.0.5`, commit
+`82d410efd5a279e887cdcf8c01e742a345fef63d`, and our package version
+`1.0.5-repack.1`. This package version belongs to our distribution; the upstream
+Chart.yaml version is `0.1.1`. Only chart version and appVersion metadata change;
+templates and CRDs come from the pinned upstream checkout. Archive timestamps and
+ownership are normalized so repeated builds produce identical package bytes.
+The controller uses the matching upstream `v1.0.5` image with digest
+`sha256:28a9cbdbfd6ac0a4e5c7e9261ace1aa30ee2da681cb640dccdfed98e8dd9d98b`.
+Extensions are enabled. The official chart does not deploy a router.
+
+The publication workflow lints and renders packages on PRs. Pushes that change the
+publication config, script, or workflow publish using GitHub's built-in token;
+manual workflow dispatch supports retries after the workflow reaches `main`.
+Publishing on feature-branch pushes makes the package available before deployment
+CI and Flux need it. Existing tags are verified and never overwritten; use a new
+package version if content changes. Publication pulls the package back and compares
+it byte-for-byte with the local build. The upload artifact contains the package
+and rendered manifests; Helm's log reports the OCI digest.
+
+For the first publication, set the GHCR package visibility to **public** in its
+GitHub package settings, then verify an anonymous `helm pull` succeeds before
+merging the deployment PR. New GHCR packages default to private. Record the OCI
+manifest digest in `helm-oci-repo.yaml` after publication; CI printing a digest
+alone does not pin the deployed source.
+
+Local package preparation (requires the pinned upstream checkout):
+
+```bash
+nix run .#agent-sandbox-chart -- prepare \
+  --source .local/agent-sandbox/helm --output .cache/agent-sandbox/publish
+```
 
 The chart does not create a Namespace; `infra-namespaces` owns both namespaces.
 The HelmRelease installs CRDs with `Create` and upgrades them with `CreateReplace`;
@@ -52,9 +78,10 @@ Kustomization's prune inventory. Deleting a CRD would cascade into user resource
 so CRD retirement remains a separate review. Keep the controller running until
 claims, pools, and sandboxes have been retired and their finalizers have completed.
 
-For upgrades, update the OCI chart version and digest together with the matching
-controller image tag and digest, then review the Helm-rendered manifest diff,
-chart changes, and upstream release notes before merging.
+For upgrades, update the publication config with the reviewed upstream commit and
+a new package version. Publish it, then update the OCI chart version and digest
+together with the matching controller image tag and digest. Review the rendered
+manifest diff, chart changes, and upstream release notes before merging.
 The image lock is maintained by the repository's existing update workflow; do not
 introduce an unpinned upstream URL or regenerate unrelated locks for an initial rollout.
 The template declares `image-lock/extra-images` because the current lock generator
@@ -130,7 +157,7 @@ spec:
     name: restricted-shell
 ```
 
-Claims in v1.0.1 require a `warmPoolRef`; they cannot reference templates directly.
+Claims in v1.0.5 require a `warmPoolRef`; they cannot reference templates directly.
 Both resources must be in `agent-sandbox`. Allocating one claim can temporarily use
 two Pods while the warm pool replenishes, which fits the initial quota.
 
