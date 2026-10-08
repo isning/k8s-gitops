@@ -1,0 +1,8 @@
+apiVersion: identity.isning.moe/v1alpha1
+kind: OIDCClientVariables
+metadata:
+  name: oauth2-proxy
+  namespace: prod
+spec:
+  secretName: oauth2-proxy-managed-oidc
+  configMapName: oauth2-proxy-oidc-variables

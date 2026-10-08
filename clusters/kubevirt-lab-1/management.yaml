@@ -154,5 +154,5 @@ spec:
   prune: false
   postBuild:
     substituteFrom:
-    - kind: Secret
-      name: oauth2-proxy-managed-oidc
+    - kind: ConfigMap
+      name: oauth2-proxy-oidc-variables

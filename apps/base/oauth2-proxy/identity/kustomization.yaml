@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - oidc-application.yaml
 - oidc-credential.yaml
+- client-variables.yaml
