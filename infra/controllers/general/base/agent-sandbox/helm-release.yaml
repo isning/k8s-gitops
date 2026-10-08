@@ -19,6 +19,18 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              labelSelector: app.kubernetes.io/name=agent-sandbox
+            patch: |
+              - op: replace
+                path: /metadata/labels/app.kubernetes.io~1version
+                value: v1.0.5
+              - op: replace
+                path: /metadata/labels/helm.sh~1chart
+                value: agent-sandbox-1.0.5-repack.1
   values:
     namespace:
       create: false
