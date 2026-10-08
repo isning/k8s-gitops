@@ -1,0 +1,64 @@
+name: Publish Agent Sandbox Chart
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/publish-agent-sandbox-chart.yaml'
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: agent-sandbox-chart
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: ${{ github.repository == 'isning/k8s-gitops' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Find latest upstream release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version=$(gh api repos/kubernetes-sigs/agent-sandbox/releases/latest --jq .tag_name)
+          commit=$(gh api "repos/kubernetes-sigs/agent-sandbox/commits/$version" --jq .sha)
+          {
+            echo "version=$version"
+            echo "chart_version=${version#v}-repack.1"
+            echo "commit=$commit"
+          } >> "$GITHUB_OUTPUT"
+      - name: Checkout official chart
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: kubernetes-sigs/agent-sandbox
+          ref: ${{ steps.release.outputs.commit }}
+          persist-credentials: false
+      - name: Publish new chart version
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USER: ${{ github.actor }}
+          UPSTREAM_VERSION: ${{ steps.release.outputs.version }}
+          CHART_VERSION: ${{ steps.release.outputs.chart_version }}
+        run: |
+          set -euo pipefail
+          registry="oci://ghcr.io/${GITHUB_REPOSITORY,,}/charts"
+          printf '%s' "$GHCR_TOKEN" | helm registry login ghcr.io --username "$GHCR_USER" --password-stdin
+          if result=$(helm show chart "$registry/agent-sandbox" --version "$CHART_VERSION" 2>&1); then
+            echo "Chart $CHART_VERSION is already published"
+            exit 0
+          fi
+          case "$result" in
+            *"not found"*|*"manifest_unknown"*|*"manifest unknown"*) ;;
+            *) printf '%s\n' "$result" >&2; exit 1 ;;
+          esac
+          helm lint ./helm --set "image.tag=$UPSTREAM_VERSION"
+          helm package ./helm --version "$CHART_VERSION" --app-version "$UPSTREAM_VERSION"
+          helm push "agent-sandbox-$CHART_VERSION.tgz" "$registry"
+          helm show chart "$registry/agent-sandbox" --version "$CHART_VERSION"

@@ -1,0 +1,14 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: helm-chart-agent-sandbox
+  namespace: agent-sandbox-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  url: oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox
+  ref:
+    tag: "1.0.5-repack.1"
+    digest: sha256:6a86bce200e67256bf3f078643ed9cb83da2ec399456478914f59130a342d860

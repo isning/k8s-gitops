@@ -79,6 +79,8 @@ GitOps manifests. Review them after a fresh bootstrap:
    - `infra/configs/base/apiserver-oidc/README.md`
 5. KubeVirt dynamic-networks-controller manual workaround notes:
    - `infra/controllers/base/kubevirt/README.md`
+6. Agent Sandbox node runtime prerequisite and staged activation:
+   - `infra/controllers/general/base/agent-sandbox/README.md`
 
 ## Usage
 
