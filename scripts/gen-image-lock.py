@@ -3,7 +3,7 @@
 # requires-python = ">=3.13"
 # dependencies = [
 #     "pyyaml",
-#     "flux-local~=8.2.0",
+#     "flux-local~=8.4.0",
 # ]
 # ///
 import argparse
@@ -623,7 +623,9 @@ class ImageLockGenerator:
         return "[\n" + "\n".join(lines) + "\n    ]"
 
     def resolve_digests_and_archive_hash(self):
-        cache_dir = Path.home() / f".cache/nixos-image-lock/{self.args.arch}-{self.args.os}"
+        cache_root = Path(self.args.cache_dir) if self.args.cache_dir else Path.home() / ".cache/nixos-image-lock"
+        cache_dir = cache_root / f"{self.args.arch}-{self.args.os}"
+        old_blocks = parse_nix_blocks(self.out_lock_file.read_text()) if self.args.reuse_locked_images and self.out_lock_file.exists() else {}
         cache_dir.mkdir(parents=True, exist_ok=True)
         self.vlog(f"[gen-image-lock] cache dir: {cache_dir}")
 
@@ -638,8 +640,18 @@ class ImageLockGenerator:
                 image_name = image_name.rsplit(":", 1)[0]
 
             uid = f"{image_name}:{tag}"
-            digest = run_cmd(["crane", "digest", img_ref], retries=4).strip()
             final_image_name = canonical_image_name(image_name)
+            locked = None
+            for item in old_blocks.values():
+                fields = dict(re.findall(r'(imageDigest|finalImageName|finalImageTag|os|arch)\s*=\s*"([^"]*)"', item["block"]))
+                pinned_digest = img_ref.split("@", 1)[1] if "@" in img_ref else None
+                if (fields.get("finalImageName") == final_image_name
+                        and fields.get("finalImageTag") == tag
+                        and fields.get("os") == self.args.os and fields.get("arch") == self.args.arch
+                        and (pinned_digest is None or pinned_digest == fields.get("imageDigest"))):
+                    locked = (fields["imageDigest"], item["archiveHash"])
+                    break
+            digest = locked[0] if locked else run_cmd(["crane", "digest", img_ref], retries=4).strip()
             
             safe_digest = digest.replace(":", "-")
             safe_name = re.sub(r'[/:]', '_', final_image_name)
@@ -651,8 +663,8 @@ class ImageLockGenerator:
             )
 
             
-            hash_val = cache_file.read_text('utf-8').strip() if cache_file.exists() else ""
-            if self.args.ignore_cache:
+            hash_val = locked[1] if locked else (cache_file.read_text('utf-8').strip() if cache_file.exists() else "")
+            if self.args.ignore_cache and not locked:
                 self.cache_skips += 1
                 hash_val = ""
                 self.vlog(f"[gen-image-lock] [{index}/{self.total_images}] cache bypass enabled")
@@ -835,6 +847,8 @@ def main():
     parser.add_argument("--mirror-retries", type=int, default=3, help="Retry attempts per mirror source")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging for cache/build details")
     parser.add_argument("--ignore-cache", action="store_true", help="Ignore local cache and force rebuild archive hashes")
+    parser.add_argument("--cache-dir", default="", help="Archive hash cache root (default: ~/.cache/nixos-image-lock)")
+    parser.add_argument("--reuse-locked-images", action="store_true", help="Keep existing digest/archive hash for unchanged image, tag and platform; explicit manifest digest must match")
     
     parser.add_argument("--namespaces", default="", help="Space separated namespaces to filter")
     parser.add_argument("--extra-images-annotation", default="image-lock/extra-images", help="Annotation key(s) for extra images (comma/space separated)")
