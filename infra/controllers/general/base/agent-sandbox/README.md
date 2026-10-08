@@ -11,7 +11,8 @@ core and extensions into `kubevirt-lab-1` through Flux.
 2. `infra-controllers-general` creates a pinned OCIRepository and a HelmRelease
    using an OCI package of the official upstream chart. Helm installs the
    four CRDs, controller RBAC, metrics Service, and one controller replica with
-   extensions    enabled. Chart values set resource limits and a restricted security context;
+   extensions enabled. Chart values set resource limits and a restricted security
+   context;
    the chart supplies health probes.
 3. `infra-configs`, which depends on healthy controllers, installs the workload
    ServiceAccount, DNS-only NetworkPolicies, ResourceQuota, and `restricted-shell`
@@ -30,20 +31,18 @@ manually or push directly to `main`.
 ## Pinned OCI chart and CRD lifecycle
 
 The official chart lives in the upstream repository's `helm/` directory.
-Chart packaging and publication belong in a separate repository. This GitOps
-repository owns only the OCIRepository, HelmRelease, and workload configuration.
-Flux does not fetch the upstream Git repository.
+[The publication workflow](../../../../../.github/workflows/publish-agent-sandbox-chart.yaml)
+checks the latest official release daily and publishes new chart versions to GHCR.
+It uses the official release commit, Helm, and GitHub’s built-in token. Published
+versions are skipped on reruns. Flux consumes only the OCI package.
 
-The current bootstrap package at
+The current package at
 `oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox` already exists and has been
 verified by anonymously downloading its OCI manifest and chart blob. Its source
 is official release `v1.0.5`, commit
 `82d410efd5a279e887cdcf8c01e742a345fef63d`; its package version is
 `1.0.5-repack.1` and its OCI manifest digest is
 `sha256:6a86bce200e67256bf3f078643ed9cb83da2ec399456478914f59130a342d860`.
-The publication workflow has been removed from this repository. Before merging,
-replace the bootstrap OCI URL and digest with the artifact published by the
-separate chart repository once that repository is selected.
 
 The matching upstream controller image is `v1.0.5`, pinned to digest
 `sha256:28a9cbdbfd6ac0a4e5c7e9261ace1aa30ee2da681cb640dccdfed98e8dd9d98b`.
@@ -57,10 +56,10 @@ Kustomization's prune inventory. Deleting a CRD would cascade into user resource
 so CRD retirement remains a separate review. Keep the controller running until
 claims, pools, and sandboxes have been retired and their finalizers have completed.
 
-For upgrades, publish the reviewed upstream chart in the separate chart repository,
-then update the OCI URL, version, and digest together with the matching controller
-image tag and digest here. Review the rendered manifest diff and upstream release
-notes before merging.
+For deployment upgrades, review the automatically published upstream chart, then
+update the OCI version and digest together with the matching controller image tag
+and digest. Review the rendered manifest diff and upstream release notes before
+merging.
 The image lock is maintained by the repository's existing update workflow; do not
 introduce an unpinned upstream URL or regenerate unrelated locks for an initial rollout.
 The template declares `image-lock/extra-images` because the current lock generator
