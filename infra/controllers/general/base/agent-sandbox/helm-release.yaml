@@ -3,19 +3,12 @@ kind: HelmRelease
 metadata:
   name: agent-sandbox
   namespace: agent-sandbox-system
-  annotations:
-    image-lock/extra-images: registry.k8s.io/agent-sandbox/agent-sandbox-controller:v1.0.5
 spec:
   interval: 1h
   timeout: 5m
-  chart:
-    spec:
-      chart: ./helm
-      reconcileStrategy: Revision
-      interval: 12h
-      sourceRef:
-        kind: GitRepository
-        name: agent-sandbox
+  chartRef:
+    kind: OCIRepository
+    name: helm-chart-agent-sandbox
   install:
     crds: Create
     remediation:
@@ -27,14 +20,16 @@ spec:
   driftDetection:
     mode: enabled
   values:
-    namespace:
-      create: false
-      name: agent-sandbox-system
+    fullnameOverride: agent-sandbox-controller
     image:
-      tag: v1.0.5
+      repository: registry.k8s.io/agent-sandbox/agent-sandbox-controller
+      tag: v1.0.1
+      digest: sha256:e1787f95cda406e2d81322e8637b6dfa2d77514fbbd0536a872b8e5d409b7154
     replicaCount: 1
-    controller:
-      extensions: true
+    extensions:
+      enabled: true
+    router:
+      enabled: false
     resources:
       requests:
         cpu: 100m
@@ -46,7 +41,7 @@ spec:
       runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
-    containerSecurityContext:
+    securityContext:
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: true
       capabilities:
