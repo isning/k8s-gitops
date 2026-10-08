@@ -1,31 +1,10 @@
 [
   {
-    imageName = "adyanth/cloudflare-operator";
-    imageDigest = "sha256:6b168dc237d50e3d36cc5df86bf2be7981700a49d7a4ae02548f4762ec0d7aaa";
-    finalImageName = "docker.io/adyanth/cloudflare-operator";
-    finalImageTag = "0.13.1";
-    archiveHash = "sha256-UFLHLGTyi5CBy8SCcQyvLAJlPIiMLQKKog0DDIhKfno=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-networking"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-networking"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
-      ]
-    ];
-    targets = [
-      { kind = "Deployment"; namespace = "cloudflare-operator-system"; name = "cloudflare-operator-controller-manager"; }
-    ];
-  }
-  {
     imageName = "b3log/siyuan";
-    imageDigest = "sha256:1a316554bfbf0c951ddabc7d3cb0292620152b44c087b6979d5d9b6bae065b1b";
+    imageDigest = "sha256:a2da59a722da6a2243f0c2a99286d9c8e73cc47dbc8757cc81ffd1137d6461a0";
     finalImageName = "docker.io/b3log/siyuan";
-    finalImageTag = "v3.6.5";
-    archiveHash = "sha256-/5ID9aWzRCa9WASVLWrmSK4X3FzHAXwom3nKmYYDfVc=";
+    finalImageTag = "v3.8.0";
+    archiveHash = "sha256-2QocmGRS1+8sjqUTJntfYeXFSEhXfBoV7Htc67I8ED8=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -104,10 +83,10 @@
   }
   {
     imageName = "cloudflare/cloudflared";
-    imageDigest = "sha256:a5b5e6fd9a372f054b9a843c219bfbcdceb54691605312a8b1ee72978bdf1aa1";
+    imageDigest = "sha256:9b49eed8f62806d5d45ddf59ecefb5710429598ea6d3fcccd2af938f621b2b07";
     finalImageName = "docker.io/cloudflare/cloudflared";
-    finalImageTag = "2026.5.1";
-    archiveHash = "sha256-be95hm//BoLg3MfzD1tfWqCZF83U98agiP+Nl9Y2caA=";
+    finalImageTag = "2026.10.0";
+    archiveHash = "sha256-D8se5AoLHhNiFK02M5ks7xhD/mx/7juhfOb1weh8TZ8=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -313,16 +292,16 @@
       ]
     ];
     targets = [
-      { kind = "Deployment"; namespace = "egress-system"; name = "proxy-engine"; }
       { kind = "CronJob"; namespace = "kube-system"; name = "ipv6-pool-reconciler"; }
+      { kind = "StatefulSet"; namespace = "egress-system"; name = "proxy-engine"; }
     ];
   }
   {
     imageName = "docker.io/rancher/local-path-provisioner";
-    imageDigest = "sha256:1eba82e9c386038b4af6d69cca7519fac738c28c42735ed48ce70c882ad0d80f";
+    imageDigest = "sha256:e757967a5ec338f6a9b371c5a9688bedaa8c3578ea3dd4db329ea0084be0a86f";
     finalImageName = "docker.io/rancher/local-path-provisioner";
-    finalImageTag = "v0.0.36";
-    archiveHash = "sha256-7elybhSANToIiMssIKIFXidv1OlZ8o971VDwfNdKe9E=";
+    finalImageTag = "v0.0.37";
+    archiveHash = "sha256-1VMx0LPPFjmlMLITzN8fCSVrqZs98gIDfQ2DP6YA/eM=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -360,11 +339,31 @@
     ];
   }
   {
+    imageName = "docker.io/tencentcom/tencentcloud-cli";
+    imageDigest = "sha256:6f2ac4dda0e903e8ada38b7a0abfaaf7609e99764e7748db0bd2b03e35d147f3";
+    finalImageName = "docker.io/tencentcom/tencentcloud-cli";
+    finalImageTag = "latest";
+    archiveHash = "sha256-+W3xrG36BSyrrEmrOPqMdVFmtECJKD5POxPaQJAAGzA=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "CronJob"; namespace = "prod"; name = "coder-edgeone-certificate"; }
+    ];
+  }
+  {
     imageName = "docker.io/vaultwarden/server";
-    imageDigest = "sha256:ebdfe70701c60ac0c28c697e787cea767d7972940b786037b29fe0d507f821e8";
+    imageDigest = "sha256:1587c45feaa479f1f5e8af3b00eded36bff77bcf1880cf8dbf0541706dd470e0";
     finalImageName = "docker.io/vaultwarden/server";
-    finalImageTag = "1.37.1";
-    archiveHash = "sha256-YiEQlYJchB91JlpcusiQAZmPlHnSIonhPcJQEOyn1Do=";
+    finalImageTag = "1.37.3";
+    archiveHash = "sha256-Eux0fWCsGCdbM0g3B0RjJkj58G2YWUT+Pm50JoSqxuQ=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -382,10 +381,10 @@
   }
   {
     imageName = "ghcr.io/astrbotdevs/shipyard-neo-bay";
-    imageDigest = "sha256:84518bf66f59d7eeb9afb760f79bb149ea6dce87d19d0478e24ce296c725f380";
+    imageDigest = "sha256:4b03c51b77435e600c378f54e08d58f2b66f51397762a05b12d76d8d9547e414";
     finalImageName = "ghcr.io/astrbotdevs/shipyard-neo-bay";
-    finalImageTag = "0.3.1";
-    archiveHash = "sha256-8vqHqtCJ2w1bMJsH8n63A23//BvADHCnkrJu9/eDFmY=";
+    finalImageTag = "0.4.0";
+    archiveHash = "sha256-Xnaw33zywkoGy8E8VwIGvslmHy3OKkIQIGf4OItYTv4=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -402,10 +401,10 @@
   }
   {
     imageName = "ghcr.io/cloudnative-pg/cloudnative-pg";
-    imageDigest = "sha256:0dfff19ba7b52ca25851a1010028b6940fff2e233290465af1cfb08a5f3f4661";
+    imageDigest = "sha256:923c267ec29636db3bee20f993d0ec4973fa22998e1adad37da79e4d32b5bc07";
     finalImageName = "ghcr.io/cloudnative-pg/cloudnative-pg";
-    finalImageTag = "1.29.1";
-    archiveHash = "sha256-xU71L4zdgfcXbZodsYIrYFnoMJxvCWaiZ1gdkEhocS4=";
+    finalImageTag = "1.30.1";
+    archiveHash = "sha256-GNlPjw+imF7qauAkHUDhF80SQ14nzO+NQ0QXBBJu234=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -424,10 +423,10 @@
   }
   {
     imageName = "ghcr.io/cloudnative-pg/plugin-barman-cloud";
-    imageDigest = "sha256:0b9c428123313d93efbec26bdef85e91f2130a7bd8e382a767de12b3938f6271";
+    imageDigest = "sha256:c75acad19a36e8176cfe2885761ff1b836c6ef977d7257e298c99a28b5c302ef";
     finalImageName = "ghcr.io/cloudnative-pg/plugin-barman-cloud";
-    finalImageTag = "v0.12.0";
-    archiveHash = "sha256-W0glk+3dwzIHLJZ9XsIKXr494zBa6O+xZykwLLTKeug=";
+    finalImageTag = "v0.15.1";
+    archiveHash = "sha256-JtbAjTv2ofEoiPnxb9cyFuDtA8sV5JzHg7kU+YiK0WQ=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -445,11 +444,32 @@
     ];
   }
   {
+    imageName = "ghcr.io/coder/coder";
+    imageDigest = "sha256:d28dd95045effa7e5cf55e96896362048be70991393d056e99271397d05f5a80";
+    finalImageName = "ghcr.io/coder/coder";
+    finalImageTag = "v2.34.7";
+    archiveHash = "sha256-TuvixBnDwezUdxVc1PHBU999J4RTFUibBVhRepIV3q8=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "coder"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "coder"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "prod"; name = "coder"; }
+    ];
+  }
+  {
     imageName = "ghcr.io/controlplaneio-fluxcd/flux-operator";
-    imageDigest = "sha256:d7423e1d6b0e206cc5b9758fa8615d7694664ed906c5087f4202eeb14187421a";
+    imageDigest = "sha256:71041d9fff7f7b05f1a8123ebe73c73b7b156f4aacfe1e8e19b5aa953a98892c";
     finalImageName = "ghcr.io/controlplaneio-fluxcd/flux-operator";
-    finalImageTag = "v0.50.0";
-    archiveHash = "sha256-WUndNOtEwGizy/ix1TK2YrJXfGWaOT6eqsDopVyW0u8=";
+    finalImageTag = "v0.61.0";
+    archiveHash = "sha256-mARFT4QhE05as8BSq9IsYTtqHDhppOccmhv0JYKz9bA=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -528,30 +548,11 @@
     ];
   }
   {
-    imageName = "ghcr.io/headlamp-k8s/headlamp-plugin-cert-manager";
-    imageDigest = "sha256:d7d0321a90c0347e2e4f9f7e362ecaa10a36592cc5ac8fd1514df11c476b43fe";
-    finalImageName = "ghcr.io/headlamp-k8s/headlamp-plugin-cert-manager";
-    finalImageTag = "v0.1.0";
-    archiveHash = "sha256-K8fgubGpDrmeagg3nqTUnP9PN0SW77TLN2CcRTyc+m8=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-      ]
-    ];
-    targets = [];
-  }
-  {
     imageName = "ghcr.io/headlamp-k8s/headlamp-plugin-flux";
-    imageDigest = "sha256:055377b9011dcc73235e8969c488ecd92af5cb70aa5d5df0f66c1cea667fdccb";
+    imageDigest = "sha256:636c7a5ae0d4eb196c192f8f1cde06f20f1f5ebdf1863f6e57d22444d8b8360c";
     finalImageName = "ghcr.io/headlamp-k8s/headlamp-plugin-flux";
-    finalImageTag = "v0.6.0";
-    archiveHash = "sha256-4ADArqRNWx9gzmhBa9rpEYTJZJ14rY6N78bAi6wqZ8Y=";
+    finalImageTag = "v0.7.0";
+    archiveHash = "sha256-NFyK91FBfNwjstmo9lf9I1kLUacZ1zmXT8xkvs84u6g=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -567,10 +568,10 @@
   }
   {
     imageName = "ghcr.io/headlamp-k8s/headlamp";
-    imageDigest = "sha256:c9754bae1d799220da0547e51ceee234f6e66ebadc138518ca73e33ecd331e59";
+    imageDigest = "sha256:b491653c1a0d380b70b67a4024f1204591f9c84a68ee567778d53d28b1856168";
     finalImageName = "ghcr.io/headlamp-k8s/headlamp";
-    finalImageTag = "v0.42.0";
-    archiveHash = "sha256-NX0uuwxxZMwBHuJCWDhVvxgV8CO69j5y6ODttDP0vPg=";
+    finalImageTag = "v0.44.0";
+    archiveHash = "sha256-0UdhTpShId1t/kzQ3wCpTa9g2NvSWc3eMo5TC/7d2cM=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -584,6 +585,27 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "prod"; name = "headlamp"; }
+    ];
+  }
+  {
+    imageName = "ghcr.io/isning/cloudflare-operator";
+    imageDigest = "sha256:c04ced87671c54ad2c242d03eaba4d62298ab46bee571c71d5e136d8e192c87b";
+    finalImageName = "ghcr.io/isning/cloudflare-operator";
+    finalImageTag = "sha-123c94c";
+    archiveHash = "sha256-1ZsoezdQwuOaOLAX/kabvk1O/th0Cu0uNGhUm4/boWM=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-networking"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-networking"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "cloudflare-operator-system"; name = "cloudflare-operator-controller-manager"; }
     ];
   }
   {
@@ -606,10 +628,10 @@
   }
   {
     imageName = "ghcr.io/isning/metapi";
-    imageDigest = "sha256:eaa433f15ede608d885d74642fda9c0d539d65146d77906e838fe5ad6da545a3";
+    imageDigest = "sha256:18f0ab7173a197f0fa4d73662121b94098894417d3dbd15ae12afb0c3b22938b";
     finalImageName = "ghcr.io/isning/metapi";
     finalImageTag = "latest";
-    archiveHash = "sha256-ZCyZ3Yhqwi5Wj+lKNg9GqXruKPwjyJ6NNLvZdyZsZ/k=";
+    archiveHash = "sha256-fp+DbodTjFPfwMxlJ4rmXxcbGLUSzl0iUmHGy3pp7xY=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -670,10 +692,10 @@
   }
   {
     imageName = "ghcr.io/naval-group/headlamp-kubevirt";
-    imageDigest = "sha256:7cdff58fdda4f3ad7b7a208b83744ec82648795056cf726f0ce5df2501ee3d14";
+    imageDigest = "sha256:2e2102c52cef9318f15d07718a3ffcac91c54f2a2ef187c498c3f25b56cb657e";
     finalImageName = "ghcr.io/naval-group/headlamp-kubevirt";
-    finalImageTag = "0.2.2";
-    archiveHash = "sha256-kF1hnipCHJmyujf3G8o1q/LtogrPKMDMW5jD1976rKk=";
+    finalImageTag = "0.3.1";
+    archiveHash = "sha256-y12pILMWDHlRa0lSmxYEmiCmBQCVSLMZWNOSr3EzzQE=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -705,7 +727,7 @@
       ]
     ];
     targets = [
-      { kind = "Deployment"; namespace = "egress-system"; name = "proxy-engine"; }
+      { kind = "StatefulSet"; namespace = "egress-system"; name = "proxy-engine"; }
     ];
   }
   {
@@ -726,6 +748,27 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "prod"; name = "speaches"; }
+    ];
+  }
+  {
+    imageName = "ghcr.io/the-ccsn/metacubexd";
+    imageDigest = "sha256:703e33a8d6794db8e7cc4046d5eb4151674db085d9c9414a75f33b2845a980e1";
+    finalImageName = "ghcr.io/the-ccsn/metacubexd";
+    finalImageTag = "sha-81a1be9b191571cf395707b0e705bc28a4acde36";
+    archiveHash = "sha256-JQ21UDP9fNhOmfAIvHEIZA7srEsqykM9INqVkfLyKfk=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "egress-system"; name = "proxy-dashboard"; }
     ];
   }
   {
@@ -806,6 +849,27 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "i-reroute"; name = "i-reroute-proxy"; }
+    ];
+  }
+  {
+    imageName = "node";
+    imageDigest = "sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1";
+    finalImageName = "docker.io/library/node";
+    finalImageTag = "24-alpine";
+    archiveHash = "sha256-PAz8+pQR+T3kZ02JgnhFiY6Qi20LiQPAcGCkKA61Kug=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "prod"; name = "headlamp"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "prod"; name = "headlamp"; }
     ];
   }
   {
@@ -1323,10 +1387,10 @@
   }
   {
     imageName = "soulter/astrbot";
-    imageDigest = "sha256:d26eacf8aba492ae09ef781038ceea08a7c6f3bffbe222dbd8679ce642ed5c5f";
+    imageDigest = "sha256:e51e924d47c5921b9f92afd9c9bb1d459cb5eda33185b494515464f4b051d9bc";
     finalImageName = "docker.io/soulter/astrbot";
-    finalImageTag = "v4.25.1";
-    archiveHash = "sha256-hZLSMXflPYk6asnT7QMfEOMTngH526t2oPJ9EbEBM0g=";
+    finalImageTag = "v4.27.3";
+    archiveHash = "sha256-0gEktCjT8S/5eu4chyGFEhwPlzW4Y3ucFK+jI0IrpgU=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -1339,26 +1403,6 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "prod"; name = "astrbot"; }
-    ];
-  }
-  {
-    imageName = "docker.io/tencentcom/tencentcloud-cli";
-    imageDigest = "sha256:6f2ac4dda0e903e8ada38b7a0abfaaf7609e99764e7748db0bd2b03e35d147f3";
-    finalImageName = "docker.io/tencentcom/tencentcloud-cli";
-    finalImageTag = "latest";
-    archiveHash = "sha256-+W3xrG36BSyrrEmrOPqMdVFmtECJKD5POxPaQJAAGzA=";
-    os = "linux";
-    arch = "amd64";
-    sources = [
-      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-    ];
-    sourceChains = [
-      [
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
-      ]
-    ];
-    targets = [
-      { kind = "CronJob"; namespace = "prod"; name = "coder-edgeone-certificate"; }
     ];
   }
   {
@@ -1381,6 +1425,28 @@
     ];
     targets = [
       { kind = "Deployment"; namespace = "monitoring"; name = "victoria-metrics-k8s-stack-victoria-metrics-operator"; }
+    ];
+  }
+  {
+    imageName = "xpkg.crossplane.io/crossplane/crossplane";
+    imageDigest = "sha256:cfa88491dca479686747ccd0f0d1888ec8a7d1ee34629f19d45f509d6995148b";
+    finalImageName = "xpkg.crossplane.io/crossplane/crossplane";
+    finalImageTag = "v2.4.2";
+    archiveHash = "sha256-CWcxIa9PBFt+gIS/UvdoXhCwrQ/0nYX00n0k/Dh/bsU=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "crossplane-system"; name = "crossplane"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "crossplane-system"; name = "crossplane"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-pre-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "crossplane-system"; name = "crossplane"; }
+      { kind = "Deployment"; namespace = "crossplane-system"; name = "crossplane-rbac-manager"; }
     ];
   }
 ]
