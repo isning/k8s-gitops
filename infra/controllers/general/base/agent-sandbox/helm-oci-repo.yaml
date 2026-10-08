@@ -11,3 +11,4 @@ spec:
   url: oci://ghcr.io/isning/k8s-gitops/charts/agent-sandbox
   ref:
     tag: "1.0.5-repack.1"
+    digest: sha256:6a86bce200e67256bf3f078643ed9cb83da2ec399456478914f59130a342d860

@@ -57,11 +57,13 @@ package version if content changes. Publication pulls the package back and compa
 it byte-for-byte with the local build. The upload artifact contains the package
 and rendered manifests; Helm's log reports the OCI digest.
 
-For the first publication, set the GHCR package visibility to **public** in its
-GitHub package settings, then verify an anonymous `helm pull` succeeds before
-merging the deployment PR. New GHCR packages default to private. Record the OCI
-manifest digest in `helm-oci-repo.yaml` after publication; CI printing a digest
-alone does not pin the deployed source.
+The initial package has been verified by downloading both its OCI manifest and
+chart blob anonymously and comparing the chart bytes with the local build. Its
+manifest digest is pinned in `helm-oci-repo.yaml`:
+`sha256:6a86bce200e67256bf3f078643ed9cb83da2ec399456478914f59130a342d860`.
+For a new registry path, verify anonymous pull before deployment; if the package
+is private, change its visibility to public in GitHub package settings. Record
+the newly published OCI manifest digest in the source manifest before merging.
 
 Local package preparation (requires the pinned upstream checkout):
 
