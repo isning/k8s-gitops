@@ -325,3 +325,5 @@
 - 新增核心 Secret 均 SOPS 加密，用户填写的 Logto M2M 凭据通过 MAC/解密回读校验。
 - 公网管理 API 只读查询返回 HTTP 403，现有资源 ID 未核实；接管层保持暂停。
 - 镜像锁生成支持 `--reuse-locked-images`：保留未变更镜像/tag/platform 的现有 immutable digest/archive hash，明确改变的 manifest digest 不复用。新增/升级的镜像仍正常解析和计算 archive hash。
+
+- 镜像锁已由只读 CI 生成并验证：69 个镜像条目，所有 digest/archive hash 格式校验通过；Crossplane hash 与本地同 digest 的 Docker Hub 独立计算结果一致。生成工作流及全部检查通过：[CI run](https://github.com/isning/k8s-gitops/actions/runs/37763751416)。
