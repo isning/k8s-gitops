@@ -1,10 +1,15 @@
+---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: proxy-engine
   namespace: egress-system
 spec:
+  serviceName: proxy-engine-headless
   replicas: 1
+  minReadySeconds: 10
+  updateStrategy:
+    type: RollingUpdate
   selector:
     matchLabels:
       app: proxy-engine
@@ -12,7 +17,11 @@ spec:
     metadata:
       labels:
         app: proxy-engine
+        istio.io/use-waypoint: none
     spec:
+      serviceAccountName: proxy-engine
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -26,53 +35,79 @@ spec:
         - secretRef:
             name: sub-converter-suburls-secret
         env:
+        - name: POD_IPS
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIPs
         - name: HOME
           value: /tmp
-        command: ["python3", "/scripts/update_sub.py"]
+        command:
+        - python3
+        - /scripts/update_sub.py
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           capabilities:
-            drop: ["ALL"]
+            drop:
+            - ALL
           seccompProfile:
             type: RuntimeDefault
         resources:
-          requests: 
+          requests:
             cpu: 50m
             memory: 32Mi
           limits:
             cpu: 500m
             memory: 64Mi
         volumeMounts:
+        - name: config-main
+          mountPath: /etc/sing-box/main
+          readOnly: true
         - name: script-volume
           mountPath: /scripts
           readOnly: true
-        - name: config-temp
+        - name: nodes-cache
           mountPath: /shared-nodes
+        - name: config-temp
+          mountPath: /runtime-nodes
         - name: tmp
           mountPath: /tmp
       containers:
       - name: sing-box
         image: ghcr.io/sagernet/sing-box:v1.13.12@sha256:da0e2331395c9025a85fa58892772b4cdbe5f2e530e93defeec3968175d06c6d
-        command: 
-        - "sing-box"
-        - "run"
-        - "-D"
-        - "/var/lib/sing-box"
-        - "-c"
-        - "/etc/sing-box/main/main.json"
-        - "-c"
-        - "/etc/sing-box/temp/nodes.json"
+        command:
+        - sing-box
+        - run
+        - -D
+        - /var/lib/sing-box
+        - -c
+        - /etc/sing-box/main/main.json
+        - -c
+        - /etc/sing-box/temp/nodes.json
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -ec
+              - sleep 10
         ports:
         - containerPort: 7890
           name: mixed-proxy
+        - containerPort: 8891
+          name: public-http
+        - containerPort: 8892
+          name: public-v4
+        - containerPort: 8893
+          name: public-v6
         - containerPort: 9090
           name: clash-api
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           capabilities:
-            drop: ["ALL"]
+            drop:
+            - ALL
           seccompProfile:
             type: RuntimeDefault
         livenessProbe:
@@ -93,21 +128,20 @@ spec:
           successThreshold: 1
           failureThreshold: 3
         resources:
-          requests: 
+          requests:
             cpu: 50m
             memory: 32Mi
           limits:
             cpu: 500m
             memory: 64Mi
         volumeMounts:
-        - name: config-main
-          mountPath: /etc/sing-box/main
+        - name: config-temp
+          mountPath: /etc/sing-box/main/main.json
+          subPath: main.json
           readOnly: true
         - name: config-temp
           mountPath: /etc/sing-box/temp
           readOnly: true
-        # This should be considered non-persistent and can be cleared on each restart,
-        # as it's mainly used for caching geoip and geosite data.
         - name: work-cache
           mountPath: /var/lib/sing-box
         - name: tmp
@@ -117,6 +151,9 @@ spec:
         configMap:
           name: sing-box-main-config
       - name: config-temp
+        emptyDir:
+          sizeLimit: 10Mi
+      - name: nodes-cache
         persistentVolumeClaim:
           claimName: nodes-cache
       - name: script-volume
@@ -126,5 +163,103 @@ spec:
         emptyDir:
           sizeLimit: 50Mi
       - name: work-cache
-        persistentVolumeClaim:
-          claimName: proxy-engine-work-cache
+        emptyDir:
+          sizeLimit: 100Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: proxy-dashboard
+  namespace: egress-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: proxy-dashboard
+  namespace: egress-system
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  resourceNames:
+  - proxy-engine
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: proxy-dashboard
+  namespace: egress-system
+subjects:
+- kind: ServiceAccount
+  name: proxy-dashboard
+  namespace: egress-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: proxy-dashboard
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: proxy-engine
+  namespace: egress-system
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-dashboard
+  namespace: egress-system
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: proxy-dashboard
+  template:
+    metadata:
+      labels:
+        app: proxy-dashboard
+        istio.io/use-waypoint: none
+    spec:
+      serviceAccountName: proxy-dashboard
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: webui
+        image: ghcr.io/the-ccsn/metacubexd:sha-81a1be9b191571cf395707b0e705bc28a4acde36@sha256:703e33a8d6794db8e7cc4046d5eb4151674db085d9c9414a75f33b2845a980e1
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: STATEFULSET_NAME
+          value: proxy-engine
+        - name: PUBLIC_ORIGIN
+          value: https://proxy-engine.isning.moe
+        ports:
+        - name: http-webui
+          containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http-webui
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi

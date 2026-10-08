@@ -349,3 +349,8 @@ To prevent damage to the cluster, we have to follow some rules:
 ## LICENSE
 
 [MIT](LICENSE)
+
+Bootstrap and management adoption guides:
+
+- [Flux Operator bootstrap](bootstrap/README.md)
+- [Crossplane management adoption](infra/pre-controllers/base/crossplane/README.md)

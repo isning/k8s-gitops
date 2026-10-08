@@ -1,0 +1,77 @@
+---
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: proxycaches.harbor.isning.moe
+spec:
+  scope: Namespaced
+  group: harbor.isning.moe
+  names:
+    kind: ProxyCache
+    plural: proxycaches
+  defaultCompositionRef:
+    name: harbor-proxy-cache
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - registry
+            properties:
+              providerConfigName:
+                type: string
+                default: isning-harbor
+              resourceManagementPolicies:
+                type: array
+                default:
+                - Observe
+                minItems: 1
+                items:
+                  type: string
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+              registry:
+                type: object
+                required:
+                - name
+                - providerName
+                - endpointUrl
+                properties:
+                  name:
+                    type: string
+                    minLength: 1
+                  providerName:
+                    type: string
+                    minLength: 1
+                  endpointUrl:
+                    type: string
+                    pattern: ^https://
+                  accessId:
+                    type: string
+                  accessSecretRef:
+                    type: object
+                    required:
+                    - name
+                    - key
+                    properties:
+                      name:
+                        type: string
+                      key:
+                        type: string
+                  externalID:
+                    type: string
+              projectID:
+                type: string
+          status:
+            type: object
+            properties:
+              registryId:
+                type: integer

@@ -44,6 +44,9 @@ jobs:
               - 'apps/**'
               - 'vms/**'
               - 'clusters/**'
+              - 'scripts/patch-flux-local.py'
+              - 'scripts/gen-image-lock.py'
+              - 'scripts/tests/**'
             terraform_related:
               - '.github/workflows/**'
               - '**/*.tf'
@@ -59,6 +62,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Test dynamic IPv6 pool reconciliation
         run: python3 -m unittest discover -s infra/pre-controllers/overlays/kubevirt-lab-1/cilium -p 'test_*.py'
+      - name: Setup uv
+        uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+      - name: Test proxy API isolation and cache recovery
+        run: uv run --with pyyaml python -m unittest discover -s scripts/tests -p 'test_*.py'
+
 
   terraform-validate:
     if:  ${{ needs.changes.outputs.terraform_related == 'true' }}
@@ -150,11 +158,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@889be9d6cc8afa8ed639e1e1ba4ab678e3b38d8c # v2.9.4
+        uses: fluxcd/flux2/action@b9c17924adb533d3617ec7de97a7b0f4acc07b39 # v2.9.6
       - name: Setup kustomize
         uses: fluxcd/pkg/actions/kustomize@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+      - name: Checkout pinned flux-local
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: allenporter/flux-local
+          ref: 92d3a538c009c3fec120fbf50f6ef33b3e0a569c # 8.4.0
+          path: .local/flux-local
+      - name: Patch core Secret parsing
+        run: python3 scripts/patch-flux-local.py .local/flux-local
       - name: flux-local test
-        uses: allenporter/flux-local/action/test@92d3a538c009c3fec120fbf50f6ef33b3e0a569c # 8.4.0
+        uses: ./.local/flux-local/action/test
         with:
           path: clusters/${{ matrix.cluster }}
           enable-helm: true
@@ -177,12 +193,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@889be9d6cc8afa8ed639e1e1ba4ab678e3b38d8c # v2.9.4
+        uses: fluxcd/flux2/action@b9c17924adb533d3617ec7de97a7b0f4acc07b39 # v2.9.6
       - name: Setup kustomize
         uses: fluxcd/pkg/actions/kustomize@f3ad4b56adec90eb5661af565cdebec997ad4bfb # main
+      - name: Checkout pinned flux-local
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: allenporter/flux-local
+          ref: 92d3a538c009c3fec120fbf50f6ef33b3e0a569c # 8.4.0
+          path: .local/flux-local
+      - name: Patch core Secret parsing
+        run: python3 scripts/patch-flux-local.py .local/flux-local
       - name: flux-local diff
         id: diff
-        uses: allenporter/flux-local/action/diff@92d3a538c009c3fec120fbf50f6ef33b3e0a569c # 8.4.0
+        uses: ./.local/flux-local/action/diff
         continue-on-error: true
         with:
           live-branch: main
@@ -298,6 +322,7 @@ jobs:
             else:
               total_failed += 1
 
+          diff_budget = 48000 // max(total_changed, 1)
           short_sha = os.environ["GITHUB_SHA"][:7]
           body = "## flux-local diff summary\n"
           body += f"\nCommit: `{short_sha}` | Clusters: {len(grouped)} | Resources: {total_resources}\n"
@@ -331,15 +356,15 @@ jobs:
                 else:
                   body += f"\n<details><summary>Resource `{resource}`: ⚠️ updates detected</summary>\n\n"
                   body += "```diff\n"
-                  body += entry["diff"].rstrip() + "\n"
+                  diff = entry["diff"].rstrip()
+                  body += diff[:diff_budget] + "\n"
+                  if len(diff) > diff_budget:
+                    body += "… truncated; full diff is in the workflow artifacts.\n"
                   body += "```\n\n</details>\n"
 
           run_url = os.environ["RUN_URL"]
           body += f"\n[Open workflow logs]({run_url})\n"
 
-          # Write to both GITHUB_OUTPUT and a file
-          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
-              out.write(f"body<<EOF\n{body}\nEOF\n")
           with open("pr_comment.md", "w", encoding="utf-8") as f:
               f.write(body)
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:

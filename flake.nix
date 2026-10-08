@@ -27,7 +27,23 @@
       };
 
       packages = forAllSystems (pkgs: {
-        gen-image-lock = pkgs.writeShellApplication {
+        gen-image-lock = let
+          fluxLocalSource = pkgs.fetchFromGitHub {
+            owner = "allenporter";
+            repo = "flux-local";
+            rev = "92d3a538c009c3fec120fbf50f6ef33b3e0a569c"; # 8.4.0
+            hash = "sha256-dKU06DyyVk7wjIRSG85/TvLRpi+L/zFimzjpi7Ajjlw=";
+          };
+          patchedFluxLocal = pkgs.runCommand "flux-local-core-kind" {
+            nativeBuildInputs = [ (pkgs.python3.withPackages (p: [ p.build p.setuptools p.wheel ])) ];
+          } ''
+            cp -r ${fluxLocalSource} source
+            chmod -R u+w source
+            python ${./scripts/patch-flux-local.py} source
+            cd source
+            python -m build --wheel --no-isolation --outdir $out
+          '';
+        in pkgs.writeShellApplication {
           name = "gen-image-lock";
           runtimeInputs = with pkgs; [
             kustomize
@@ -41,7 +57,7 @@
             bash
           ];
           text = ''
-            exec uv run ${./scripts/gen-image-lock.py} \
+            exec uv run --with ${patchedFluxLocal}/flux_local-8.4.0-py3-none-any.whl ${./scripts/gen-image-lock.py} \
               --extra-images-annotation image-lock/extra-images \
               "$@"
           '';
