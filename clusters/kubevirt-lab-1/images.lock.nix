@@ -21,10 +21,10 @@
   }
   {
     imageName = "bitnami/kubectl";
-    imageDigest = "sha256:1a86ba502f618724fd493f6a2b129f060454db04f06faa58d8ed94510280b17f";
+    imageDigest = "sha256:999d5eb28f404b45f15117f2a110ff23c6164f76edac261d75d783b6e88252b7";
     finalImageName = "docker.io/bitnami/kubectl";
     finalImageTag = "latest";
-    archiveHash = "sha256-yTSC7f176Sy5fuTdDNg/p8w49sjPW6s7BWdeFuYsZAU=";
+    archiveHash = "sha256-91mUoFhsutpJjZHNyp+ScxbTZQ06MrVHalTFIUL+/co=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -33,7 +33,7 @@
     sourceChains = [
       [
         { kind = "HelmRelease"; namespace = "prod"; name = "logto"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "logto"; }
       ]
     ];
     targets = [
@@ -62,10 +62,10 @@
   }
   {
     imageName = "busybox";
-    imageDigest = "sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616";
+    imageDigest = "sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e";
     finalImageName = "docker.io/library/busybox";
     finalImageTag = "latest";
-    archiveHash = "sha256-8JHl6A6xiGtRTalpNBVAHcEoXQV196ryXb8BPyMRFOo=";
+    archiveHash = "sha256-S7pcixHZLEIqTelFlxB9tiSEXA7f0e3myxdGW8aottg=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -74,7 +74,7 @@
     sourceChains = [
       [
         { kind = "HelmRelease"; namespace = "prod"; name = "logto"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "logto"; }
       ]
     ];
     targets = [
@@ -251,10 +251,10 @@
   }
   {
     imageName = "docker.io/library/alpine";
-    imageDigest = "sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce";
+    imageDigest = "sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8";
     finalImageName = "docker.io/library/alpine";
     finalImageTag = "3.22";
-    archiveHash = "sha256-MSr0Qgn2cQO9gCDnbNBe+sEXNmw85QF886YZZ9rYH6Y=";
+    archiveHash = "sha256-x5XmGbSFw/vD8kUCUV0kVC+IuMv8I4J5SLlGQosI5pE=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -269,6 +269,24 @@
     targets = [
       { kind = "CronJob"; namespace = "unknown ns"; name = "vaultwarden-vaultwarden-backup"; }
     ];
+  }
+  {
+    imageName = "docker.io/library/busybox";
+    imageDigest = "sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e";
+    finalImageName = "docker.io/library/busybox";
+    finalImageTag = "1.37.0";
+    archiveHash = "sha256-DazLrg/s7AZRihGdxdU1NFJqL8fYB0l5g7cwWylbUSM=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "SandboxTemplate"; namespace = "agent-sandbox"; name = "restricted-shell"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
+      ]
+    ];
+    targets = [];
   }
   {
     imageName = "docker.io/library/python";
@@ -478,7 +496,7 @@
     sourceChains = [
       [
         { kind = "HelmRelease"; namespace = "flux-system"; name = "flux-operator"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-pre-controllers"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
       ]
     ];
     targets = [
@@ -682,7 +700,7 @@
     sourceChains = [
       [
         { kind = "HelmRelease"; namespace = "prod"; name = "logto"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "logto"; }
       ]
     ];
     targets = [
@@ -874,10 +892,10 @@
   }
   {
     imageName = "postgres";
-    imageDigest = "sha256:3d0f7584ed7d04e27fa050d6683a74746608faf21f202be78460d679cc56461f";
+    imageDigest = "sha256:f7d23353e1b15400d22ebe31189f4d314b87a4c129cc400c8c2d8d4ca127bf81";
     finalImageName = "docker.io/library/postgres";
     finalImageTag = "15-alpine";
-    archiveHash = "sha256-ApAoUCuMrGfVAZ7+JFW7yOU1+BSQ6BPsJz5qAifGjGQ=";
+    archiveHash = "sha256-7cpQSMWgGBZTgtv4Mkn+hhWV5OCxL8hzph/0yUZp6Jw=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -886,7 +904,7 @@
     sourceChains = [
       [
         { kind = "HelmRelease"; namespace = "prod"; name = "logto"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "logto"; }
       ]
     ];
     targets = [
@@ -1122,8 +1140,8 @@
     sourceChains = [
       [
         { kind = "HelmRelease"; namespace = "kiali-operator"; name = "kiali"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-networking"; }
-        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-identity-consumers"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
       ]
     ];
     targets = [
@@ -1318,6 +1336,28 @@
     ];
     targets = [
       { kind = "DaemonSet"; namespace = "istio-system"; name = "ztunnel"; }
+    ];
+  }
+  {
+    imageName = "registry.k8s.io/agent-sandbox/agent-sandbox-controller";
+    imageDigest = "sha256:28a9cbdbfd6ac0a4e5c7e9261ace1aa30ee2da681cb640dccdfed98e8dd9d98b";
+    finalImageName = "registry.k8s.io/agent-sandbox/agent-sandbox-controller";
+    finalImageTag = "v1.0.5";
+    archiveHash = "sha256-dLRuso0541JS/ibzw9onWfrrGGXIecp5ACwtxG3ohBY=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "HelmRelease"; namespace = "agent-sandbox-system"; name = "agent-sandbox"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "HelmRelease"; namespace = "agent-sandbox-system"; name = "agent-sandbox"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers-general"; }
+        { kind = "Kustomization"; namespace = "flux-system"; name = "infra-controllers"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "agent-sandbox-system"; name = "agent-sandbox-controller"; }
     ];
   }
   {
