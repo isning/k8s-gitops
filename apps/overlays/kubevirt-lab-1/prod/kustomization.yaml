@@ -15,5 +15,6 @@ resources:
 - ./../../../base/siyuan/
 - ./../../../base/vaultwarden/
 - ./../../../base/coder/
+- ./../../../base/paseo/
 patches:
 - path: coder-edgeone-record.yaml
