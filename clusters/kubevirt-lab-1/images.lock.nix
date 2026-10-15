@@ -871,10 +871,10 @@
   }
   {
     imageName = "node";
-    imageDigest = "sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1";
+    imageDigest = "sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f";
     finalImageName = "docker.io/library/node";
     finalImageTag = "24-alpine";
-    archiveHash = "sha256-PAz8+pQR+T3kZ02JgnhFiY6Qi20LiQPAcGCkKA61Kug=";
+    archiveHash = "sha256-31gNcTg5Gbv1AzyNeQCxgNhrwM1CV1ZRYQC2eg1Gfao=";
     os = "linux";
     arch = "amd64";
     sources = [
