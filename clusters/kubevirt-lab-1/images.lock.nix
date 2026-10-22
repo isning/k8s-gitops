@@ -251,10 +251,10 @@
   }
   {
     imageName = "docker.io/library/alpine";
-    imageDigest = "sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8";
+    imageDigest = "sha256:d406446bc05b82480756ce8f1287964d28768c23955fa9480d2a74a2eae7a654";
     finalImageName = "docker.io/library/alpine";
     finalImageTag = "3.22";
-    archiveHash = "sha256-x5XmGbSFw/vD8kUCUV0kVC+IuMv8I4J5SLlGQosI5pE=";
+    archiveHash = "sha256-Ps8Rhb5kGZ9uZ0nWi3JDb28yDcnMDzjOUs/qpuJt1Tc=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -871,10 +871,10 @@
   }
   {
     imageName = "node";
-    imageDigest = "sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f";
+    imageDigest = "sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53";
     finalImageName = "docker.io/library/node";
     finalImageTag = "24-alpine";
-    archiveHash = "sha256-31gNcTg5Gbv1AzyNeQCxgNhrwM1CV1ZRYQC2eg1Gfao=";
+    archiveHash = "sha256-d0HKv1FXCG8l5+ex/uPMFsWw/HA42XP8Vl4YM5cmUno=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -892,10 +892,10 @@
   }
   {
     imageName = "postgres";
-    imageDigest = "sha256:f7d23353e1b15400d22ebe31189f4d314b87a4c129cc400c8c2d8d4ca127bf81";
+    imageDigest = "sha256:d2c2ced0372e855e4c257a9e9b5725f403847c01cfb64facbf2b21dbdadb2d74";
     finalImageName = "docker.io/library/postgres";
     finalImageTag = "15-alpine";
-    archiveHash = "sha256-7cpQSMWgGBZTgtv4Mkn+hhWV5OCxL8hzph/0yUZp6Jw=";
+    archiveHash = "sha256-Kp0mBIED09oV/WkbD9l+ETGa7UL2SPjwjEwuN+JgBog=";
     os = "linux";
     arch = "amd64";
     sources = [
