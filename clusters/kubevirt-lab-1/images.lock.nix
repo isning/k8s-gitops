@@ -62,10 +62,10 @@
   }
   {
     imageName = "busybox";
-    imageDigest = "sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e";
+    imageDigest = "sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4";
     finalImageName = "docker.io/library/busybox";
     finalImageTag = "latest";
-    archiveHash = "sha256-S7pcixHZLEIqTelFlxB9tiSEXA7f0e3myxdGW8aottg=";
+    archiveHash = "sha256-H0PyPdLJbqePcaYzE3qSR73/R155We/TL5+yJaKPXOI=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -272,10 +272,10 @@
   }
   {
     imageName = "docker.io/library/busybox";
-    imageDigest = "sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e";
+    imageDigest = "sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec";
     finalImageName = "docker.io/library/busybox";
     finalImageTag = "1.37.0";
-    archiveHash = "sha256-DazLrg/s7AZRihGdxdU1NFJqL8fYB0l5g7cwWylbUSM=";
+    archiveHash = "sha256-sDNJdhot+lUMvY6y+Xp97AT8PPgorjzM/oiUp+xKfjU=";
     os = "linux";
     arch = "amd64";
     sources = [
@@ -871,10 +871,10 @@
   }
   {
     imageName = "node";
-    imageDigest = "sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53";
+    imageDigest = "sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85";
     finalImageName = "docker.io/library/node";
     finalImageTag = "24-alpine";
-    archiveHash = "sha256-d0HKv1FXCG8l5+ex/uPMFsWw/HA42XP8Vl4YM5cmUno=";
+    archiveHash = "sha256-yeE9yhJWcuoxigZmTNhqjAmQADz7OQ+1olde10ILUrY=";
     os = "linux";
     arch = "amd64";
     sources = [
