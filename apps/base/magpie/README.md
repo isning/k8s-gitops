@@ -1,9 +1,5 @@
 # Magpie
 
-Deployment phase: the new workload is enabled, while the existing Metapi routes
-and replica count remain active. Enable `httproute.yaml` and retire the old
-routes only after Magpie is healthy.
-
 Magpie replaces the Metapi gateway without importing its data. Configure providers,
 models, routing and gateway keys manually in the dashboard after deployment.
 

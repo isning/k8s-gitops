@@ -6,7 +6,10 @@ metadata:
     app: metapi
 spec:
   serviceName: metapi-headless
-  replicas: 1
+  replicas: 0
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   selector:
     matchLabels:
       app: metapi

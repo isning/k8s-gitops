@@ -4,6 +4,7 @@ resources:
   - deployment.yaml
   - pvc.yaml
   - service.yaml
+  - httproute.yaml
   - authz-policy.yaml
   - network-policy.yaml
 configMapGenerator:
