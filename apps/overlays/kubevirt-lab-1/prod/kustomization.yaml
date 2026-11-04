@@ -30,3 +30,14 @@ patchesJson6902:
       path: /spec/selector/matchLabels
       value:
         app: magpie
+# Gateway Pods are managed by the infrastructure overlay and have no app env label.
+- target:
+    group: networking.k8s.io
+    version: v1
+    kind: NetworkPolicy
+    name: magpie-ingress
+  patch: |-
+    - op: replace
+      path: /spec/ingress/0/from/0/podSelector/matchLabels
+      value:
+        gateway.networking.k8s.io/gateway-name: default-gateway

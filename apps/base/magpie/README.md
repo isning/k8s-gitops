@@ -19,7 +19,10 @@ injects the matching cookie after gateway OAuth authentication. Users neither
 enter nor manage that key. The sidecar hides upstream sign-in cookies, rejects
 Web key sign-in requests and requires the dashboard Origin for mutations, since
 injecting the cookie would otherwise remove the application's CSRF protection.
-The ingress NetworkPolicy permits only the production gateway to reach the Pod.
+The ingress NetworkPolicy permits only the production gateway to reach the Pod,
+including ambient HBONE traffic on port 15008. The production overlay keeps the
+gateway source selector free of application environment labels, because gateway
+Pods belong to the infrastructure overlay.
 The API listener continues to require a Magpie gateway key; proxy trust is not
 enabled. The ephemeral Web key changes when the Pod is replaced.
 
