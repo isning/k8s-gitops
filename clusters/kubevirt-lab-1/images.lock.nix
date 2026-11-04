@@ -790,6 +790,26 @@
     ];
   }
   {
+    imageName = "ghcr.io/yetone/magpie";
+    imageDigest = "sha256:6b6638b8b1b7f906d445488877d8cc38630b779a63d7b4a0353bf9805dbe5a21";
+    finalImageName = "ghcr.io/yetone/magpie";
+    finalImageTag = "latest";
+    archiveHash = "sha256-rkpbo1IZWYG6pXEBSMeM4q8JyZDXCCodGkvpKuwb7WE=";
+    os = "linux";
+    arch = "amd64";
+    sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+    ];
+    sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
+    ];
+    targets = [
+      { kind = "Deployment"; namespace = "prod"; name = "magpie"; }
+    ];
+  }
+  {
     imageName = "mendhak/http-https-echo";
     imageDigest = "sha256:d072446da821a767d05dc19fa5ab6a27b1150bfb5c6ecfaecf3a2e5f9812794c";
     finalImageName = "docker.io/mendhak/http-https-echo";
@@ -858,15 +878,20 @@
     os = "linux";
     arch = "amd64";
     sources = [
+      { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
       { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
     ];
     sourceChains = [
+      [
+        { kind = "Kustomization"; namespace = "flux-system"; name = "apps"; }
+      ]
       [
         { kind = "Kustomization"; namespace = "flux-system"; name = "infra-configs"; }
       ]
     ];
     targets = [
       { kind = "Deployment"; namespace = "i-reroute"; name = "i-reroute-proxy"; }
+      { kind = "Deployment"; namespace = "prod"; name = "magpie"; }
     ];
   }
   {
