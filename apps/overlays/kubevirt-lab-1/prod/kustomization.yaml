@@ -11,9 +11,22 @@ resources:
 - ./../../../base/astrbot/
 - ./../../../base/oauth2-proxy/
 - ./../../../base/metapi/
+- ./../../../base/magpie/
 - ./../../../base/speaches/
 - ./../../../base/siyuan/
 - ./../../../base/vaultwarden/
 - ./../../../base/coder/
 patches:
 - path: coder-edgeone-record.yaml
+# Keep the bootstrapped Magpie Deployment selector stable when adding env labels.
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: magpie
+  patch: |-
+    - op: replace
+      path: /spec/selector/matchLabels
+      value:
+        app: magpie

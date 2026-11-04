@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magpie
+  labels:
+    app: magpie
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: magpie
+  template:
+    metadata:
+      labels:
+        app: magpie
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: web-auth
+          image: ghcr.io/yetone/magpie:latest@sha256:6b6638b8b1b7f906d445488877d8cc38630b779a63d7b4a0353bf9805dbe5a21
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              umask 077
+              od -An -N32 -tx1 /dev/urandom | tr -d ' \n' > /run/magpie-auth/key
+              test "$(wc -c < /run/magpie-auth/key)" -eq 64
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: web-auth
+              mountPath: /run/magpie-auth
+      containers:
+        - name: magpie
+          image: ghcr.io/yetone/magpie:latest@sha256:6b6638b8b1b7f906d445488877d8cc38630b779a63d7b4a0353bf9805dbe5a21
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              export MAGPIE_WEB_KEY="$(cat /run/magpie-auth/key)"
+              exec /magpie web --addr 127.0.0.1:3430 --no-open --gateway
+          ports:
+            - name: api
+              containerPort: 3425
+          env:
+            - name: MAGPIE_ADDR
+              value: 0.0.0.0:3425
+            - name: MAGPIE_PUBLIC_URL
+              value: https://llm.isning.moe
+            - name: MAGPIE_WEB_URL
+              value: https://llm-dash.isning.moe
+            - name: TZ
+              value: Asia/Shanghai
+          startupProbe:
+            exec:
+              command: ["/magpie", "healthcheck"]
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: ["/magpie", "healthcheck"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["/magpie", "healthcheck"]
+            periodSeconds: 30
+            timeoutSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: web-auth
+              mountPath: /run/magpie-auth
+              readOnly: true
+            - name: magpie-tmp
+              mountPath: /tmp
+        - name: web-proxy
+          image: nginx:stable-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              umask 077
+              export MAGPIE_INTERNAL_WEB_KEY="$(cat /run/magpie-auth/key)"
+              envsubst '$MAGPIE_INTERNAL_WEB_KEY' < /etc/magpie-proxy/nginx.conf > /tmp/nginx.conf
+              unset MAGPIE_INTERNAL_WEB_KEY
+              exec nginx -c /tmp/nginx.conf -g 'daemon off;'
+          ports:
+            - name: web
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: web
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: web
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+          volumeMounts:
+            - name: web-proxy-config
+              mountPath: /etc/magpie-proxy
+              readOnly: true
+            - name: web-auth
+              mountPath: /run/magpie-auth
+              readOnly: true
+            - name: proxy-tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: magpie-config
+        - name: web-auth
+          emptyDir:
+            medium: Memory
+        - name: web-proxy-config
+          configMap:
+            name: magpie-web-proxy
+        - name: magpie-tmp
+          emptyDir: {}
+        - name: proxy-tmp
+          emptyDir:
+            medium: Memory
