@@ -16,6 +16,7 @@ resources:
 - ./../../../base/siyuan/
 - ./../../../base/vaultwarden/
 - ./../../../base/coder/
+- ./../../../base/paseo/
 patches:
 - path: coder-edgeone-record.yaml
 # Keep the bootstrapped Magpie Deployment selector stable when adding env labels.

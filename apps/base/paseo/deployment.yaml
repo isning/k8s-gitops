@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paseo
+  labels:
+    app: paseo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: paseo
+  template:
+    metadata:
+      labels:
+        app: paseo
+    spec:
+      runtimeClassName: gvisor
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: install-agent-clis
+          image: ghcr.io/getpaseo/paseo:0.11.1@sha256:664a58a73cac82448b3c72558129534e3be52a18b5f4e801ae446f646bb5d8c1
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              npm install --global --prefix /opt/agents --no-audit --no-fund \
+                @openai/codex@0.161.0 \
+                @anthropic-ai/claude-code@2.1.294 \
+                @earendil-works/pi-coding-agent@1.1.0
+              /opt/agents/bin/codex --version
+              /opt/agents/bin/claude --version
+              /opt/agents/bin/pi --version
+          env:
+            - name: NPM_CONFIG_CACHE
+              value: /home/paseo/.cache/npm
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          volumeMounts:
+            - name: home
+              mountPath: /home/paseo
+            - name: agent-clis
+              mountPath: /opt/agents
+            - name: tmp
+              mountPath: /tmp
+      containers:
+        - name: paseo
+          image: ghcr.io/getpaseo/paseo:0.11.1@sha256:664a58a73cac82448b3c72558129534e3be52a18b5f4e801ae446f646bb5d8c1
+          ports:
+            - name: http
+              containerPort: 6767
+          env:
+            - name: PATH
+              value: /opt/agents/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            - name: PASEO_HOSTNAMES
+              value: paseo.isning.moe
+            - name: PASEO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: paseo-secret
+                  key: PASEO_PASSWORD
+            - name: TZ
+              value: Asia/Shanghai
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          volumeMounts:
+            - name: home
+              mountPath: /home/paseo
+            - name: workspace
+              mountPath: /workspace
+            - name: agent-clis
+              mountPath: /opt/agents
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: paseo-home
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: paseo-workspace
+        - name: agent-clis
+          emptyDir:
+            sizeLimit: 2Gi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paseo
+  labels:
+    app: paseo
+spec:
+  selector:
+    app: paseo
+  ports:
+    - name: http
+      port: 6767
+      targetPort: http
