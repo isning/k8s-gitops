@@ -251,10 +251,10 @@
   }
   {
     imageName = "docker.io/library/alpine";
-    imageDigest = "sha256:bfe7ceb9f09ec0566c48fb93356e45a47a00be5a1dd14fa5b909e7709c66b034";
+    imageDigest = "sha256:49340b346798875b5592e5d420241f2f9cfba5f47e62ebb1446a1b34734e898f";
     finalImageName = "docker.io/library/alpine";
     finalImageTag = "3.22";
-    archiveHash = "sha256-WLwq2Qrd4SVaIKoPDwhO0UN9Q3TZQ4KYot0ZE/YzIbw=";
+    archiveHash = "sha256-J0WEi8bfOUP604T0UfFVxvZtf6e10NFc/fJiUjN0rsk=";
     os = "linux";
     arch = "amd64";
     sources = [
